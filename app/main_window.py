@@ -331,7 +331,28 @@ class MainWindow(QMainWindow):
                 # Clear existing items
                 self.recent_activity_list.clear()
 
-                # 1. Add active tasks first
+                all_items = []
+
+                # 1. Get recent activity from database (processed screenshots)
+                db_activities = []
+                if getattr(self, "recent_activity_limit", 0) > 0:
+                    db_activities = self.db.get_recent_activity(
+                        limit=self.recent_activity_limit
+                    )
+                
+                # DB activities come newest first from SQL, so reverse them for bottom-newest
+                for activity in reversed(db_activities):
+                    item_text = f"{activity['timestamp']} - {activity['description']}"
+                    all_items.append({"text": item_text, "color": None})
+
+                # 2. Add session status messages
+                session_msgs = list(getattr(self, "recent_activity_messages", []))
+                # session_msgs are in chronological order, so just append
+                for entry in session_msgs:
+                    item_text = f"{entry['timestamp']} - {entry['description']}"
+                    all_items.append({"text": item_text, "color": None})
+
+                # 3. Add active tasks last (so they are at the bottom)
                 active_tasks = [
                     t
                     for t in self.processing_tasks
@@ -344,40 +365,23 @@ class MainWindow(QMainWindow):
                     item_text = (
                         f"[{task['status']}] {task['description']}{progress_text}"
                     )
-                    item = self.recent_activity_list.addItem(item_text)
-                    # Color active tasks
-                    last_item = self.recent_activity_list.item(
-                        self.recent_activity_list.count() - 1
-                    )
-                    if task["status"] == "Running":
-                        last_item.setForeground(Qt.GlobalColor.blue)
-                    else:
-                        last_item.setForeground(Qt.GlobalColor.darkYellow)
+                    color = Qt.GlobalColor.blue if task["status"] == "Running" else Qt.GlobalColor.darkYellow
+                    all_items.append({"text": item_text, "color": color})
 
-                # 2. Add session status messages (newest first)
-                session_msgs = list(getattr(self, "recent_activity_messages", []))
-                if session_msgs:
-                    # Show newest first
-                    for entry in reversed(session_msgs):
-                        item_text = f"{entry['timestamp']} - {entry['description']}"
-                        self.recent_activity_list.addItem(item_text)
-
-                # 3. Get recent activity from database (processed screenshots)
-                db_activities = []
-                if getattr(self, "recent_activity_limit", 0) > 0:
-                    db_activities = self.db.get_recent_activity(
-                        limit=self.recent_activity_limit
-                    )
-
-                if db_activities:
-                    for activity in db_activities:
-                        item_text = (
-                            f"{activity['timestamp']} - {activity['description']}"
+                # Add all to list
+                for item_data in all_items:
+                    self.recent_activity_list.addItem(item_data["text"])
+                    if item_data["color"]:
+                        last_item = self.recent_activity_list.item(
+                            self.recent_activity_list.count() - 1
                         )
-                        self.recent_activity_list.addItem(item_text)
+                        last_item.setForeground(item_data["color"])
 
-                if not active_tasks and not session_msgs and not db_activities:
+                if not all_items:
                     self.recent_activity_list.addItem("No recent activity")
+                else:
+                    # Scroll to bottom to show newest entries
+                    self.recent_activity_list.scrollToBottom()
 
         except Exception as e:
             logger.error(f"Error updating recent activity: {e}")
@@ -1085,8 +1089,9 @@ class MainWindow(QMainWindow):
                 and self.recent_activity_list is not None
             ):
                 display_text = f"{timestamp} - {message}"
-                # Insert at the top for immediacy without re-querying the DB
-                self.recent_activity_list.insertItem(0, display_text)
+                # Append to the bottom for chronological order
+                self.recent_activity_list.addItem(display_text)
+                self.recent_activity_list.scrollToBottom()
         except Exception as e:
             # Never let activity logging break UI status updates
             logger.debug(f"Failed to add status to Recent Activity: {e}")
@@ -1398,6 +1403,29 @@ class MainWindow(QMainWindow):
     def _on_process_screenshots(self):
         """Handle Process Screenshots action"""
         print("Process Screenshots action triggered")
+
+        # Check if cards are loaded first
+        try:
+            if hasattr(self, "db") and self.db:
+                unique_cards = self.db.get_unique_cards_count()
+                if unique_cards == 0:
+                    from PyQt6.QtWidgets import QMessageBox
+                    QMessageBox.warning(
+                        self,
+                        "Missing Card Database",
+                        "No cards found in database. Please import a CSV file first (File -> Import CSV) "
+                        "before processing screenshots."
+                    )
+                    self._update_status_message("Aborted screenshot processing: No cards in database")
+                    return
+            else:
+                self._update_status_message("Database not available")
+                return
+        except Exception as e:
+            logger.error(f"Error checking card count: {e}")
+            # Continue anyway? Or abort? Aborting is safer.
+            self._update_status_message(f"Error checking card count: {e}")
+            return
 
         try:
             # Get initial directory from settings
