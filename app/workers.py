@@ -395,7 +395,7 @@ class ScreenshotProcessingWorker(QRunnable):
                 else:
                     raise ValueError("No image files found in directory")
 
-            self.signals.status.emit(f"Found {total_files} images to process")
+            self.signals.status.emit(f"Found {total_files} images to process. Loading workers...")
 
             # Initialize image processor
             from app.image_processing import ImageProcessor
