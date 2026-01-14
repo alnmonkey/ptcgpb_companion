@@ -231,7 +231,13 @@ class ImageProcessor:
             # Detect card positions using fixed layout
             card_positions = self._detect_card_positions(screenshot)
 
-            logger.info(f"Detected {len(card_positions)} card positions")
+            num_cards = len(card_positions)
+            logger.info(f"Detected {num_cards} card positions")
+
+            # If 4 cards, it's always A4b / Deluxe Pack Ex
+            forced_set = "A4b" if num_cards == 4 else None
+            if forced_set:
+                logger.info(f"Four-card pack detected, forcing set to {forced_set}")
 
             # Stage 1: Initial identification for all cards
             initial_results = []
@@ -240,7 +246,7 @@ class ImageProcessor:
             for i, (x, y, w, h) in enumerate(card_positions):
                 logger.info(f"Initial scan: card {i+1} at position ({x}, {y})")
                 card_region = screenshot[y : y + h, x : x + w]
-                best_match = self._find_best_card_match(card_region)
+                best_match = self._find_best_card_match(card_region, force_set=forced_set)
 
                 initial_results.append(
                     {
@@ -260,8 +266,8 @@ class ImageProcessor:
                     set_counts[card_set] = set_counts.get(card_set, 0) + 1
 
             # Determine majority set
-            majority_set = None
-            if set_counts:
+            majority_set = forced_set
+            if not majority_set and set_counts:
                 majority_set = max(set_counts.items(), key=lambda x: x[1])[0]
                 logger.info(f"Majority set identified: {majority_set}")
 
