@@ -77,6 +77,9 @@ class MainWindow(QMainWindow):
         # Initialize settings
         self.settings = PortableSettings()
 
+        # Track combined import flow state
+        self._combined_import_request = None
+
         # Initialize core non-UI components first
         self._init_database()
         self._init_thread_pool()
@@ -93,6 +96,9 @@ class MainWindow(QMainWindow):
         self._setup_status_bar()  # Initialize status bar early so it can be used by other setup methods
         self._setup_menu_bar()
         self._setup_central_widget()
+
+        # Set initial state for combined import availability
+        self._update_load_new_data_availability()
 
         # Ensure card art templates are available
         self._start_art_download_if_needed()
@@ -241,6 +247,12 @@ class MainWindow(QMainWindow):
         process_action.triggered.connect(self._on_process_screenshots)
         file_menu.addAction(process_action)
 
+        # Combined import action
+        self.load_new_data_action = QAction("&Load New Data", self)
+        self.load_new_data_action.triggered.connect(self._on_load_new_data)
+        self.load_new_data_action.setEnabled(False)
+        file_menu.addAction(self.load_new_data_action)
+
         # Exit action
         exit_action = QAction("E&xit", self)
         exit_action.setShortcut("Ctrl+Q")
@@ -313,13 +325,17 @@ class MainWindow(QMainWindow):
         # Quick actions section
         actions_layout = QHBoxLayout()
 
-        quick_import_btn = QPushButton("Import CSV")
-        quick_import_btn.clicked.connect(self._on_import_csv)
-        actions_layout.addWidget(quick_import_btn)
+        self.import_csv_btn = QPushButton("Import CSV")
+        self.import_csv_btn.clicked.connect(self._on_import_csv)
+        actions_layout.addWidget(self.import_csv_btn)
 
-        load_screenshots_btn = QPushButton("Load Screenshots")
-        load_screenshots_btn.clicked.connect(self._on_process_screenshots)
-        actions_layout.addWidget(load_screenshots_btn)
+        self.import_screenshots_btn = QPushButton("Load Screenshots")
+        self.import_screenshots_btn.clicked.connect(self._on_process_screenshots)
+        actions_layout.addWidget(self.import_screenshots_btn)
+
+        self.load_new_data_btn = QPushButton("Load New Data")
+        self.load_new_data_btn.clicked.connect(self._on_load_new_data)
+        actions_layout.addWidget(self.load_new_data_btn)
 
         dashboard_layout.addLayout(actions_layout)
 
@@ -397,7 +413,7 @@ class MainWindow(QMainWindow):
                     db_activities = self.db.get_recent_activity(
                         limit=self.recent_activity_limit
                     )
-                
+
                 # DB activities come newest first from SQL, so reverse them for bottom-newest
                 for activity in reversed(db_activities):
                     item_text = f"{activity['timestamp']} - {activity['description']}"
@@ -1304,6 +1320,74 @@ class MainWindow(QMainWindow):
         self.status_progress.setVisible(False)
         self.status_progress.setValue(0)
 
+    def _get_saved_paths(self):
+        """Retrieve saved CSV and screenshot paths from settings"""
+        csv_path = self.settings.get_setting("csv_import_path", "")
+        screenshots_dir = self.settings.get_setting("screenshots_dir", "")
+        return csv_path, screenshots_dir
+
+    def _update_load_new_data_availability(self):
+        """Show or hide the combined import controls based on saved paths"""
+        csv_path, screenshots_dir = self._get_saved_paths()
+        available = (
+            bool(csv_path)
+            and os.path.isfile(csv_path)
+            and bool(screenshots_dir)
+            and os.path.isdir(screenshots_dir)
+        )
+
+        if hasattr(self, "load_new_data_btn"):
+            self.load_new_data_btn.setVisible(available)
+            self.load_new_data_btn.setEnabled(available)
+            self.import_csv_btn.setVisible(not available)
+            self.import_screenshots_btn.setVisible(not available)
+
+        if hasattr(self, "load_new_data_action"):
+            self.load_new_data_action.setEnabled(available)
+            # Keep action visible in menu for discoverability
+            self.load_new_data_action.setVisible(True)
+
+    def _on_load_new_data(self):
+        """Run the combined CSV + screenshot import using saved paths"""
+        if self._combined_import_request:
+            QMessageBox.information(
+                self,
+                "Load New Data",
+                "A data import is already in progress. Please wait for it to finish.",
+            )
+            return
+
+        csv_path, screenshots_dir = self._get_saved_paths()
+
+        issues = []
+        if not csv_path:
+            issues.append("CSV file path is not set.")
+        elif not os.path.isfile(csv_path):
+            issues.append(f"CSV file not found: {csv_path}")
+
+        if not screenshots_dir:
+            issues.append("Screenshots directory is not set.")
+        elif not os.path.isdir(screenshots_dir):
+            issues.append(f"Screenshots directory not found: {screenshots_dir}")
+
+        if issues:
+            QMessageBox.warning(
+                self,
+                "Load New Data",
+                "\n".join(issues)
+                + "\n\nPlease use the Import CSV or Process Screenshots options to set the correct locations.",
+            )
+            self._update_load_new_data_availability()
+            return
+
+        self._combined_import_request = {
+            "csv_path": csv_path,
+            "screenshots_dir": screenshots_dir,
+        }
+
+        self._update_status_message("Starting data import…")
+        self._on_csv_imported(csv_path, combined=True)
+
     def _on_import_csv(self):
         """Handle Import CSV action"""
         print("Import CSV action triggered")
@@ -1323,11 +1407,14 @@ class MainWindow(QMainWindow):
             else:
                 self._update_status_message("CSV import cancelled")
 
+            # Update combined import availability after any dialog interaction
+            self._update_load_new_data_availability()
+
         except Exception as e:
             print(f"Error importing CSV: {e}")
             self._update_status_message(f"Error importing CSV: {e}")
 
-    def _on_csv_imported(self, file_path: str):
+    def _on_csv_imported(self, file_path: str, combined: bool = False):
         """Handle successful CSV import - start background processing"""
         print(f"Starting background CSV import from: {file_path}")
         self._update_status_message(f"Starting background CSV import...")
@@ -1342,6 +1429,9 @@ class MainWindow(QMainWindow):
             self._add_processing_task(
                 task_id, f"CSV Import: {os.path.basename(file_path)}"
             )
+
+            if combined and self._combined_import_request is not None:
+                self._combined_import_request["csv_task_id"] = task_id
 
             # Create worker for CSV import
             worker = CSVImportWorker(
@@ -1409,6 +1499,14 @@ class MainWindow(QMainWindow):
         if task_id:
             self._update_task_status(task_id, "Completed")
 
+        # If part of a combined flow, continue with screenshot processing
+        if (
+            self._combined_import_request
+            and self._combined_import_request.get("csv_task_id") == task_id
+        ):
+            self._update_status_message("Starting screenshot processing from saved directory…")
+            self._start_combined_screenshot_step()
+
     def _on_csv_import_error(self, error: str, task_id: str = None):
         """Handle CSV import errors"""
         print(f"CSV import error: {error}")
@@ -1416,6 +1514,16 @@ class MainWindow(QMainWindow):
 
         if task_id:
             self._update_task_status(task_id, "Failed", error=error)
+
+        if (
+            self._combined_import_request
+            and self._combined_import_request.get("csv_task_id") == task_id
+        ):
+            self._update_status_message(
+                "Combined import stopped due to CSV import error."
+            )
+            self._combined_import_request = None
+            self._update_load_new_data_availability()
 
     def _on_csv_import_finished(self, worker=None):
         """Handle CSV import completion"""
@@ -1433,6 +1541,24 @@ class MainWindow(QMainWindow):
 
         # Clear progress indicators
         self._clear_progress()
+
+    def _start_combined_screenshot_step(self):
+        """Start screenshot processing for a combined import flow"""
+        if not self._combined_import_request:
+            return
+
+        screenshots_dir = self._combined_import_request.get("screenshots_dir")
+
+        if not screenshots_dir or not os.path.isdir(screenshots_dir):
+            self._update_status_message(
+                "Combined import stopped: saved screenshots directory is unavailable."
+            )
+            self._combined_import_request = None
+            self._update_load_new_data_availability()
+            return
+
+        self._combined_import_request["status"] = "screenshots"
+        self._on_processing_started(screenshots_dir, overwrite=False)
 
     def _on_screenshot_processing_progress(
         self, current: int, total: int, task_id: str = None
@@ -1468,6 +1594,14 @@ class MainWindow(QMainWindow):
         if task_id:
             self._update_task_status(task_id, "Completed")
 
+        if (
+            self._combined_import_request
+            and self._combined_import_request.get("screenshot_task_id") == task_id
+        ):
+            self._update_status_message("Data import finished!")
+            self._combined_import_request = None
+            self._update_load_new_data_availability()
+
     def _on_screenshot_processing_error(self, error: str, task_id: str = None):
         """Handle screenshot processing errors"""
         print(f"Screenshot processing error: {error}")
@@ -1475,6 +1609,16 @@ class MainWindow(QMainWindow):
 
         if task_id:
             self._update_task_status(task_id, "Failed", error=error)
+
+        if (
+            self._combined_import_request
+            and self._combined_import_request.get("screenshot_task_id") == task_id
+        ):
+            self._update_status_message(
+                "Combined import stopped due to screenshot processing error."
+            )
+            self._combined_import_request = None
+            self._update_load_new_data_availability()
 
     def _on_screenshot_processing_finished(self, worker=None):
         """Handle screenshot processing completion"""
@@ -1492,6 +1636,14 @@ class MainWindow(QMainWindow):
 
         # Clear progress indicators
         self._clear_progress()
+
+        if (
+            self._combined_import_request
+            and self._combined_import_request.get("screenshot_task_id")
+        ):
+            # Leave status message from result/error; just clear state here
+            self._combined_import_request = None
+            self._update_load_new_data_availability()
 
     def _on_process_screenshots(self):
         """Handle Process Screenshots action"""
@@ -1535,6 +1687,9 @@ class MainWindow(QMainWindow):
             else:
                 self._update_status_message("Screenshot processing cancelled")
 
+            # Update combined import availability after any dialog interaction
+            self._update_load_new_data_availability()
+
         except Exception as e:
             print(f"Error processing screenshots: {e}")
             self._update_status_message(f"Error processing screenshots: {e}")
@@ -1556,6 +1711,13 @@ class MainWindow(QMainWindow):
             self._add_processing_task(
                 task_id, f"Screenshot Processing: {os.path.basename(directory_path)}"
             )
+
+            if (
+                self._combined_import_request
+                and self._combined_import_request.get("screenshots_dir")
+                == directory_path
+            ):
+                self._combined_import_request["screenshot_task_id"] = task_id
 
             # Create worker for screenshot processing
             worker = ScreenshotProcessingWorker(
@@ -1660,13 +1822,34 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         """Handle window close event"""
         print("Closing application...")
+        try:
+            # Request cancellation on any active workers
+            for worker in getattr(self, "active_workers", []):
+                cancel = getattr(worker, "cancel", None)
+                if callable(cancel):
+                    try:
+                        cancel()
+                    except Exception:
+                        # Ignore failures during shutdown
+                        pass
 
-        # Clean up database connections
-        if hasattr(self, "db"):
-            self.db.close()
-            print("Database connections closed")
+            # Wait briefly for workers to finish
+            if hasattr(self, "thread_pool"):
+                try:
+                    self.thread_pool.clear()
+                except Exception:
+                    pass
+                try:
+                    self.thread_pool.waitForDone(3000)
+                except Exception:
+                    pass
 
-        event.accept()
+            # Clean up database connections
+            if hasattr(self, "db"):
+                self.db.close()
+                print("Database connections closed")
+        finally:
+            event.accept()
 
     def _get_display_name_and_rarity(self, card_code, raw_name, raw_rarity):
         """
