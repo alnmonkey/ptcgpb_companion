@@ -1431,7 +1431,7 @@ class MainWindow(QMainWindow):
         self.status_progress.setVisible(False)
         self.status_progress.setValue(0)
 
-    def _get_saved_paths(self):
+    def _get_saved_paths(self) -> tuple[str, str]:
         """Retrieve saved CSV and screenshot paths from settings"""
         csv_path = self.settings.get_setting("General/csv_import_path", "")
         screenshots_dir = self.settings.get_setting("General/screenshots_dir", "")
@@ -2062,6 +2062,10 @@ class MainWindow(QMainWindow):
         self._watchdog_handler.has_changes = False
 
         # Trigger combined import (CSV + screenshots)
+        csv_path, screenshot_path = self._get_saved_paths()
+        if not csv_path or not screenshot_path:
+            logger.warning("No CSV or screenshots directory found. Skipping import.")
+            return
         self._on_load_new_data()
 
     def closeEvent(self, event):
