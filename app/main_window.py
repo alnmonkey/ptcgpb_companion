@@ -1061,7 +1061,14 @@ class MainWindow(QMainWindow):
             current_rarity = self.rarity_filter.currentText()
             self.rarity_filter.clear()
             self.rarity_filter.addItem("All Rarities")
-            for rarity in sorted(rarities):
+            
+            # Sort rarities according to the order in RARITY_MAP
+            rarity_order = list(RARITY_MAP.values())
+            sorted_rarities = sorted(
+                rarities,
+                key=lambda r: rarity_order.index(r) if r in rarity_order else 999
+            )
+            for rarity in sorted_rarities:
                 self.rarity_filter.addItem(rarity)
 
             # Restore previous selection if possible
