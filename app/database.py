@@ -137,6 +137,18 @@ class Database:
                 "CREATE INDEX IF NOT EXISTS idx_screenshots_clean_filename ON screenshots(clean_filename)"
             )
             cursor.execute(
+                "CREATE INDEX IF NOT EXISTS idx_screenshots_original_filename ON screenshots(original_filename)"
+            )
+            cursor.execute(
+                "CREATE INDEX IF NOT EXISTS idx_screenshots_account ON screenshots(account)"
+            )
+            cursor.execute(
+                "CREATE INDEX IF NOT EXISTS idx_screenshots_timestamp ON screenshots(timestamp)"
+            )
+            cursor.execute(
+                "CREATE INDEX IF NOT EXISTS idx_screenshots_processed ON screenshots(processed)"
+            )
+            cursor.execute(
                 "CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(card_name)"
             )
             cursor.execute(
@@ -164,7 +176,10 @@ class Database:
 
             # Create index for screenshot_cards table
             cursor.execute(
-                "CREATE INDEX IF NOT EXISTS idx_screenshot_cards ON screenshot_cards(screenshot_id, card_id)"
+                "CREATE INDEX IF NOT EXISTS idx_screenshot_cards_screenshot_id ON screenshot_cards(screenshot_id)"
+            )
+            cursor.execute(
+                "CREATE INDEX IF NOT EXISTS idx_screenshot_cards_card_id ON screenshot_cards(card_id)"
             )
 
             conn.commit()

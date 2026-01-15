@@ -57,7 +57,7 @@ class CSVImportWorker(QRunnable):
             if not os.path.exists(self.file_path):
                 raise FileNotFoundError(f"CSV file not found: {self.file_path}")
 
-            # Read all rows into memory for parallel processing
+            # Read all rows into memory
             rows = []
             try:
                 with open(self.file_path, "r", encoding="utf-8") as f:
@@ -72,75 +72,54 @@ class CSVImportWorker(QRunnable):
                 self.signals.result.emit({"total_rows": 0, "new_rows": 0})
                 return
 
-            from concurrent.futures import ThreadPoolExecutor, as_completed
             from app.database import Database
 
-            # Determine number of workers - balance between speed and system load
-            max_workers = get_max_thread_count()
             processed_count = 0
             new_records = 0
 
-            self.signals.status.emit(
-                f"Importing {total_rows} rows in parallel using {max_workers} threads..."
-            )
+            self.signals.status.emit(f"Importing {total_rows} rows...")
 
-            # Initialize database once (thread-local connections will be created as needed)
+            # Initialize database once
             db = Database(self.db_path)
 
-            def process_row(row):
-                """Helper function to process a single CSV row in a thread"""
-                if self._is_cancelled:
-                    return False
-
-                # Use CleanFilename as the Account
-                if "CleanFilename" in row and row["CleanFilename"]:
-                    row["Account"] = row["CleanFilename"]
-                elif "DeviceAccount" in row and row["DeviceAccount"]:
-                    row["Account"] = row["DeviceAccount"]
-                elif "Account" not in row or not row["Account"]:
-                    row["Account"] = "Account Unknown"
-
-                # Ensure all required fields exist to avoid KeyError in add_screenshot
-                required_fields = [
-                    "Timestamp",
-                    "OriginalFilename",
-                    "CleanFilename",
-                    "Account",
-                    "PackType",
-                    "CardTypes",
-                    "CardCounts",
-                    "PackScreenshot",
-                    "Shinedust",
-                ]
-                for field in required_fields:
-                    if field not in row:
-                        row[field] = ""  # Provide empty default if missing
-
-                # Add to database
-                try:
-                    _, is_new = db.add_screenshot(row)
-                    return is_new
-                except Exception as e:
-                    logger.error(f"Error importing row: {e}")
-                    return False
-
-            with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                # Submit all tasks
-                future_to_row = {executor.submit(process_row, row): row for row in rows}
-
-                # Process results as they complete
-                for future in as_completed(future_to_row):
+            # Use a single transaction for much better performance
+            with db.transaction():
+                for row in rows:
                     if self._is_cancelled:
-                        executor.shutdown(wait=False, cancel_futures=True)
                         self.signals.status.emit("CSV import cancelled")
                         return
 
+                    # Use CleanFilename as the Account
+                    if "CleanFilename" in row and row["CleanFilename"]:
+                        row["Account"] = row["CleanFilename"]
+                    elif "DeviceAccount" in row and row["DeviceAccount"]:
+                        row["Account"] = row["DeviceAccount"]
+                    elif "Account" not in row or not row["Account"]:
+                        row["Account"] = "Account Unknown"
+
+                    # Ensure all required fields exist to avoid KeyError in add_screenshot
+                    required_fields = [
+                        "Timestamp",
+                        "OriginalFilename",
+                        "CleanFilename",
+                        "Account",
+                        "PackType",
+                        "CardTypes",
+                        "CardCounts",
+                        "PackScreenshot",
+                        "Shinedust",
+                    ]
+                    for field in required_fields:
+                        if field not in row:
+                            row[field] = ""  # Provide empty default if missing
+
+                    # Add to database
                     try:
-                        is_new = future.result()
+                        _, is_new = db.add_screenshot(row)
                         if is_new:
                             new_records += 1
                     except Exception as e:
-                        logger.error(f"Future error during CSV import: {e}")
+                        logger.error(f"Error importing row: {e}")
 
                     processed_count += 1
 
@@ -171,7 +150,12 @@ class CSVImportWorker(QRunnable):
     def cancel(self):
         """Cancel the worker"""
         self._is_cancelled = True
-
+        executor = getattr(self, "_executor", None)
+        if executor:
+            try:
+                executor.shutdown(wait=False, cancel_futures=True)
+            except Exception:
+                pass
 
 class CardArtDownloadWorker(QRunnable):
     """Worker to download card art templates in the background.
@@ -200,6 +184,12 @@ class CardArtDownloadWorker(QRunnable):
     def cancel(self):
         """Cancel the worker"""
         self._is_cancelled = True
+        executor = getattr(self, "_executor", None)
+        if executor:
+            try:
+                executor.shutdown(wait=False, cancel_futures=True)
+            except Exception:
+                pass
 
     def run(self):
         try:
@@ -235,6 +225,8 @@ class CardArtDownloadWorker(QRunnable):
 
             # Ensure per-set directories
             for set_id in set_ids:
+                if self._is_cancelled:
+                    return
                 os.makedirs(os.path.join(dest_root, set_id), exist_ok=True)
 
             total_estimate = len(set_ids) * 500  # rough estimate for progress
@@ -282,11 +274,13 @@ class CardArtDownloadWorker(QRunnable):
                 return images_saved
 
             total_saved = 0
-            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-                futures = {executor.submit(download_set, sid): sid for sid in set_ids}
+            self._executor = ThreadPoolExecutor(max_workers=self.max_workers)
+            try:
+                futures = {self._executor.submit(download_set, sid): sid for sid in set_ids}
                 for fut in as_completed(futures):
                     if self._is_cancelled:
-                        executor.shutdown(wait=False, cancel_futures=True)
+                        if self._executor:
+                            self._executor.shutdown(wait=False, cancel_futures=True)
                         self.signals.status.emit("Card art download cancelled")
                         return
                     sid = futures[fut]
@@ -302,6 +296,10 @@ class CardArtDownloadWorker(QRunnable):
                         )
                     except Exception as e:
                         self.signals.status.emit(f"Error downloading set {sid}: {e}")
+            finally:
+                if self._executor:
+                    self._executor.shutdown(wait=not self._is_cancelled, cancel_futures=self._is_cancelled)
+                    self._executor = None
 
             self.signals.progress.emit(total_estimate, total_estimate)
             self.signals.status.emit(
@@ -897,5 +895,37 @@ class VersionCheckWorker(QRunnable):
         except Exception as e:
             logger.error(f"Error checking for updates: {e}")
             self.signals.result.emit({"new_available": False})
+        finally:
+            self.signals.finished.emit()
+
+
+class DashboardStatsWorker(QRunnable):
+    """Worker to load dashboard statistics and recent activity in the background"""
+
+    def __init__(self, db_path: str = None, activity_limit: int = 100):
+        super().__init__()
+        self.db_path = db_path
+        self.activity_limit = activity_limit
+        self.signals = WorkerSignals()
+
+    def run(self):
+        """Load statistics and activity from database"""
+        try:
+            from app.database import Database
+
+            db = Database(self.db_path)
+
+            stats = {
+                "total_cards": db.get_total_cards_count(),
+                "unique_cards": db.get_unique_cards_count(),
+                "total_packs": db.get_total_packs_count(),
+                "last_processed": db.get_last_processed_timestamp(),
+                "recent_activity": db.get_recent_activity(limit=self.activity_limit),
+            }
+
+            self.signals.result.emit(stats)
+        except Exception as e:
+            logger.error(f"Error loading dashboard stats in worker: {e}")
+            self.signals.error.emit(str(e))
         finally:
             self.signals.finished.emit()

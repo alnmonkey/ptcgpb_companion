@@ -31,6 +31,7 @@ from PyQt6.QtGui import QAction
 import os
 import sys
 import logging
+import threading
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,7 @@ from app.workers import (
     CardDataLoadWorker,
     CardArtDownloadWorker,
     VersionCheckWorker,
+    DashboardStatsWorker,
 )
 from PyQt6.QtCore import QThreadPool, Qt, QUrl
 from PyQt6.QtGui import QDesktopServices
@@ -124,16 +126,22 @@ class MainWindow(QMainWindow):
         self._update_load_new_data_availability()
 
         # Ensure card art templates are available
-        self._start_art_download_if_needed()
+        QTimer.singleShot(100, self._start_art_download_if_needed)
 
         # Load initial dashboard statistics
-        self._update_dashboard_statistics()
+        QTimer.singleShot(200, self._update_dashboard_statistics)
 
         # Check for updates
-        self._check_for_updates()
+        QTimer.singleShot(300, self._check_for_updates)
 
-        # Initialize watchdog system deferred to avoid blocking UI startup
-        QTimer.singleShot(0, self._init_watchdog)
+        # Mark app as loaded in recent activity
+        self.recent_activity_messages.append(
+            {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "description": "App loaded."}
+        )
+        self._update_recent_activity()
+
+        # Initialize watchdog system deferred with a small delay to ensure UI renders first
+        QTimer.singleShot(1000, self._init_watchdog)
 
     def _start_art_download_if_needed(self):
         """Check for card art directory and start background download if missing"""
@@ -201,6 +209,14 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logger.error(f"Failed to start art download worker: {e}")
             self._update_status_message(f"Failed to start art download: {e}")
+
+    def _workers_are_running(self) -> bool:
+        return any(
+            isinstance(w, ScreenshotProcessingWorker)
+            or isinstance(w, CSVImportWorker)
+            or isinstance(w, CardArtDownloadWorker)
+            for w in self.active_workers
+        )
 
     def _init_database(self):
         """Initialize database connection"""
@@ -406,34 +422,44 @@ class MainWindow(QMainWindow):
 
         try:
             if hasattr(self, "db") and self.db:
-                # Get statistics from database
-                total_cards = self.db.get_total_cards_count()
-                unique_cards = self.db.get_unique_cards_count()
-                total_packs = self.db.get_total_packs_count()
-                last_processed = self.db.get_last_processed_timestamp()
-
-                # Update UI
-                self.total_cards_label.setText(f"Total Cards: {total_cards}")
-                self.unique_cards_label.setText(f"Unique Cards: {unique_cards}")
-                self.total_packs_label.setText(f"Total Packs: {total_packs}")
-
-                if last_processed:
-                    self.last_processed_label.setText(
-                        f"Last Processed: {last_processed}"
-                    )
-                else:
-                    self.last_processed_label.setText("Last Processed: Never")
-
-                # Update recent activity
-                self._update_recent_activity()
-
-                self._update_status_message("Dashboard statistics updated")
+                # Use a worker to avoid hanging the UI thread
+                limit = getattr(self, "recent_activity_limit", 100)
+                worker = DashboardStatsWorker(
+                    db_path=self.db.db_path, activity_limit=limit
+                )
+                worker.signals.result.connect(self._on_dashboard_stats_ready)
+                worker.signals.error.connect(
+                    lambda e: logger.error(f"Dashboard stats error: {e}")
+                )
+                self.thread_pool.start(worker)
             else:
                 self._update_status_message("Database not available for statistics")
 
         except Exception as e:
-            logger.error(f"Error updating dashboard statistics: {e}")
+            logger.error(f"Error starting dashboard statistics update: {e}")
             self._update_status_message(f"Error updating statistics: {e}")
+
+    def _on_dashboard_stats_ready(self, stats):
+        """Handle statistics loaded from background worker"""
+        try:
+            # Update UI labels
+            self.total_cards_label.setText(f"Total Cards: {stats['total_cards']}")
+            self.unique_cards_label.setText(f"Unique Cards: {stats['unique_cards']}")
+            self.total_packs_label.setText(f"Total Packs: {stats['total_packs']}")
+
+            if stats.get("last_processed"):
+                self.last_processed_label.setText(
+                    f"Last Processed: {stats['last_processed']}"
+                )
+            else:
+                self.last_processed_label.setText("Last Processed: Never")
+
+            # Update recent activity list with the database results
+            self._update_recent_activity(db_activities=stats.get("recent_activity", []))
+            self._update_status_message("Dashboard statistics updated")
+
+        except Exception as e:
+            logger.error(f"Error updating dashboard UI: {e}")
 
     def _request_dashboard_update(self):
         """Request a dashboard update with debouncing"""
@@ -442,99 +468,107 @@ class MainWindow(QMainWindow):
         else:
             self._update_dashboard_statistics()
 
-    def _update_recent_activity(self):
+    def _update_recent_activity(self, db_activities=None):
         """Update recent activity list"""
         try:
-            if hasattr(self, "db") and self.db:
-                # Clear existing items
-                self.recent_activity_list.clear()
+            # Clear existing items
+            self.recent_activity_list.clear()
 
-                all_items = []
+            all_items = []
 
-                # 1. Get recent activity from database (processed screenshots)
+            # 1. Add recent activity from database (if provided)
+            if db_activities is None:
                 db_activities = []
-                if getattr(self, "recent_activity_limit", 0) > 0:
-                    db_activities = self.db.get_recent_activity(
-                        limit=self.recent_activity_limit
-                    )
 
-                # DB activities come newest first from SQL, so reverse them for bottom-newest
-                for activity in reversed(db_activities):
-                    item_text = f"{activity['timestamp']} - {activity['description']}"
-                    all_items.append({"text": item_text, "color": None})
+            # Filter for this session only if session_start_time is set
+            session_start = getattr(self, "session_start_time", None)
 
-                # 2. Add session status messages
-                session_msgs = list(getattr(self, "recent_activity_messages", []))
-                # session_msgs are in chronological order, so just append
-                for entry in session_msgs:
-                    item_text = f"{entry['timestamp']} - {entry['description']}"
-                    all_items.append({"text": item_text, "color": None})
+            # DB activities come newest first from SQL, so reverse them for bottom-newest
+            for activity in reversed(db_activities):
+                raw_ts = activity.get("timestamp")
+                if not raw_ts:
+                    continue
 
-                # 3. Add active tasks last (so they are at the bottom)
-                active_tasks = [
-                    t
-                    for t in self.processing_tasks
-                    if t["status"] in ["Running", "Queued"]
-                ]
-                for task in active_tasks:
-                    progress_text = (
-                        f" ({task['progress']}%)" if task["status"] == "Running" else ""
-                    )
-                    item_text = (
-                        f"[{task['status']}] {task['description']}{progress_text}"
-                    )
-                    color = Qt.GlobalColor.blue if task["status"] == "Running" else Qt.GlobalColor.darkYellow
-                    all_items.append({"text": item_text, "color": color})
+                # Use string comparison, but normalize ISO format (replace T with space)
+                ts = raw_ts.replace("T", " ")
+                ss = session_start.replace("T", " ") if session_start else None
+                if ss and ts < ss:
+                    continue
+                item_text = f"{raw_ts} - {activity['description']}"
+                all_items.append({"text": item_text, "color": None})
 
-                # 4. Add update message if available
-                if getattr(self, "new_version_available", False):
-                    latest_version = self.latest_version_info.get(
-                        "latest_version", "unknown"
-                    )
-                    download_url = self.latest_version_info.get(
-                        "url",
-                        "https://github.com/itsthejoker/ptcgpb_companion/releases/latest",
-                    )
+            # 2. Add session status messages
+            session_msgs = list(getattr(self, "recent_activity_messages", []))
+            # session_msgs are in chronological order, so just append
+            for entry in session_msgs:
+                item_text = f"{entry['timestamp']} - {entry['description']}"
+                all_items.append({"text": item_text, "color": None})
 
-                    update_text = f"✨ NEW UPDATE AVAILABLE: v{latest_version}! ✨\nDownload it from: {download_url}"
-                    all_items.append(
-                        {
-                            "text": update_text,
-                            "color": Qt.GlobalColor.red,
-                            "is_update": True,
-                            "url": download_url,
-                        }
-                    )
+            # 3. Add active tasks last (so they are at the bottom)
+            active_tasks = [
+                t
+                for t in self.processing_tasks
+                if t["status"] in ["Running", "Queued"]
+            ]
+            for task in active_tasks:
+                progress_text = (
+                    f" ({task['progress']}%)" if task["status"] == "Running" else ""
+                )
+                item_text = (
+                    f"[{task['status']}] {task['description']}{progress_text}"
+                )
+                color = Qt.GlobalColor.blue if task["status"] == "Running" else Qt.GlobalColor.darkYellow
+                all_items.append({"text": item_text, "color": color})
 
-                # Add all to list
-                for item_data in all_items:
-                    self.recent_activity_list.addItem(item_data["text"])
-                    last_item = self.recent_activity_list.item(
-                        self.recent_activity_list.count() - 1
-                    )
+            # 4. Add update message if available
+            if getattr(self, "new_version_available", False):
+                latest_version = self.latest_version_info.get(
+                    "latest_version", "unknown"
+                )
+                download_url = self.latest_version_info.get(
+                    "url",
+                    "https://github.com/itsthejoker/ptcgpb_companion/releases/latest",
+                )
 
-                    if item_data.get("url"):
-                        last_item.setData(Qt.ItemDataRole.UserRole, item_data["url"])
-                        # Change cursor to pointing hand when hovering over this item
-                        # Note: QListWidget doesn't easily support per-item cursors without custom delegate,
-                        # but we can at least make it look more like a link.
-                        if item_data.get("is_update"):
-                            last_item.setToolTip("Click to open download page")
+                update_text = f"✨ NEW UPDATE AVAILABLE: v{latest_version}! ✨\nDownload it from: {download_url}"
+                all_items.append(
+                    {
+                        "text": update_text,
+                        "color": Qt.GlobalColor.red,
+                        "is_update": True,
+                        "url": download_url,
+                    }
+                )
 
+            # Add all to list
+            for item_data in all_items:
+                self.recent_activity_list.addItem(item_data["text"])
+                last_item = self.recent_activity_list.item(
+                    self.recent_activity_list.count() - 1
+                )
+
+                if item_data.get("url"):
+                    last_item.setData(Qt.ItemDataRole.UserRole, item_data["url"])
+                    # Change cursor to pointing hand when hovering over this item
+                    # Note: QListWidget doesn't easily support per-item cursors without custom delegate,
+                    # but we can at least make it look more like a link.
                     if item_data.get("is_update"):
-                        font = last_item.font()
-                        font.setPointSize(12)
-                        font.setBold(True)
-                        last_item.setFont(font)
+                        last_item.setToolTip("Click to open download page")
 
-                    if item_data.get("color"):
-                        last_item.setForeground(item_data["color"])
+                if item_data.get("is_update"):
+                    font = last_item.font()
+                    font.setPointSize(12)
+                    font.setBold(True)
+                    last_item.setFont(font)
 
-                if not all_items:
-                    self.recent_activity_list.addItem("No recent activity")
-                else:
-                    # Scroll to bottom to show newest entries
-                    self.recent_activity_list.scrollToBottom()
+                if item_data.get("color"):
+                    last_item.setForeground(item_data["color"])
+
+            if not all_items:
+                self.recent_activity_list.addItem("No recent activity")
+            else:
+                # Scroll to bottom to show newest entries
+                self.recent_activity_list.scrollToBottom()
 
         except Exception as e:
             logger.error(f"Error updating recent activity: {e}")
@@ -762,8 +796,12 @@ class MainWindow(QMainWindow):
         # This will be expanded in future phases
         self.processing_tasks = []
         self.recent_activity_limit = 100
+        # Session start time to filter out previous session activity
+        self.session_start_time = datetime.now().isoformat()
         # In-memory session log for status messages to surface in Recent Activity
-        self.recent_activity_messages = []
+        self.recent_activity_messages = [
+            {"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "description": "Loading app..."}
+        ]
 
     def _clear_recent_activity(self):
         """Clear the recent activity list and reset session count"""
@@ -1803,7 +1841,6 @@ class MainWindow(QMainWindow):
             print(f"Error starting screenshot processing worker: {e}")
             self._update_status_message(f"Error starting screenshot processing: {e}")
 
-    # --- Card art download handlers ---
     def _on_art_download_progress(self, current: int, total: int, task_id: str = None):
         """Progress updates for card art download (also updates task model)."""
         try:
@@ -1881,13 +1918,32 @@ class MainWindow(QMainWindow):
         """Initialize the screenshot directory watchdog system"""
         self._watchdog_observer = None
         self._watchdog_handler = ScreenshotChangeHandler()
+        # Do NOT force has_changes = True here to avoid immediate heavy I/O on startup.
+        # Instead, we will schedule a one-time catch-up scan after the app is stable.
+        self._watchdog_handler.has_changes = False
 
-        # Periodic check timer
         self._watchdog_timer = QTimer(self)
         self._watchdog_timer.timeout.connect(self._check_for_screenshot_changes)
 
-        # Initial setup
         self._setup_watchdog()
+
+        # Schedule a one-time catch-up scan after 10 seconds
+        QTimer.singleShot(10000, self._trigger_catchup_scan)
+
+    def _trigger_catchup_scan(self):
+        """Trigger an initial scan to catch up on any changes while the app was closed"""
+        logger.info("Triggering initial catch-up scan for screenshots...")
+        if not hasattr(self, "_watchdog_handler"):
+            return
+
+        # We only trigger if no other processing is running
+        if not self._workers_are_running():
+            self._watchdog_handler.has_changes = True
+            self._check_for_screenshot_changes()
+        else:
+            # If something is already running, we don't need to force it, 
+            # it's already doing a scan.
+            logger.info("Catch-up scan skipped: processing already in progress.")
 
     def _setup_watchdog(self):
         """Setup or refresh the watchdog observer based on settings"""
@@ -1924,19 +1980,31 @@ class MainWindow(QMainWindow):
 
         # Start observer
         try:
-            # We use PollingObserver specifically because many users are on WSL/network mounts
+            # Using PollingObserver specifically of WSL/network mounts
             # where native inotify events don't work correctly.
             # timeout=10 to keep CPU usage low with many files.
-            self._watchdog_observer = PollingObserver(timeout=10)
-            self._watchdog_observer.schedule(
-                self._watchdog_handler, watch_dir, recursive=False
-            )
-            self._watchdog_observer.start()
+            observer = PollingObserver(timeout=10)
+            self._watchdog_observer = observer
 
-            # Start timer
+            def start_observer():
+                try:
+                    observer.schedule(
+                        self._watchdog_handler, watch_dir, recursive=False
+                    )
+                    observer.start()
+                    logger.info(
+                        f"Watchdog background thread started for {watch_dir}"
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to start watchdog observer thread: {e}")
+
+            threading.Thread(target=start_observer, daemon=True).start()
+
+            # Start timer - check once immediately (but still deferred by QTimer)
             self._watchdog_timer.start(interval_min * 60 * 1000)
+            QTimer.singleShot(1000, self._check_for_screenshot_changes)
             logger.info(
-                f"Watchdog started for {watch_dir}, checking every {interval_min} minutes"
+                f"Watchdog initialization scheduled for {watch_dir}, checking every {interval_min} minutes"
             )
         except Exception as e:
             logger.error(f"Failed to start watchdog observer: {e}")
@@ -1948,14 +2016,15 @@ class MainWindow(QMainWindow):
         if not self._watchdog_handler.has_changes:
             return
         
-        logger.info("Changes detected in screenshots directory.")
+        # Don't start processing if the window hasn't been shown yet or just shown
+        # This helps avoid a hang immediately on startup if there are pending changes
+        if not self.isVisible():
+            logger.info("Screenshot changes detected, but window is not yet visible. Delaying.")
+            return
 
-        # Check if a processing job is already running
-        is_running = any(
-            isinstance(w, ScreenshotProcessingWorker) for w in self.active_workers
-        )
+        logger.debug("Changes detected in screenshots directory.")
 
-        if is_running:
+        if self._workers_are_running():
             logger.info(
                 "Screenshot changes detected, but processing is already in progress. Skipping."
             )
@@ -1963,53 +2032,54 @@ class MainWindow(QMainWindow):
 
         logger.info("Screenshot changes detected by watchdog. Triggering processing job.")
 
-        # Reset flag
         self._watchdog_handler.has_changes = False
 
-        # Trigger processing
-        watch_dir = self.settings.get_setting("General/screenshots_dir", "")
-        if watch_dir and os.path.isdir(watch_dir):
-            # We use overwrite=False for automatic watch
-            self._on_processing_started(watch_dir, overwrite=False)
+        # Trigger combined import (CSV + screenshots)
+        self._on_load_new_data()
 
     def closeEvent(self, event):
         """Handle window close event"""
         print("Closing application...")
+        # Hide the window immediately
+        self.hide()
+        
+        # Force the UI to process the hide event before we do anything else
+        from PyQt6.QtWidgets import QApplication
+        QApplication.processEvents()
+        
+        # Accept the event so the window is technically closed
+        event.accept()
+
+        # Perform cleanup in a way that doesn't block the UI
         try:
             # Stop watchdog
             if hasattr(self, "_watchdog_observer") and self._watchdog_observer:
                 try:
                     self._watchdog_observer.stop()
+                    # We don't join() because it might block and
+                    # watchdog threads are daemon threads
                 except Exception:
                     pass
 
             # Request cancellation on any active workers
-            for worker in getattr(self, "active_workers", []):
+            active_workers = getattr(self, "active_workers", [])
+            for worker in list(active_workers):
                 cancel = getattr(worker, "cancel", None)
                 if callable(cancel):
                     try:
                         cancel()
                     except Exception:
-                        # Ignore failures during shutdown
                         pass
 
-            # Wait briefly for workers to finish
-            if hasattr(self, "thread_pool"):
-                try:
-                    self.thread_pool.clear()
-                except Exception:
-                    pass
-                try:
-                    self.thread_pool.waitForDone(3000)
-                except Exception:
-                    pass
-
-            # Clean up database connections
+            # Clean up database connections for the main thread
             if hasattr(self, "db"):
-                self.db.close()
-                print("Database connections closed")
-        finally:
-            event.accept()
+                try:
+                    self.db.close()
+                    print("Database connections closed")
+                except Exception:
+                    pass
+        except Exception as e:
+            print(f"Error during shutdown: {e}")
 
     def _get_display_name_and_rarity(self, card_code, raw_name, raw_rarity):
         """
