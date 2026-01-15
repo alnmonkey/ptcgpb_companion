@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_max_thread_count():
-    # because everyone's hardware is different, we set limits here.
-    # OpenCV operations are CPU intensive and often already multi-threaded,
-    # so we limit the number of worker threads to avoid oversubscription.
-    return min(os.cpu_count() or 4, 8)
+    # Leave at least one core for the UI thread to keep things responsive
+    cpu_count = os.cpu_count() or 2
+    # Use max(1, count - 1) but still cap at 8 to avoid too many threads on high-core systems
+    return min(max(1, cpu_count - 1), 8)
 
 
 
@@ -82,53 +82,54 @@ class CSVImportWorker(QRunnable):
             # Initialize database once
             db = Database(self.db_path)
 
-            # Use a single transaction for much better performance
-            with db.transaction():
-                for row in rows:
-                    if self._is_cancelled:
-                        self.signals.status.emit("CSV import cancelled")
-                        return
+            # Process in batches to avoid holding a transaction for too long
+            # and to allow other threads to write to the database.
+            batch_size = 100
+            for i in range(0, total_rows, batch_size):
+                if self._is_cancelled:
+                    break
+                
+                batch = rows[i:i + batch_size]
+                with db.transaction():
+                    for row in batch:
+                        if self._is_cancelled:
+                            break
 
-                    # Use CleanFilename as the Account
-                    if "CleanFilename" in row and row["CleanFilename"]:
-                        row["Account"] = row["CleanFilename"]
-                    elif "DeviceAccount" in row and row["DeviceAccount"]:
-                        row["Account"] = row["DeviceAccount"]
-                    elif "Account" not in row or not row["Account"]:
-                        row["Account"] = "Account Unknown"
+                        # Use CleanFilename as the Account
+                        if "CleanFilename" in row and row["CleanFilename"]:
+                            row["Account"] = row["CleanFilename"]
+                        elif "DeviceAccount" in row and row["DeviceAccount"]:
+                            row["Account"] = row["DeviceAccount"]
+                        elif "Account" not in row or not row["Account"]:
+                            row["Account"] = "Account Unknown"
 
-                    # Ensure all required fields exist to avoid KeyError in add_screenshot
-                    required_fields = [
-                        "Timestamp",
-                        "OriginalFilename",
-                        "CleanFilename",
-                        "Account",
-                        "PackType",
-                        "CardTypes",
-                        "CardCounts",
-                        "PackScreenshot",
-                        "Shinedust",
-                    ]
-                    for field in required_fields:
-                        if field not in row:
-                            row[field] = ""  # Provide empty default if missing
+                        # Ensure all required fields exist
+                        required_fields = [
+                            "Timestamp", "OriginalFilename", "CleanFilename",
+                            "Account", "PackType", "CardTypes", "CardCounts",
+                            "PackScreenshot", "Shinedust",
+                        ]
+                        for field in required_fields:
+                            if field not in row:
+                                row[field] = ""
 
-                    # Add to database
-                    try:
-                        _, is_new = db.add_screenshot(row)
-                        if is_new:
-                            new_records += 1
-                    except Exception as e:
-                        logger.error(f"Error importing row: {e}")
+                        # Add to database
+                        try:
+                            _, is_new = db.add_screenshot(row)
+                            if is_new:
+                                new_records += 1
+                        except Exception as e:
+                            logger.error(f"Error importing row: {e}")
 
-                    processed_count += 1
+                        processed_count += 1
 
-                    # Update progress every 10 rows or at the end
-                    if processed_count % 10 == 0 or processed_count == total_rows:
-                        self.signals.progress.emit(processed_count, total_rows)
-                        # self.signals.status.emit(
-                        #     f"Processed {processed_count} of {total_rows} rows"
-                        # )
+                # Update progress after each batch
+                self.signals.progress.emit(processed_count, total_rows)
+                # self.signals.status.emit(f"Imported {processed_count}/{total_rows}...")
+
+            if self._is_cancelled:
+                self.signals.status.emit("CSV import cancelled")
+                return
 
             self.signals.progress.emit(total_rows, total_rows)
             self.signals.status.emit(
@@ -459,7 +460,7 @@ class ScreenshotProcessingWorker(QRunnable):
 
                     if file_size is not None and file_size < 1024:
                         # Store an entry with zero cards and mark as processed
-                        self.signals.status.emit(
+                        logger.info(
                             f"Blank image detected ({file_size} bytes) in {filename}. Marking as processed."
                         )
                         # Reuse storage routine with no detected cards
@@ -475,10 +476,10 @@ class ScreenshotProcessingWorker(QRunnable):
                         self._store_results_in_database(filename, cards_found)
                         return True
                     else:
-                        self.signals.status.emit(f"No cards detected in {filename}")
+                        logger.info(f"No cards detected in {filename}")
                         return False
                 except Exception as e:
-                    self.signals.status.emit(f"Error processing {filename}: {e}")
+                    logger.error(f"Error processing {filename}: {e}")
                     return False
 
             self._executor = ThreadPoolExecutor(max_workers=max_workers)
@@ -677,10 +678,8 @@ class ScreenshotProcessingWorker(QRunnable):
                 # Mark screenshot as processed
                 db.mark_screenshot_processed(screenshot_id)
 
-            self.signals.status.emit(f"Stored {len(cards_found)} cards from {filename}")
-
         except Exception as e:
-            self.signals.status.emit(f"Error storing results for {filename}: {e}")
+            logger.error(f"Error storing results for {filename}: {e}")
             raise
 
     def cancel(self):

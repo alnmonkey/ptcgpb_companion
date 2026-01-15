@@ -1253,12 +1253,32 @@ class MainWindow(QMainWindow):
 
     def _update_status_message(self, message: str):
         """Update the main status message and clear any temporary messages"""
+        if not message:
+            return
+
         if hasattr(self, "main_status"):
             self.statusBar().clearMessage()
             self.main_status.setText(message)
             logger.debug(f"Status updated: {message}")
 
         # Also push this status message to the Recent Activity session log
+        # but filter out frequent progress updates to keep the UI responsive
+        # and the log clean.
+        skip_log_keywords = [
+            "Progress:",
+            "Processed ",
+            "Scanned ",
+            "Importing ",
+            "Imported ",
+            "Screenshot processing:",
+            "CSV import:",
+            "Downloading card art",
+            "Checking for updates",
+            "Dashboard statistics updated",
+        ]
+        if any(keyword in message for keyword in skip_log_keywords):
+            return
+
         try:
             timestamp = datetime.now().isoformat(timespec="seconds")
             if not hasattr(self, "recent_activity_messages"):
