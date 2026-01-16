@@ -49,7 +49,8 @@ PYI_OPTS=(
 #  "resources/card_imgs:resources/card_imgs"
 #)
 ADD_DATA=(
-  "_internal/ptcgpb-companion-icon.ico:.",
+  "_internal/ptcgpb-companion-icon.ico:."
+  "pyproject.toml:."
 )
 
 for spec in "${ADD_DATA[@]}"; do

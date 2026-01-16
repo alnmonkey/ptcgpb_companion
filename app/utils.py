@@ -55,11 +55,19 @@ def get_portable_path(*parts):
 
 def get_app_version():
     """
-    Get the application version from pyproject.toml
+    Get the application version from pyproject.toml or package metadata
 
     Returns:
         str: Version string
     """
+    # Try getting version from package metadata first
+    try:
+        import importlib.metadata
+        return importlib.metadata.version("ptcgpb-companion")
+    except Exception:
+        pass
+
+    # Fallback to pyproject.toml
     try:
         pyproject_path = get_portable_path("pyproject.toml")
         if os.path.exists(pyproject_path):
