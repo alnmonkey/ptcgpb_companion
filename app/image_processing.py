@@ -13,6 +13,7 @@ import imagehash
 from typing import List, Dict, Any, Tuple
 from PIL import Image
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -270,10 +271,6 @@ class ImageProcessor:
 
         # 2. Rebuild template matrices for detailed search
         self.template_vectors = {}
-        self.all_templates_matrix = None
-        self.all_templates_metadata = []
-        
-        all_vectors = []
 
         logger.info(
             f"Vectorizing templates at {self.match_width}x{self.match_height}..."
@@ -290,19 +287,12 @@ class ImageProcessor:
                     vec /= norm
                 vectors.append(vec)
                 metadata.append(card_name)
-                
-                # Add to global list
-                all_vectors.append(vec)
-                self.all_templates_metadata.append((set_name, card_name))
 
             if vectors:
                 self.template_vectors[set_name] = {
                     "matrix": np.array(vectors),
                     "metadata": metadata,
                 }
-        
-        if all_vectors:
-            self.all_templates_matrix = np.array(all_vectors)
 
     def process_screenshot(self, image_path: str) -> List[Dict[str, Any]]:
         """
@@ -385,32 +375,32 @@ class ImageProcessor:
                     if bm and bm["confidence"] > 0.2:
                         s = bm["card_set"]
                         set_weights[s] = set_weights.get(s, 0.0) + bm["confidence"]
-                
+
                 if set_weights:
                     majority_set = max(set_weights.items(), key=lambda x: x[1])[0]
                     logger.info(f"Majority set identified (weighted): {majority_set}")
 
-            # Stage 2: Re-process outliers if a majority set exists
+            # Stage 2: Re-process all cards with the majority set as accuracy check
+            # mostly for similar cards (like 80 vs 108) that might have been
+            # misidentified in Stage 1 due to pHash collisions
             detected_cards = []
             for result in initial_results:
                 best_match = result["best_match"]
                 i = result["position"]
 
-                is_outlier = False
-                if not best_match:
-                    is_outlier = True
-                elif majority_set and best_match["card_set"] != majority_set:
-                    # All cards in a single screenshot are guaranteed to be from a single set.
-                    # So if it doesn't match the majority set, it's an outlier.
-                    is_outlier = True
-                    logger.info(
-                        f"Card at position {i} belongs to different set ({best_match['card_set']}) but we are guaranteed a single set, forcing to {majority_set}"
+                if majority_set:
+                    is_outlier = (
+                        not best_match or best_match["card_set"] != majority_set
                     )
+                    if is_outlier:
+                        logger.info(
+                            f"Re-scanning outlier card {i} in majority set {majority_set} with detailed search"
+                        )
+                    else:
+                        logger.info(
+                            f"Re-scanning card {i} in majority set {majority_set} to confirm identity"
+                        )
 
-                if is_outlier and majority_set:
-                    logger.info(
-                        f"Re-scanning outlier card {i} in majority set {majority_set} with detailed search"
-                    )
                     new_match = self._find_best_card_match(
                         result["card_region"],
                         force_set=majority_set,
@@ -569,11 +559,131 @@ class ImageProcessor:
         Returns:
             Dict: Best match result with card_name, card_set, and confidence
         """
+        best_match = None
+        best_score = -1
+
         # Ensure templates are prepared
         if not hasattr(self, "phash_templates") or not self.phash_templates:
             self._prepare_templates()
 
-        # 1. Prepare query vector for color-aware matching
+        # Multi-stage matching for better performance:
+        # 1. Quick search using pHash and Hamming distance to identify likely sets
+        # 2. Detailed search at full resolution within the candidate sets
+
+        # Stage 1: Quick search using pHash
+        # Compute pHash for the region directly from the provided region
+        region_pil = Image.fromarray(card_region)
+        region_hash = imagehash.phash(region_pil)
+
+        # Quick search to identify candidate sets and best card match
+        set_scores = {}
+        quick_best_match = None
+        quick_best_score = -1
+
+        if self.phash_matrix is not None:
+            # Filter indices based on force_set / exclude_sets
+            if force_set:
+                indices = [
+                    i
+                    for i, m in enumerate(self.phash_metadata)
+                    if m[0] == force_set
+                ]
+            elif exclude_sets:
+                indices = [
+                    i
+                    for i, m in enumerate(self.phash_metadata)
+                    if m[0] not in exclude_sets
+                ]
+            else:
+                indices = range(len(self.phash_metadata))
+
+            if indices:
+                sub_matrix = self.phash_matrix[indices]
+                q_hash = region_hash.hash.flatten()
+                # Hamming distance: count non-matching bits
+                distances = np.count_nonzero(sub_matrix != q_hash, axis=1)
+                scores = 1.0 - (distances / 64.0)
+
+                for i, score in enumerate(scores):
+                    meta_idx = indices[i]
+                    s_name, c_name = self.phash_metadata[meta_idx]
+
+                    if score > set_scores.get(s_name, 0):
+                        set_scores[s_name] = score
+
+                    if score > quick_best_score:
+                        quick_best_score = score
+                        quick_best_match = {
+                            "card_name": c_name,
+                            "card_set": s_name,
+                            "confidence": float(score),
+                        }
+        else:
+            # Fallback to slow loop if matrix not built (should not happen)
+            if force_set:
+                search_sets = [force_set]
+            else:
+                search_sets = [
+                    s
+                    for s in self.phash_templates.keys()
+                    if s not in (exclude_sets or [])
+                ]
+
+            for set_name in search_sets:
+                if set_name not in self.phash_templates:
+                    continue
+
+                cards = self.phash_templates[set_name]
+                for card_name, template_hash in cards.items():
+                    # Hamming distance: lower is better. Max distance is 64 for 8x8 hash.
+                    distance = region_hash - template_hash
+                    # Convert to a confidence-like score (0 to 1)
+                    score = 1.0 - (distance / 64.0)
+
+                    if score > set_scores.get(set_name, 0):
+                        set_scores[set_name] = score
+
+                    if score > quick_best_score:
+                        quick_best_score = score
+                        quick_best_match = {
+                            "card_name": card_name,
+                            "card_set": set_name,
+                            "confidence": score,
+                        }
+
+        # Optimization: If quick search is extremely confident, skip detailed search
+        # Only if not forced to do a detailed search
+        CONFIDENCE_THRESHOLD = 0.92  # Increased threshold for higher certainty
+        if (
+            not force_detailed
+            and quick_best_match
+            and quick_best_match["confidence"] >= CONFIDENCE_THRESHOLD
+        ):
+            logger.info(
+                f"Quick search extremely confident ({quick_best_match['confidence']:.3f}), skipping detailed search"
+            )
+            return quick_best_match
+
+        # Stage 2: Detailed search at full resolution
+        # Determine candidate sets from quick search
+        candidate_sets = []
+        if force_set:
+            candidate_sets = [force_set]
+        elif set_scores:
+            # Sort sets by their best card score
+            sorted_sets = sorted(set_scores.items(), key=lambda x: x[1], reverse=True)
+            # Take top sets that are close to the best score
+            top_phash_score = sorted_sets[0][1]
+            for s_name, s_score in sorted_sets:
+                # Include set if it's in top 3 or within 0.05 of the top score
+                if len(candidate_sets) < 3 or s_score >= top_phash_score - 0.05:
+                    candidate_sets.append(s_name)
+                # Cap at 5 sets to maintain performance
+                if len(candidate_sets) >= 5:
+                    break
+
+        logger.info(f"Candidate sets for detailed search: {candidate_sets}")
+
         # Upscale card region to match matching resolution for detailed matching
         upscaled_region = cv2.resize(
             card_region, (self.match_width, self.match_height)
@@ -585,85 +695,76 @@ class ImageProcessor:
         q_norm = np.linalg.norm(q_vec)
         if q_norm > 0:
             q_vec /= q_norm
-        else:
-            return None
 
-        best_match = None
-        best_score = -1
+        # Detailed search in candidate sets
+        for search_set in candidate_sets:
+            if search_set not in self.template_vectors:
+                # Fallback if vectorized data not available
+                if (
+                    search_set in self.color_templates
+                    and self.color_templates[search_set]
+                ):
+                    for card_name, template_color in self.color_templates[
+                        search_set
+                    ].items():
+                        try:
+                            # Resize template if it doesn't match
+                            if template_color.shape[:2][::-1] != (
+                                self.match_width,
+                                self.match_height,
+                            ):
+                                template_color = cv2.resize(
+                                    template_color,
+                                    (self.match_width, self.match_height),
+                                )
 
-        # 2. Detailed search using vectorized color matching
-        # If a specific set is forced, search only that set for maximum accuracy and speed
-        if force_set:
-            if force_set in self.template_vectors:
-                data = self.template_vectors[force_set]
-                scores = data["matrix"] @ q_vec
-                max_idx = np.argmax(scores)
-                best_score = float(scores[max_idx])
+                            result = cv2.matchTemplate(
+                                upscaled_region,
+                                template_color,
+                                cv2.TM_CCOEFF_NORMED,
+                            )
+                            _, max_val, _, _ = cv2.minMaxLoc(result)
+
+                            if max_val > best_score:
+                                best_score = max_val
+                                best_match = {
+                                    "card_name": card_name,
+                                    "card_set": search_set,
+                                    "confidence": float(max_val),
+                                }
+                        except cv2.error:
+                            continue
+                continue
+
+            data = self.template_vectors[search_set]
+            matrix = data["matrix"]
+            metadata = data["metadata"]
+
+            # Matrix-vector multiplication for all cards in set
+            # This computes normalized correlation (TM_CCOEFF_NORMED)
+            # because both matrix and q_vec are zero-centered and unit-normalized.
+            scores = matrix @ q_vec
+
+            max_idx = np.argmax(scores)
+            max_val = scores[max_idx]
+
+            if max_val > best_score:
+                best_score = max_val
                 best_match = {
-                    "card_name": data["metadata"][max_idx],
-                    "card_set": force_set,
-                    "confidence": best_score,
+                    "card_name": metadata[max_idx],
+                    "card_set": search_set,
+                    "confidence": float(max_val),
                 }
-        else:
-            # Search across all allowed sets
-            # Using the global matrix for maximum robustness against pHash outliers
-            if self.all_templates_matrix is not None:
-                scores = self.all_templates_matrix @ q_vec
-                
-                # Apply exclude_sets filter if necessary
-                if exclude_sets:
-                    # Create a mask for excluded indices
-                    mask = np.ones(len(scores), dtype=bool)
-                    for i, (s_name, _) in enumerate(self.all_templates_metadata):
-                        if s_name in exclude_sets:
-                            mask[i] = False
-                    
-                    # Apply mask by setting excluded scores to -1
-                    scores[~mask] = -1
-                
-                max_idx = np.argmax(scores)
-                best_score = float(scores[max_idx])
-                if best_score > -1:
-                    s_name, c_name = self.all_templates_metadata[max_idx]
-                    best_match = {
-                        "card_name": c_name,
-                        "card_set": s_name,
-                        "confidence": best_score,
-                    }
 
-        # 3. Fallback to pHash only if color matching failed or for additional verification
-        # (pHash is less reliable for inverse colors but can be a good secondary signal)
-        if not best_match or best_match["confidence"] < 0.2:
-            # Compute pHash for the region
-            region_pil = Image.fromarray(card_region)
-            region_hash = imagehash.phash(region_pil)
-            q_hash = region_hash.hash.flatten()
+        # If detailed search found a better match or if we haven't found anything yet
+        if best_match:
+            return best_match
 
-            if self.phash_matrix is not None:
-                # Filter indices based on force_set / exclude_sets
-                if force_set:
-                    indices = [i for i, m in enumerate(self.phash_metadata) if m[0] == force_set]
-                elif exclude_sets:
-                    indices = [i for i, m in enumerate(self.phash_metadata) if m[0] not in exclude_sets]
-                else:
-                    indices = range(len(self.phash_metadata))
+        # Fallback to quick search result if detailed search failed but quick search had something
+        if quick_best_match and quick_best_match["confidence"] > 0.2:
+            return quick_best_match
 
-                if indices:
-                    sub_matrix = self.phash_matrix[indices]
-                    distances = np.count_nonzero(sub_matrix != q_hash, axis=1)
-                    phash_scores = 1.0 - (distances / 64.0)
-                    
-                    max_idx = np.argmax(phash_scores)
-                    if phash_scores[max_idx] > (best_match["confidence"] if best_match else -1):
-                        meta_idx = indices[max_idx]
-                        s_name, c_name = self.phash_metadata[meta_idx]
-                        best_match = {
-                            "card_name": c_name,
-                            "card_set": s_name,
-                            "confidence": float(phash_scores[max_idx]),
-                        }
-
-        return best_match
+        return None
 
     def get_template_count(self) -> int:
         """
