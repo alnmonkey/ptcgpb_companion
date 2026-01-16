@@ -680,6 +680,7 @@ class ScreenshotProcessingWorker(QRunnable):
                             card_set=card_set,
                             image_path=image_path,
                             rarity="Common",  # Default rarity for now
+                            card_code=card_code,
                         )
 
                         # Add relationship between screenshot and card

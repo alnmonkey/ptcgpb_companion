@@ -28,6 +28,7 @@ class ImageProcessor:
     def __init__(self, card_imgs_dir: str = "card_imgs"):
         """Initialize the image processor"""
         self.card_imgs_dir = card_imgs_dir
+        self._lock = threading.Lock()
         self.card_database = self._load_card_database()
         self.card_names = self._load_card_names()
 
@@ -42,7 +43,8 @@ class ImageProcessor:
         self.match_width, self.match_height = 92, 128
 
         if self.card_database:
-            self._prepare_templates()
+            with self._lock:
+                self._prepare_templates()
 
     def _load_phashes(self) -> bool:
         """Load pHashes from phashes.json if it exists"""
@@ -562,13 +564,14 @@ class ImageProcessor:
         best_match = None
         best_score = -1
 
-        # Ensure templates are prepared
-        if not hasattr(self, "phash_templates") or not self.phash_templates:
-            self._prepare_templates()
-
         # Multi-stage matching for better performance:
         # 1. Quick search using pHash and Hamming distance to identify likely sets
         # 2. Detailed search at full resolution within the candidate sets
+
+        # Ensure templates are prepared
+        with self._lock:
+            if not hasattr(self, "phash_templates") or not self.phash_templates:
+                self._prepare_templates()
 
         # Stage 1: Quick search using pHash
         # Compute pHash for the region directly from the provided region

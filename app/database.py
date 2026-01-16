@@ -7,6 +7,7 @@ This module provides database access for the portable desktop application.
 
 import sqlite3
 import threading
+import os
 from typing import List, Dict, Any, Optional
 import logging
 from contextlib import contextmanager
@@ -124,13 +125,61 @@ class Database:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     card_name TEXT,
                     card_set TEXT,
+                    card_code TEXT,
                     image_path TEXT,
                     rarity TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    UNIQUE(card_name, card_set)
+                    UNIQUE(card_code, card_set)
                 )
             """
             )
+
+            # Check if card_code column exists in existing table
+            cursor.execute("PRAGMA table_info(cards)")
+            columns = [row[1] for row in cursor.fetchall()]
+            if "card_code" not in columns:
+                logger.info("Migrating database: Adding card_code column to cards table")
+                try:
+                    # SQLite doesn't support dropping/modifying UNIQUE constraints easily.
+                    # The safest way is to recreate the table.
+                    cursor.execute("ALTER TABLE cards RENAME TO cards_old")
+                    cursor.execute("""
+                        CREATE TABLE cards (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            card_name TEXT,
+                            card_set TEXT,
+                            card_code TEXT,
+                            image_path TEXT,
+                            rarity TEXT,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            UNIQUE(card_code, card_set)
+                        )
+                    """)
+                    
+                    # Copy data and try to infer card_code from image_path
+                    cursor.execute("SELECT id, card_name, card_set, image_path, rarity, created_at FROM cards_old")
+                    for row in cursor.fetchall():
+                        cid, name, cset, img_path, rarity, created = row
+                        # Infer code from image_path: "A2b/A2b_80.webp" -> "A2b_80"
+                        code = None
+                        if img_path:
+                            base = os.path.basename(img_path)
+                            code = os.path.splitext(base)[0]
+                        
+                        if not code:
+                            code = f"{cset}_{name}"
+                            
+                        cursor.execute("""
+                            INSERT INTO cards (id, card_name, card_set, card_code, image_path, rarity, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """, (cid, name, cset, code, img_path, rarity, created))
+                    
+                    cursor.execute("DROP TABLE cards_old")
+                    logger.info("Database migration: cards table updated successfully")
+                except Exception as e:
+                    logger.error(f"Failed to migrate cards table: {e}")
+                    # Try to recover by renaming back if possible, but rename might fail if new table exists
+                    raise
 
             # Create index for faster searches (only for tables that exist)
             cursor.execute(
@@ -272,7 +321,12 @@ class Database:
             self._return_connection()
 
     def add_card(
-        self, card_name: str, card_set: str, image_path: str, rarity: str = None
+        self,
+        card_name: str,
+        card_set: str,
+        image_path: str,
+        rarity: str = None,
+        card_code: str = None,
     ) -> int:
         """
         Add a card to the database
@@ -282,6 +336,7 @@ class Database:
             card_set: Set the card belongs to
             image_path: Path to card image
             rarity: Rarity of the card (optional)
+            card_code: Unique code for the card (optional)
 
         Returns:
             int: ID of the card
@@ -290,20 +345,27 @@ class Database:
         try:
             cursor = conn.cursor()
 
+            # If card_code not provided, infer from image_path or use set_name
+            if not card_code:
+                if image_path:
+                    card_code = os.path.splitext(os.path.basename(image_path))[0]
+                else:
+                    card_code = f"{card_set}_{card_name}"
+
             cursor.execute(
                 """
-                INSERT OR IGNORE INTO cards (card_name, card_set, image_path, rarity)
-                VALUES (?, ?, ?, ?)
+                INSERT OR IGNORE INTO cards (card_name, card_set, card_code, image_path, rarity)
+                VALUES (?, ?, ?, ?, ?)
             """,
-                (card_name, card_set, image_path, rarity),
+                (card_name, card_set, card_code, image_path, rarity),
             )
 
             self._commit(conn)
 
             # Get the card ID
             cursor.execute(
-                "SELECT id FROM cards WHERE card_name = ? AND card_set = ?",
-                (card_name, card_set),
+                "SELECT id FROM cards WHERE card_code = ? AND card_set = ?",
+                (card_code, card_set),
             )
             result = cursor.fetchone()
             return result[0] if result else None
@@ -519,7 +581,7 @@ class Database:
             if account:
                 query = """
                     SELECT 
-                        c.card_name || '_' || c.card_set as card_code,
+                        c.card_code,
                         c.card_name,
                         c.card_set as set_name,
                         c.rarity,
@@ -528,14 +590,14 @@ class Database:
                     FROM cards c
                     LEFT JOIN screenshot_cards sc ON c.id = sc.card_id
                     LEFT JOIN screenshots s ON sc.screenshot_id = s.id AND s.account = ?
-                    GROUP BY c.card_name, c.card_set, c.rarity, c.image_path
-                    ORDER BY c.card_set, c.card_name
+                    GROUP BY c.card_code, c.card_name, c.card_set, c.rarity, c.image_path
+                    ORDER BY c.card_set, c.card_code
                 """
                 cursor.execute(query, (account,))
             else:
                 query = """
                     SELECT 
-                        c.card_name || '_' || c.card_set as card_code,
+                        c.card_code,
                         c.card_name,
                         c.card_set as set_name,
                         c.rarity,
@@ -543,8 +605,8 @@ class Database:
                         c.image_path
                     FROM cards c
                     LEFT JOIN screenshot_cards sc ON c.id = sc.card_id
-                    GROUP BY c.card_name, c.card_set, c.rarity, c.image_path
-                    ORDER BY c.card_set, c.card_name
+                    GROUP BY c.card_code, c.card_name, c.card_set, c.rarity, c.image_path
+                    ORDER BY c.card_set, c.card_code
                 """
                 cursor.execute(query)
 
@@ -566,14 +628,6 @@ class Database:
         try:
             cursor = conn.cursor()
 
-            # Split card code into name and set
-            if "_" in card_code:
-                # Use rsplit to handle cases where card_name itself contains underscores (e.g., A1_1_A1)
-                name, set_name = card_code.rsplit("_", 1)
-            else:
-                name = card_code
-                set_name = ""
-
             query = """
                 SELECT 
                     s.account,
@@ -581,12 +635,12 @@ class Database:
                 FROM screenshots s
                 JOIN screenshot_cards sc ON s.id = sc.screenshot_id
                 JOIN cards c ON sc.card_id = c.id
-                WHERE c.card_name = ? AND c.card_set = ?
+                WHERE c.card_code = ?
                 GROUP BY s.account
                 ORDER BY card_count DESC, s.account ASC
             """
 
-            cursor.execute(query, (name, set_name))
+            cursor.execute(query, (card_code,))
             return cursor.fetchall()
         finally:
             self._return_connection()
