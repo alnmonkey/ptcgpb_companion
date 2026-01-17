@@ -794,7 +794,10 @@ class AccountCardListDialog(QDialog):
                             screenshot_path is None or spath == screenshot_path
                         ):
                             if count > 1:
-                                self.all_data[i] = (acc, count - 1, spath)
+                                # Preserve all columns, just update count
+                                new_row = list(row)
+                                new_row[1] = count - 1
+                                self.all_data[i] = tuple(new_row)
                             else:
                                 self.all_data.pop(i)
                             break
