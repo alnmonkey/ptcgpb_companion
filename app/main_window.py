@@ -65,6 +65,7 @@ from app.utils import (
     get_app_version,
     get_removed_cards,
     clear_removed_cards,
+    get_task_id,
 )
 from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
@@ -189,7 +190,7 @@ class MainWindow(QMainWindow):
                 # Create a task entry so it appears in Processing tab & counter
                 import uuid
 
-                task_id = str(uuid.uuid4())
+                task_id = get_task_id()
                 self._add_processing_task(task_id, "Card Art Download")
 
                 worker = CardArtDownloadWorker()
@@ -1570,10 +1571,7 @@ class MainWindow(QMainWindow):
         self._update_status_message(f"Starting background CSV import...")
 
         try:
-            # Generate task ID
-            import uuid
-
-            task_id = str(uuid.uuid4())
+            task_id = get_task_id()
 
             # Add task to tracking system
             self._add_processing_task(
@@ -1860,10 +1858,7 @@ class MainWindow(QMainWindow):
         self._update_status_message(f"Starting background screenshot processing...")
 
         try:
-            # Generate task ID
-            import uuid
-
-            task_id = str(uuid.uuid4())
+            task_id = get_task_id()
 
             # Add task to tracking system
             self._add_processing_task(

@@ -726,6 +726,8 @@ class Database:
 
             results = cursor.fetchall()
             # If any matching record is processed, we consider it processed
+            # IMPORTANT: We MUST ensure we are checking ONLY the record for the given account if provided.
+            # The current query already filters by account, so we just check if any resulting row is 1.
             return any(row[0] == 1 for row in results)
         except Exception as e:
             logger.error(f"Error checking if screenshot exists: {e}")
@@ -733,13 +735,17 @@ class Database:
         finally:
             self._return_connection()
 
-    def get_unprocessed_files(self, filenames: List[str]) -> List[str]:
+    def get_unprocessed_files(
+        self, filenames: List[str], account: str = None
+    ) -> List[str]:
         """
         Given a list of filenames, returns only those that are NOT already
         processed in the database.
+        If account is provided, only filters out files processed for that specific account.
 
         Args:
             filenames: List of filenames to check
+            account: Optional account name to filter by
 
         Returns:
             List[str]: List of filenames that are not processed
@@ -759,12 +765,23 @@ class Database:
             for i in range(0, len(filenames), batch_size):
                 chunk = filenames[i : i + batch_size]
                 placeholders = ", ".join(["?"] * len(chunk))
-                query = f"""
-                    SELECT original_filename, pack_screenshot 
-                    FROM screenshots 
-                    WHERE processed = 1 AND (original_filename IN ({placeholders}) OR pack_screenshot IN ({placeholders}))
-                """
-                cursor.execute(query, chunk + chunk)
+
+                if account:
+                    query = f"""
+                        SELECT original_filename, pack_screenshot 
+                        FROM screenshots 
+                        WHERE processed = 1 AND account = ? AND (original_filename IN ({placeholders}) OR pack_screenshot IN ({placeholders}))
+                    """
+                    params = [account] + chunk + chunk
+                else:
+                    query = f"""
+                        SELECT original_filename, pack_screenshot 
+                        FROM screenshots 
+                        WHERE processed = 1 AND (original_filename IN ({placeholders}) OR pack_screenshot IN ({placeholders}))
+                    """
+                    params = chunk + chunk
+
+                cursor.execute(query, params)
                 for row in cursor.fetchall():
                     if row[0]:
                         all_processed.add(row[0])

@@ -13,6 +13,8 @@ import os
 import logging
 import tomllib
 import json
+import uuid
+
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtCore import QSettings
 
@@ -286,3 +288,7 @@ def show_info_message(title, message):
     msg_box.setWindowTitle(title)
     msg_box.setText(message)
     msg_box.exec()
+
+
+def get_task_id() -> str:
+    return str(uuid.uuid4()).split("-")[0]

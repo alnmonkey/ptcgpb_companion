@@ -25,25 +25,31 @@ class ImageProcessor:
     Provides functionality for identifying cards in screenshot images.
     """
 
+    _init_lock = threading.Lock()
+    _phashes_lock = threading.Lock()
+
     def __init__(self, card_imgs_dir: str = "card_imgs"):
         """Initialize the image processor"""
         self.card_imgs_dir = card_imgs_dir
-        self._lock = threading.Lock()
-        self.card_database = self._load_card_database()
-        self.card_names = self._load_card_names()
+        self._lock = threading.RLock()
 
-        # Pre-calculated templates for performance
-        self.color_templates = {}
-        self.phash_templates = {}
+        with ImageProcessor._init_lock:
+            self.card_database = self._load_card_database()
+            self.card_names = self._load_card_names()
 
-        # Vectorized data structures for performance
-        self.phash_matrix = None
-        self.phash_metadata = []
-        self.template_vectors = {}  # {set_name: {'matrix': np.array, 'metadata': list}}
-        self.match_width, self.match_height = 92, 128
+            # Pre-calculated templates for performance
+            self.color_templates = {}
+            self.phash_templates = {}
 
-        if self.card_database:
-            with self._lock:
+            # Vectorized data structures for performance
+            self.phash_matrix = None
+            self.phash_metadata = []
+            self.template_vectors = (
+                {}
+            )  # {set_name: {'matrix': np.array, 'metadata': list}}
+            self.match_width, self.match_height = 92, 128
+
+            if self.card_database:
                 self._prepare_templates()
 
     def _load_phashes(self) -> bool:
@@ -194,28 +200,31 @@ class ImageProcessor:
         Args:
             template_dir: Directory containing card template images
         """
-        try:
-            logger.info(f"Loading card templates from {template_dir}")
+        with self._lock:
+            try:
+                logger.info(f"Loading card templates from {template_dir}")
 
-            # Check if directory exists
-            if not os.path.isdir(template_dir):
-                raise FileNotFoundError(f"Template directory not found: {template_dir}")
+                # Check if directory exists
+                if not os.path.isdir(template_dir):
+                    raise FileNotFoundError(
+                        f"Template directory not found: {template_dir}"
+                    )
 
-            # Update card_imgs_dir and reload database
-            self.card_imgs_dir = template_dir
-            self.card_database = self._load_card_database()
+                # Update card_imgs_dir and reload database
+                self.card_imgs_dir = template_dir
+                self.card_database = self._load_card_database()
 
-            if self.card_database:
-                self._prepare_templates()  # Optimization: Pre-calculate versions
-                template_count = self.get_template_count()
-                logger.info(f"Successfully loaded {template_count} card templates")
-                self.loaded = True
-            else:
-                raise ValueError(f"No valid card templates found in {template_dir}")
+                if self.card_database:
+                    self._prepare_templates()  # Optimization: Pre-calculate versions
+                    template_count = self.get_template_count()
+                    logger.info(f"Successfully loaded {template_count} card templates")
+                    self.loaded = True
+                else:
+                    raise ValueError(f"No valid card templates found in {template_dir}")
 
-        except Exception as e:
-            logger.error(f"Failed to load card templates: {e}")
-            raise
+            except Exception as e:
+                logger.error(f"Failed to load card templates: {e}")
+                raise
 
     def _prepare_templates(self):
         """Pre-calculate versions of all templates and compute pHashes"""
@@ -306,149 +315,152 @@ class ImageProcessor:
         Returns:
             List[Dict]: List of identified cards with positions and confidence scores
         """
-        if not self.phash_templates:
-            raise RuntimeError(
-                "Card templates not loaded. Call load_card_templates() first."
-            )
-
-        try:
-            logger.info(f"Processing screenshot: {image_path}")
-
-            # Load and preprocess screenshot
-            screenshot = self._preprocess_screenshot(image_path)
-
-            if screenshot is None:
-                logger.warning(f"Failed to load screenshot: {image_path}")
-                return []
-
-            logger.info(f"Screenshot loaded: {screenshot.shape}")
-
-            # Detect card positions using fixed layout
-            card_positions = self._detect_card_positions(screenshot)
-
-            num_cards = len(card_positions)
-            logger.info(f"Detected {num_cards} card positions")
-
-            # If 4 cards, it's always A4b / Deluxe Pack Ex
-            # If 5 or 6 cards, it's guaranteed NOT to be A4b
-            forced_set = "A4b" if num_cards == 4 else None
-            excluded_sets = ["A4b"] if num_cards in (5, 6) else []
-
-            if forced_set:
-                logger.info(f"Four-card pack detected, forcing set to {forced_set}")
-            if excluded_sets:
-                logger.info(
-                    f"{num_cards}-card pack detected, excluding sets: {excluded_sets}"
+        with self._lock:
+            if not self.phash_templates:
+                raise RuntimeError(
+                    "Card templates not loaded. Call load_card_templates() first."
                 )
 
-            # Stage 1: Initial identification for all cards
-            initial_results = []
-            set_counts = {}
+            try:
+                logger.info(f"Processing screenshot: {image_path}")
 
-            for i, (x, y, w, h) in enumerate(card_positions):
-                logger.info(f"Initial scan: card {i+1} at position ({x}, {y})")
-                card_region = screenshot[y : y + h, x : x + w]
-                best_match = self._find_best_card_match(
-                    card_region, force_set=forced_set, exclude_sets=excluded_sets
-                )
+                # Load and preprocess screenshot
+                screenshot = self._preprocess_screenshot(image_path)
 
-                initial_results.append(
-                    {
-                        "position": i + 1,
-                        "best_match": best_match,
-                        "x": x,
-                        "y": y,
-                        "w": w,
-                        "h": h,
-                        "card_region": card_region,
-                    }
-                )
+                if screenshot is None:
+                    logger.warning(f"Failed to load screenshot: {image_path}")
+                    return []
 
-                # Use slightly lower threshold for majority set identification
-                if best_match and best_match["confidence"] > 0.2:
-                    card_set = best_match["card_set"]
-                    set_counts[card_set] = set_counts.get(card_set, 0) + 1
+                logger.info(f"Screenshot loaded: {screenshot.shape}")
 
-            # Determine majority set by weighted confidence
-            majority_set = forced_set
-            if not majority_set and set_counts:
-                # Sum up confidence for each set to find the most likely set for the whole pack
-                set_weights = {}
-                for result in initial_results:
-                    bm = result["best_match"]
-                    if bm and bm["confidence"] > 0.2:
-                        s = bm["card_set"]
-                        set_weights[s] = set_weights.get(s, 0.0) + bm["confidence"]
+                # Detect card positions using fixed layout
+                card_positions = self._detect_card_positions(screenshot)
 
-                if set_weights:
-                    majority_set = max(set_weights.items(), key=lambda x: x[1])[0]
-                    logger.info(f"Majority set identified (weighted): {majority_set}")
+                num_cards = len(card_positions)
+                logger.info(f"Detected {num_cards} card positions")
 
-            # Stage 2: Re-process all cards with the majority set as accuracy check
-            # mostly for similar cards (like 80 vs 108) that might have been
-            # misidentified in Stage 1 due to pHash collisions
-            detected_cards = []
-            for result in initial_results:
-                best_match = result["best_match"]
-                i = result["position"]
+                # If 4 cards, it's always A4b / Deluxe Pack Ex
+                # If 5 or 6 cards, it's guaranteed NOT to be A4b
+                forced_set = "A4b" if num_cards == 4 else None
+                excluded_sets = ["A4b"] if num_cards in (5, 6) else []
 
-                if majority_set:
-                    is_outlier = (
-                        not best_match or best_match["card_set"] != majority_set
-                    )
-                    if is_outlier:
-                        logger.info(
-                            f"Re-scanning outlier card {i} in majority set {majority_set} with detailed search"
-                        )
-                    else:
-                        logger.info(
-                            f"Re-scanning card {i} in majority set {majority_set} to confirm identity"
-                        )
-
-                    new_match = self._find_best_card_match(
-                        result["card_region"],
-                        force_set=majority_set,
-                        force_detailed=True,
-                    )
-
-                    # Only update if the new match is at least somewhat decent
-                    if new_match and new_match["confidence"] > 0.2:
-                        best_match = new_match
-                    elif not best_match:
-                        best_match = new_match
-
-                # Final check with lower threshold
-                if best_match and best_match["confidence"] > 0.2:
-                    # Get the display name for this card
-                    display_name = self._get_display_name(
-                        best_match["card_name"], best_match["card_set"]
-                    )
+                if forced_set:
+                    logger.info(f"Four-card pack detected, forcing set to {forced_set}")
+                if excluded_sets:
                     logger.info(
-                        f"Final result card {i}: {display_name} (confidence: {best_match['confidence']:.2f})"
+                        f"{num_cards}-card pack detected, excluding sets: {excluded_sets}"
                     )
 
-                    detected_cards.append(
+                # Stage 1: Initial identification for all cards
+                initial_results = []
+                set_counts = {}
+
+                for i, (x, y, w, h) in enumerate(card_positions):
+                    logger.info(f"Initial scan: card {i+1} at position ({x}, {y})")
+                    card_region = screenshot[y : y + h, x : x + w]
+                    best_match = self._find_best_card_match(
+                        card_region, force_set=forced_set, exclude_sets=excluded_sets
+                    )
+
+                    initial_results.append(
                         {
-                            "position": i,
-                            "card_code": best_match["card_name"],
-                            "card_name": display_name,
-                            "card_set": best_match["card_set"],
-                            "confidence": best_match["confidence"],
-                            "x": result["x"],
-                            "y": result["y"],
-                            "width": result["w"],
-                            "height": result["h"],
+                            "position": i + 1,
+                            "best_match": best_match,
+                            "x": x,
+                            "y": y,
+                            "w": w,
+                            "h": h,
+                            "card_region": card_region,
                         }
                     )
-                else:
-                    logger.info(f"No card match found for position {i}")
 
-            logger.info(f"Found {len(detected_cards)} cards in {image_path}")
-            return detected_cards
+                    # Use slightly lower threshold for majority set identification
+                    if best_match and best_match["confidence"] > 0.2:
+                        card_set = best_match["card_set"]
+                        set_counts[card_set] = set_counts.get(card_set, 0) + 1
 
-        except Exception as e:
-            logger.error(f"Failed to process screenshot {image_path}: {e}")
-            raise
+                # Determine majority set by weighted confidence
+                majority_set = forced_set
+                if not majority_set and set_counts:
+                    # Sum up confidence for each set to find the most likely set for the whole pack
+                    set_weights = {}
+                    for result in initial_results:
+                        bm = result["best_match"]
+                        if bm and bm["confidence"] > 0.2:
+                            s = bm["card_set"]
+                            set_weights[s] = set_weights.get(s, 0.0) + bm["confidence"]
+
+                    if set_weights:
+                        majority_set = max(set_weights.items(), key=lambda x: x[1])[0]
+                        logger.info(
+                            f"Majority set identified (weighted): {majority_set}"
+                        )
+
+                # Stage 2: Re-process all cards with the majority set as accuracy check
+                # mostly for similar cards (like 80 vs 108) that might have been
+                # misidentified in Stage 1 due to pHash collisions
+                detected_cards = []
+                for result in initial_results:
+                    best_match = result["best_match"]
+                    i = result["position"]
+
+                    if majority_set:
+                        is_outlier = (
+                            not best_match or best_match["card_set"] != majority_set
+                        )
+                        if is_outlier:
+                            logger.info(
+                                f"Re-scanning outlier card {i} in majority set {majority_set} with detailed search"
+                            )
+                        else:
+                            logger.info(
+                                f"Re-scanning card {i} in majority set {majority_set} to confirm identity"
+                            )
+
+                        new_match = self._find_best_card_match(
+                            result["card_region"],
+                            force_set=majority_set,
+                            force_detailed=True,
+                        )
+
+                        # Only update if the new match is at least somewhat decent
+                        if new_match and new_match["confidence"] > 0.2:
+                            best_match = new_match
+                        elif not best_match:
+                            best_match = new_match
+
+                    # Final check with lower threshold
+                    if best_match and best_match["confidence"] > 0.2:
+                        # Get the display name for this card
+                        display_name = self._get_display_name(
+                            best_match["card_name"], best_match["card_set"]
+                        )
+                        logger.info(
+                            f"Final result card {i}: {display_name} (confidence: {best_match['confidence']:.2f})"
+                        )
+
+                        detected_cards.append(
+                            {
+                                "position": i,
+                                "card_code": best_match["card_name"],
+                                "card_name": display_name,
+                                "card_set": best_match["card_set"],
+                                "confidence": best_match["confidence"],
+                                "x": result["x"],
+                                "y": result["y"],
+                                "width": result["w"],
+                                "height": result["h"],
+                            }
+                        )
+                    else:
+                        logger.info(f"No card match found for position {i}")
+
+                logger.info(f"Found {len(detected_cards)} cards in {image_path}")
+                return detected_cards
+
+            except Exception as e:
+                logger.error(f"Failed to process screenshot {image_path}: {e}")
+                raise
 
     def _detect_card_positions(
         self, screenshot: np.ndarray
@@ -685,7 +697,7 @@ class ImageProcessor:
                 if len(candidate_sets) >= 5:
                     break
 
-        logger.info(f"Candidate sets for detailed search: {candidate_sets}")
+        # logger.info(f"Candidate sets for detailed search: {candidate_sets}")
 
         # Upscale card region to match matching resolution for detailed matching
         upscaled_region = cv2.resize(card_region, (self.match_width, self.match_height))

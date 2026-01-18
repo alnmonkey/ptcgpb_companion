@@ -12,10 +12,9 @@ import os
 import csv
 import time
 import logging
+import threading
 
 from app.utils import PortableSettings
-
-logger = logging.getLogger(__name__)
 
 
 def get_max_thread_count():
@@ -57,6 +56,11 @@ class CSVImportWorker(QRunnable):
         self.screenshots_dir = screenshots_dir
         self.signals = WorkerSignals()
         self._is_cancelled = False
+
+        logger_name = f"{__name__}.{self.__class__.__name__}"
+        if self.task_id:
+            logger_name += f".{self.task_id}"
+        self.logger = logging.getLogger(logger_name)
 
     def run(self):
         """Process CSV import in background thread"""
@@ -160,7 +164,7 @@ class CSVImportWorker(QRunnable):
                                 if is_new:
                                     new_records += 1
                         except Exception as e:
-                            logger.error(f"Error importing row: {e}")
+                            self.logger.error(f"Error importing row: {e}")
 
                         processed_count += 1
 
@@ -214,6 +218,7 @@ class CardArtDownloadWorker(QRunnable):
         base_list_url: str = None,
         card_url_template: str = None,
         max_workers: int = None,
+        task_id: str = None,
     ):
         super().__init__()
         self.signals = WorkerSignals()
@@ -223,6 +228,12 @@ class CardArtDownloadWorker(QRunnable):
             "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/{set_id}/{set_id}_{card_num}_EN_SM.webp"
         )
         self.max_workers = max_workers or get_max_thread_count()
+        self.task_id = task_id
+
+        logger_name = f"{__name__}.{self.__class__.__name__}"
+        if self.task_id:
+            logger_name += f".{self.task_id}"
+        self.logger = logging.getLogger(logger_name)
 
     def cancel(self):
         """Cancel the worker"""
@@ -282,6 +293,9 @@ class CardArtDownloadWorker(QRunnable):
             )
 
             def download_set(set_id: str) -> int:
+                # Use a child logger that includes the thread name
+                logger = self.logger.getChild(threading.current_thread().name)
+
                 if self._is_cancelled:
                     return 0
                 images_saved = 0
@@ -317,7 +331,10 @@ class CardArtDownloadWorker(QRunnable):
                 return images_saved
 
             total_saved = 0
-            self._executor = ThreadPoolExecutor(max_workers=self.max_workers)
+            self._executor = ThreadPoolExecutor(
+                max_workers=self.max_workers,
+                thread_name_prefix=f"ArtDL-{self.task_id or 'pool'}",
+            )
             try:
                 futures = {
                     self._executor.submit(download_set, sid): sid for sid in set_ids
@@ -364,7 +381,7 @@ class CardArtDownloadWorker(QRunnable):
                     processor = ImageProcessor(dest_root)
                     self.signals.status.emit("pHashes precomputed and saved.")
                 except Exception as e:
-                    logger.error(f"Failed to precompute pHashes: {e}")
+                    self.logger.error(f"Failed to precompute pHashes: {e}")
                     self.signals.status.emit(
                         f"Warning: Failed to precompute pHashes: {e}"
                     )
@@ -393,6 +410,12 @@ class ScreenshotProcessingWorker(QRunnable):
         self.signals = WorkerSignals()
         self._is_cancelled = False
         self._executor = None
+        self._db_lock = threading.Lock()
+
+        logger_name = f"{__name__}.{self.__class__.__name__}"
+        if self.task_id:
+            logger_name += f".{self.task_id}"
+        self.logger = logging.getLogger(logger_name)
 
     def run(self):
         """Process screenshot images in background thread"""
@@ -509,6 +532,9 @@ class ScreenshotProcessingWorker(QRunnable):
 
             def process_single_file(filename):
                 """Helper function to process a single file in a thread"""
+                # Use a child logger that includes the thread name to distinguish parallel workers
+                logger = self.logger.getChild(threading.current_thread().name)
+
                 if self._is_cancelled:
                     return None
 
@@ -527,7 +553,7 @@ class ScreenshotProcessingWorker(QRunnable):
                         )
                         # Reuse storage routine with no detected cards
                         self._store_results_in_database(
-                            filename, [], full_path=file_path
+                            filename, [], full_path=file_path, logger=logger
                         )
                         # Do not count as "with results" but it's successfully handled
                         return False
@@ -538,7 +564,7 @@ class ScreenshotProcessingWorker(QRunnable):
                     # Store results in database
                     if cards_found:
                         self._store_results_in_database(
-                            filename, cards_found, full_path=file_path
+                            filename, cards_found, full_path=file_path, logger=logger
                         )
                         return True
                     else:
@@ -548,7 +574,10 @@ class ScreenshotProcessingWorker(QRunnable):
                     logger.error(f"Error processing {filename}: {e}")
                     return False
 
-            self._executor = ThreadPoolExecutor(max_workers=max_workers)
+            self._executor = ThreadPoolExecutor(
+                max_workers=max_workers,
+                thread_name_prefix=f"ImgProc-{self.task_id or 'pool'}",
+            )
             try:
                 # Submit all tasks
                 future_to_file = {
@@ -631,10 +660,13 @@ class ScreenshotProcessingWorker(QRunnable):
         # Fallback: replace underscores with spaces and return the whole base name
         return base_name.replace("_", " ").strip()
 
-    def _identify_set(self, cards_found: list) -> str:
+    def _identify_set(self, cards_found: list, logger: logging.Logger = None) -> str:
         """
         Identify the set name from the detected cards.
         """
+        if logger is None:
+            logger = self.logger
+
         if not cards_found:
             return "Unknown"
 
@@ -661,113 +693,126 @@ class ScreenshotProcessingWorker(QRunnable):
             return "Unknown"
 
     def _store_results_in_database(
-        self, filename: str, cards_found: list, full_path: str = None
+        self,
+        filename: str,
+        cards_found: list,
+        full_path: str = None,
+        logger: logging.Logger = None,
     ):
         """Store processing results in the database"""
-        max_retries = 5
-        retry_delay = 1.0  # seconds
+        if logger is None:
+            logger = self.logger
 
-        for attempt in range(max_retries):
-            try:
-                # Use the database instance from the worker
-                db = self.db
+        with self._db_lock:
+            max_retries = 5
+            retry_delay = 1.0  # seconds
 
-                # Identify set from cards found
-                pack_type = self._identify_set(cards_found)
+            for attempt in range(max_retries):
+                try:
+                    # Use the database instance from the worker
+                    db = self.db
 
-                # Fallback to filename if set is unknown
-                if pack_type == "Unknown":
-                    pack_type = self._extract_pack_type(filename)
+                    # Identify set from cards found
+                    pack_type = self._identify_set(cards_found, logger=logger)
 
-                # Add screenshot record
-                # Default to "Account Unknown" for screenshots without CSV info
-                screenshot_data = {
-                    "Timestamp": datetime.now().isoformat(),
-                    "OriginalFilename": filename,
-                    "CleanFilename": "Account Unknown",
-                    "Account": "Account Unknown",
-                    "PackType": pack_type,
-                    "CardTypes": ", ".join([card["card_name"] for card in cards_found]),
-                    "CardCounts": str(len(cards_found)),
-                    "PackScreenshot": filename,  # Use filename as unique key for screenshot
-                    "ScreenshotPath": full_path,
-                    "Shinedust": "",
-                }
+                    # Fallback to filename if set is unknown
+                    if pack_type == "Unknown":
+                        pack_type = self._extract_pack_type(filename)
 
-                with db.transaction():
-                    screenshot_id, is_new = db.add_screenshot(screenshot_data)
+                    # Add screenshot record
+                    # Default to "Account Unknown" for screenshots without CSV info
+                    screenshot_data = {
+                        "Timestamp": datetime.now().isoformat(),
+                        "OriginalFilename": filename,
+                        "CleanFilename": "Account Unknown",
+                        "Account": "Account Unknown",
+                        "PackType": pack_type,
+                        "CardTypes": ", ".join(
+                            [card["card_name"] for card in cards_found]
+                        ),
+                        "CardCounts": str(len(cards_found)),
+                        "PackScreenshot": filename,  # Use filename as unique key for screenshot
+                        "ScreenshotPath": full_path,
+                        "Shinedust": "",
+                    }
 
-                    if not is_new and not self.overwrite:
-                        # If the screenshot already exists, check if it's already been processed
-                        # This allows processing screenshots that were imported via CSV but not yet analyzed
-                        if db.check_screenshot_exists(
-                            filename, screenshot_data["Account"]
-                        ):
-                            self.signals.status.emit(
-                                f"Skipping {filename}: Already processed in database"
+                    with db.transaction():
+                        screenshot_id, is_new = db.add_screenshot(screenshot_data)
+
+                        if not is_new and not self.overwrite:
+                            # If the screenshot already exists, check if it's already been processed
+                            # This allows processing screenshots that were imported via CSV but not yet analyzed
+                            if db.check_screenshot_exists(
+                                filename, screenshot_data["Account"]
+                            ):
+                                self.signals.status.emit(
+                                    f"Skipping {filename}: Already processed in database"
+                                )
+                                return
+                            else:
+                                self.logger.info(
+                                    f"Screenshot {filename} exists in database but is not processed. Continuing."
+                                )
+
+                        # Add each card to database and create relationships
+                        for card_data in cards_found:
+                            # Extract card code if available
+                            card_code = card_data.get("card_code", "")
+                            card_name = card_data.get("card_name", "Unknown")
+                            card_set = card_data.get("card_set", "Unknown")
+
+                            # Try to extract card number from code for better image path
+                            if card_code and "_" in card_code:
+                                set_code, card_number = card_code.split("_", 1)
+                                # Use the card number for the image path
+                                image_path = f"{set_code}/{card_code}.webp"
+                            else:
+                                # Fallback to name-based path
+                                image_path = f"{card_set}/{card_name}.webp"
+
+                            # Add card (if not already exists)
+                            card_id = db.add_card(
+                                card_name=card_name,
+                                card_set=card_set,
+                                image_path=image_path,
+                                rarity="Common",  # Default rarity for now
+                                card_code=card_code,
                             )
-                            return
-                        else:
-                            logger.info(
-                                f"Screenshot {filename} exists in database but is not processed. Continuing."
-                            )
 
-                    # Add each card to database and create relationships
-                    for card_data in cards_found:
-                        # Extract card code if available
-                        card_code = card_data.get("card_code", "")
-                        card_name = card_data.get("card_name", "Unknown")
-                        card_set = card_data.get("card_set", "Unknown")
+                            # Add relationship between screenshot and card
+                            if card_id:
+                                db.add_screenshot_card(
+                                    screenshot_id=screenshot_id,
+                                    card_id=card_id,
+                                    position=card_data.get("position", 1),
+                                    confidence=card_data.get("confidence", 0.0),
+                                )
 
-                        # Try to extract card number from code for better image path
-                        if card_code and "_" in card_code:
-                            set_code, card_number = card_code.split("_", 1)
-                            # Use the card number for the image path
-                            image_path = f"{set_code}/{card_code}.webp"
-                        else:
-                            # Fallback to name-based path
-                            image_path = f"{card_set}/{card_name}.webp"
+                                # Log the card detection
+                                logger.info(
+                                    f"Stored card {card_name} ({card_set}) with confidence {card_data.get('confidence', 0.0):.2f}"
+                                )
 
-                        # Add card (if not already exists)
-                        card_id = db.add_card(
-                            card_name=card_name,
-                            card_set=card_set,
-                            image_path=image_path,
-                            rarity="Common",  # Default rarity for now
-                            card_code=card_code,
+                        # Mark screenshot as processed
+                        db.mark_screenshot_processed(screenshot_id)
+
+                    # If we reached here, success!
+                    return
+
+                except Exception as e:
+                    if (
+                        "database is locked" in str(e).lower()
+                        and attempt < max_retries - 1
+                    ):
+                        logger.warning(
+                            f"Database locked while storing {filename}, retrying in {retry_delay}s (attempt {attempt + 1}/{max_retries})"
                         )
+                        time.sleep(retry_delay)
+                        # Exponential backoff could be used here: retry_delay *= 2
+                        continue
 
-                        # Add relationship between screenshot and card
-                        if card_id:
-                            db.add_screenshot_card(
-                                screenshot_id=screenshot_id,
-                                card_id=card_id,
-                                position=card_data.get("position", 1),
-                                confidence=card_data.get("confidence", 0.0),
-                            )
-
-                            # Log the card detection
-                            logger.info(
-                                f"Stored card {card_name} ({card_set}) with confidence {card_data.get('confidence', 0.0):.2f}"
-                            )
-
-                    # Mark screenshot as processed
-                    db.mark_screenshot_processed(screenshot_id)
-
-                # If we reached here, success!
-                return
-
-            except Exception as e:
-                if "database is locked" in str(e).lower() and attempt < max_retries - 1:
-                    logger.warning(
-                        f"Database locked while storing {filename}, retrying in {retry_delay}s (attempt {attempt + 1}/{max_retries})"
-                    )
-                    time.sleep(retry_delay)
-                    # Exponential backoff could be used here: retry_delay *= 2
-                    continue
-
-                logger.error(f"Error storing results for {filename}: {e}")
-                raise
+                    logger.error(f"Error storing results for {filename}: {e}")
+                    raise
 
     def cancel(self):
         """Cancel the worker"""
@@ -789,12 +834,18 @@ class ScreenshotProcessingWorker(QRunnable):
 class DatabaseBackupWorker(QRunnable):
     """Worker for database backup operations"""
 
-    def __init__(self, source_path: str, backup_path: str):
+    def __init__(self, source_path: str, backup_path: str, task_id: str = None):
         super().__init__()
         self.source_path = source_path
         self.backup_path = backup_path
+        self.task_id = task_id
         self.signals = WorkerSignals()
         self._is_cancelled = False
+
+        logger_name = f"{__name__}.{self.__class__.__name__}"
+        if self.task_id:
+            logger_name += f".{self.task_id}"
+        self.logger = logging.getLogger(logger_name)
 
     def run(self):
         """Perform database backup in background thread"""
@@ -850,12 +901,23 @@ class DatabaseBackupWorker(QRunnable):
 class CardDataLoadWorker(QRunnable):
     """Worker to load and prepare card data in the background"""
 
-    def __init__(self, db_path: str = None, account_filter: Optional[str] = None):
+    def __init__(
+        self,
+        db_path: str = None,
+        account_filter: Optional[str] = None,
+        task_id: str = None,
+    ):
         super().__init__()
         self.db_path = db_path
         self.account_filter = account_filter
+        self.task_id = task_id
         self.signals = WorkerSignals()
         self._is_cancelled = False
+
+        logger_name = f"{__name__}.{self.__class__.__name__}"
+        if self.task_id:
+            logger_name += f".{self.task_id}"
+        self.logger = logging.getLogger(logger_name)
 
     def cancel(self):
         """Cancel the worker"""
@@ -933,7 +995,7 @@ class CardDataLoadWorker(QRunnable):
             self.signals.result.emit(data)
 
         except Exception as e:
-            logger.exception("Error loading card data in worker")
+            self.logger.exception("Error loading card data in worker")
             self.signals.error.emit(f"Card load failed: {e}")
         finally:
             self.signals.finished.emit()
@@ -942,10 +1004,16 @@ class CardDataLoadWorker(QRunnable):
 class VersionCheckWorker(QRunnable):
     """Worker to check for application updates on GitHub"""
 
-    def __init__(self, current_version: str):
+    def __init__(self, current_version: str, task_id: str = None):
         super().__init__()
         self.current_version = current_version
+        self.task_id = task_id
         self.signals = WorkerSignals()
+
+        logger_name = f"{__name__}.{self.__class__.__name__}"
+        if self.task_id:
+            logger_name += f".{self.task_id}"
+        self.logger = logging.getLogger(logger_name)
 
     def run(self):
         """Check GitHub API for the latest release"""
@@ -976,12 +1044,12 @@ class VersionCheckWorker(QRunnable):
                 else:
                     self.signals.result.emit({"new_available": False})
             else:
-                logger.warning(
+                self.logger.warning(
                     f"GitHub API returned status code {response.status_code}"
                 )
                 self.signals.result.emit({"new_available": False})
         except Exception as e:
-            logger.error(f"Error checking for updates: {e}")
+            self.logger.error(f"Error checking for updates: {e}")
             self.signals.result.emit({"new_available": False})
         finally:
             self.signals.finished.emit()
@@ -990,11 +1058,19 @@ class VersionCheckWorker(QRunnable):
 class DashboardStatsWorker(QRunnable):
     """Worker to load dashboard statistics and recent activity in the background"""
 
-    def __init__(self, db_path: str = None, activity_limit: int = 100):
+    def __init__(
+        self, db_path: str = None, activity_limit: int = 100, task_id: str = None
+    ):
         super().__init__()
         self.db_path = db_path
         self.activity_limit = activity_limit
+        self.task_id = task_id
         self.signals = WorkerSignals()
+
+        logger_name = f"{__name__}.{self.__class__.__name__}"
+        if self.task_id:
+            logger_name += f".{self.task_id}"
+        self.logger = logging.getLogger(logger_name)
 
     def run(self):
         """Load statistics and activity from database"""
@@ -1013,7 +1089,7 @@ class DashboardStatsWorker(QRunnable):
 
             self.signals.result.emit(stats)
         except Exception as e:
-            logger.error(f"Error loading dashboard stats in worker: {e}")
+            self.logger.error(f"Error loading dashboard stats in worker: {e}")
             self.signals.error.emit(str(e))
         finally:
             self.signals.finished.emit()
