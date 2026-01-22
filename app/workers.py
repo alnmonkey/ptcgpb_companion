@@ -5,7 +5,7 @@ Background worker classes for the Card Counter PyQt6 application.
 This module provides QRunnable-based workers for long-running operations.
 """
 
-from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
+from PyQt6.QtCore import QRunnable, pyqtSignal, QObject, QCoreApplication
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 import os
@@ -14,7 +14,11 @@ import time
 import logging
 import threading
 
-from app.utils import PortableSettings
+from django.db.models import Count
+
+from app.utils import PortableSettings, clean_card_name
+
+from django.db import transaction
 
 
 def get_max_thread_count():
@@ -46,13 +50,11 @@ class CSVImportWorker(QRunnable):
         self,
         file_path: str,
         task_id: str = None,
-        db_path: str = None,
         screenshots_dir: str = None,
     ):
         super().__init__()
         self.file_path = file_path
         self.task_id = task_id
-        self.db_path = db_path
         self.screenshots_dir = screenshots_dir
         self.signals = WorkerSignals()
         self._is_cancelled = False
@@ -64,15 +66,23 @@ class CSVImportWorker(QRunnable):
 
     def run(self):
         """Process CSV import in background thread"""
+        from app.db.models import Screenshot, Account, translate_set_name, CardSet
+
         try:
             if self._is_cancelled:
                 return
 
-            self.signals.status.emit("Starting CSV import...")
+            self.signals.status.emit(
+                QCoreApplication.translate("CSVImportWorker", "Starting CSV import...")
+            )
 
             # Validate file
             if not os.path.exists(self.file_path):
-                raise FileNotFoundError(f"CSV file not found: {self.file_path}")
+                raise FileNotFoundError(
+                    QCoreApplication.translate(
+                        "CSVImportWorker", "CSV file not found: %1"
+                    ).replace("%1", self.file_path)
+                )
 
             # Read all rows into memory
             rows = []
@@ -81,23 +91,31 @@ class CSVImportWorker(QRunnable):
                     reader = csv.DictReader(f)
                     rows = list(reader)
             except Exception as e:
-                raise ValueError(f"Failed to parse CSV file: {e}")
+                raise ValueError(
+                    QCoreApplication.translate(
+                        "CSVImportWorker", "Failed to parse CSV file: %1"
+                    ).replace("%1", str(e))
+                )
 
             total_rows = len(rows)
             if total_rows == 0:
-                self.signals.status.emit("CSV file is empty or only contains header")
+                self.signals.status.emit(
+                    QCoreApplication.translate(
+                        "CSVImportWorker", "CSV file is empty or only contains header"
+                    )
+                )
                 self.signals.result.emit({"total_rows": 0, "new_rows": 0})
                 return
 
-            from app.database import Database
-
             processed_count = 0
             new_records = 0
+            accounts_cache = {}
 
-            self.signals.status.emit(f"Importing {total_rows} rows...")
-
-            # Initialize database once
-            db = Database(self.db_path)
+            self.signals.status.emit(
+                QCoreApplication.translate(
+                    "CSVImportWorker", "Importing %1 rows..."
+                ).replace("%1", str(total_rows))
+            )
 
             # Process in batches to avoid holding a transaction for too long
             # and to allow other threads to write to the database.
@@ -107,78 +125,149 @@ class CSVImportWorker(QRunnable):
                     break
 
                 batch = rows[i : i + batch_size]
-                with db.transaction():
+                with transaction.atomic():
+                    # Pre-fetch accounts for this batch to reduce queries
+                    batch_account_names = {
+                        row.get("CleanFilename")
+                        for row in batch
+                        if row.get("CleanFilename")
+                    }
+                    missing_account_names = batch_account_names - set(
+                        accounts_cache.keys()
+                    )
+                    if missing_account_names:
+                        for acc in Account.objects.filter(
+                            name__in=missing_account_names
+                        ):
+                            accounts_cache[acc.name] = acc
+
+                        still_missing = missing_account_names - set(
+                            accounts_cache.keys()
+                        )
+                        for name in still_missing:
+                            acc, _ = Account.objects.get_or_create(name=name)
+                            accounts_cache[name] = acc
+
+                    # Pre-fetch existing screenshots for this batch
+                    batch_screenshot_names = {
+                        row.get("PackScreenshot")
+                        for row in batch
+                        if row.get("PackScreenshot")
+                    }
+                    existing_screenshots = {
+                        s.name: s
+                        for s in Screenshot.objects.filter(
+                            name__in=batch_screenshot_names
+                        )
+                    }
+
+                    to_create = []
+                    to_update = []
+                    seen_in_batch = set()
+
                     for row in batch:
                         if self._is_cancelled:
                             break
+                        processed_count += 1
 
                         # Normalize keys to handle case-insensitivity
                         row = {k: v for k, v in row.items() if k is not None}
 
-                        # Map alternative column names
-                        if "shinedust" in row and "Shinedust" not in row:
-                            row["Shinedust"] = row["shinedust"]
-                        elif "ShineDust" in row and "Shinedust" not in row:
-                            row["Shinedust"] = row["ShineDust"]
+                        account_name = row.get("CleanFilename")
+                        if not account_name:
+                            continue
 
-                        # Use CleanFilename as the Account
-                        if "CleanFilename" in row and row["CleanFilename"]:
-                            row["Account"] = row["CleanFilename"]
-                        elif "DeviceAccount" in row and row["DeviceAccount"]:
-                            row["Account"] = row["DeviceAccount"]
-                        elif "Account" not in row or not row["Account"]:
-                            row["Account"] = "Account Unknown"
+                        account_obj = accounts_cache.get(account_name)
 
-                        # Ensure all required fields exist
-                        required_fields = [
-                            "Timestamp",
-                            "OriginalFilename",
-                            "CleanFilename",
-                            "Account",
-                            "PackType",
-                            "CardTypes",
-                            "CardCounts",
-                            "PackScreenshot",
-                            "Shinedust",
-                        ]
-                        for field in required_fields:
-                            if field not in row:
-                                row[field] = ""
+                        if not row.get("PackScreenshot"):
+                            # This is a summary row (Shinedust only)
+                            if row.get("Shinedust") and account_obj:
+                                # Only update if it actually changed to save a query
+                                if account_obj.shinedust != str(row["Shinedust"]):
+                                    account_obj.shinedust = str(row["Shinedust"])
+                                    account_obj.save(update_fields=["shinedust"])
+                            continue
 
-                        # Populate ScreenshotPath if possible
-                        if self.screenshots_dir and row.get("PackScreenshot"):
-                            row["ScreenshotPath"] = os.path.join(
-                                self.screenshots_dir, row["PackScreenshot"]
+                        try:
+                            screen_name = row["PackScreenshot"]
+                            if screen_name in seen_in_batch:
+                                continue
+                            seen_in_batch.add(screen_name)
+
+                            # Use only name for get_or_create to avoid unique constraint issues
+                            # when other metadata (like timestamp) differs.
+                            set_code = translate_set_name(row.get("PackType"))
+                            pack_set = None
+                            if set_code:
+                                try:
+                                    pack_set = CardSet(set_code)
+                                except ValueError:
+                                    pass
+
+                            if screen_name in existing_screenshots:
+                                screenshot_obj = existing_screenshots[screen_name]
+                                changed = False
+                                if screenshot_obj.timestamp != row.get("Timestamp"):
+                                    screenshot_obj.timestamp = row.get("Timestamp")
+                                    changed = True
+                                if screenshot_obj.account_id != account_obj.pk:
+                                    screenshot_obj.account = account_obj
+                                    changed = True
+                                if pack_set and screenshot_obj.set != pack_set:
+                                    screenshot_obj.set = pack_set
+                                    changed = True
+
+                                if changed:
+                                    to_update.append(screenshot_obj)
+                            else:
+                                to_create.append(
+                                    Screenshot(
+                                        name=screen_name,
+                                        timestamp=row.get("Timestamp"),
+                                        account=account_obj,
+                                        set=pack_set,
+                                    )
+                                )
+                                new_records += 1
+                        except Exception as e:
+                            self.signals.status.emit(
+                                QCoreApplication.translate(
+                                    "CSVImportWorker",
+                                    "Error processing screenshot %1: %2",
+                                )
+                                .replace("%1", row.get("PackScreenshot", "unknown"))
+                                .replace("%2", str(e))
+                            )
+                            self.logger.error(
+                                f"Error processing screenshot {row.get('PackScreenshot')}: {e}"
                             )
 
-                        # Add to database
-                        try:
-                            if not row.get("PackScreenshot"):
-                                # This is likely a summary row (Shinedust only)
-                                if row.get("Shinedust") and row.get("Account"):
-                                    db.update_account_shinedust(
-                                        row["Account"], row["Shinedust"]
-                                    )
-                            else:
-                                _, is_new = db.add_screenshot(row)
-                                if is_new:
-                                    new_records += 1
-                        except Exception as e:
-                            self.logger.error(f"Error importing row: {e}")
-
-                        processed_count += 1
+                    if to_create:
+                        Screenshot.objects.bulk_create(to_create)
+                    if to_update:
+                        Screenshot.objects.bulk_update(
+                            to_update, ["timestamp", "account", "set"]
+                        )
 
                 # Update progress after each batch
                 self.signals.progress.emit(processed_count, total_rows)
                 # self.signals.status.emit(f"Imported {processed_count}/{total_rows}...")
 
             if self._is_cancelled:
-                self.signals.status.emit("CSV import cancelled")
+                self.signals.status.emit(
+                    QCoreApplication.translate(
+                        "CSVImportWorker", "CSV import cancelled"
+                    )
+                )
                 return
 
             self.signals.progress.emit(total_rows, total_rows)
             self.signals.status.emit(
-                f"Successfully imported {total_rows} packs ({new_records} new)"
+                QCoreApplication.translate(
+                    "CSVImportWorker", "Successfully imported %1 packs (%2 new)"
+                )
+                .replace("%1", str(total_rows))
+                .replace("%2", str(new_records))
             )
             self.signals.result.emit(
                 {
@@ -253,20 +342,34 @@ class CardArtDownloadWorker(QRunnable):
             # Lazy imports to keep main thread light
             import httpx
             import re
-            from app.utils import get_portable_path
+            from settings import BASE_DIR
 
             # Resolve destination root
-            dest_root = get_portable_path("resources", "card_imgs")
+            dest_root = BASE_DIR / "resources" / "card_imgs"
             os.makedirs(dest_root, exist_ok=True)
 
-            self.signals.status.emit("Fetching card set list…")
+            from app.db.models import Card, CardSet
+            from app.names import (
+                cards as CARD_NAMES_MAP,
+                rarity as RARITY_MAP,
+            )
+
+            self.signals.status.emit(
+                QCoreApplication.translate(
+                    "CardArtDownloadWorker", "Fetching card set list…"
+                )
+            )
 
             # Fetch list of set IDs
             try:
                 resp = httpx.get(self.base_list_url, timeout=30.0)
                 resp.raise_for_status()
             except Exception as e:
-                raise RuntimeError(f"Failed to fetch set list: {e}")
+                raise RuntimeError(
+                    QCoreApplication.translate(
+                        "CardArtDownloadWorker", "Failed to fetch set list: %1"
+                    ).replace("%1", str(e))
+                )
 
             # Parse set IDs using regex to avoid external parser dependency
             html = resp.text or ""
@@ -275,7 +378,11 @@ class CardArtDownloadWorker(QRunnable):
             set_ids = sorted(list(set(m for m in matches if m)))
 
             if not set_ids:
-                raise RuntimeError("No set IDs found on the listing page")
+                raise RuntimeError(
+                    QCoreApplication.translate(
+                        "CardArtDownloadWorker", "No set IDs found on the listing page"
+                    )
+                )
 
             # Ensure per-set directories
             for set_id in set_ids:
@@ -289,7 +396,12 @@ class CardArtDownloadWorker(QRunnable):
             from concurrent.futures import ThreadPoolExecutor, as_completed
 
             self.signals.status.emit(
-                f"Downloading card art for {len(set_ids)} sets using {self.max_workers} threads…"
+                QCoreApplication.translate(
+                    "CardArtDownloadWorker",
+                    "Downloading card art for %1 sets using %2 threads…",
+                )
+                .replace("%1", str(len(set_ids)))
+                .replace("%2", self.max_workers)
             )
 
             def download_set(set_id: str) -> int:
@@ -324,9 +436,39 @@ class CardArtDownloadWorker(QRunnable):
                         out_path = os.path.join(dest_root, set_id, filename)
                         with open(out_path, "wb") as f:
                             f.write(content)
+
+                        card_code = f"{set_id}_{card_num}"
+                        raw_name = CARD_NAMES_MAP.get(card_code, card_code)
+
+                        display_name = raw_name
+                        display_rarity = None
+
+                        # Match rarity from name, e.g. "Bulbasaur (1D)"
+                        rarity_match = re.search(r"\s*\(([^)]+)\)$", raw_name)
+                        if rarity_match:
+                            rarity_code = rarity_match.group(1)
+                            display_name = raw_name[: rarity_match.start()].strip()
+                            if rarity_code in RARITY_MAP:
+                                display_rarity = rarity_code
+
+                        try:
+                            valid_set = CardSet(set_id)
+                        except ValueError:
+                            valid_set = None
+
+                        Card.objects.update_or_create(
+                            code=card_code,
+                            set=valid_set.value if valid_set else set_id,
+                            defaults={
+                                "name": display_name,
+                                "image_path": f"{set_id}/{filename}",
+                                "rarity": display_rarity,
+                            },
+                        )
+
                         images_saved += 1
-                    except Exception:
-                        # Skip on IO errors and continue
+                    except Exception as e:
+                        logger.error(f"Error saving card {set_id}_{card_num}: {e}")
                         continue
                 return images_saved
 
@@ -379,6 +521,10 @@ class CardArtDownloadWorker(QRunnable):
                     from app.image_processing import ImageProcessor
 
                     processor = ImageProcessor(dest_root)
+
+                    # Also update image_path for cards that might have been downloaded but not in DB
+                    # (though update_or_create above should handle most cases during the download)
+
                     self.signals.status.emit("pHashes precomputed and saved.")
                 except Exception as e:
                     self.logger.error(f"Failed to precompute pHashes: {e}")
@@ -419,27 +565,43 @@ class ScreenshotProcessingWorker(QRunnable):
 
     def run(self):
         """Process screenshot images in background thread"""
+        from app.db.models import (
+            Screenshot,
+            Card,
+            ScreenshotCard,
+            Account,
+            CardSet,
+            translate_set_name,
+        )
+
         try:
             if self._is_cancelled:
                 return
 
-            self.signals.status.emit("Starting screenshot processing...")
+            self.signals.status.emit(
+                QCoreApplication.translate(
+                    "ScreenshotProcessingWorker", "Starting screenshot processing..."
+                )
+            )
 
             # Validate directory
             if not os.path.isdir(self.directory_path):
-                raise FileNotFoundError(f"Directory not found: {self.directory_path}")
-
-            # Initialize database
-            from app.database import Database
-
-            self.db = Database()
+                raise FileNotFoundError(
+                    QCoreApplication.translate(
+                        "ScreenshotProcessingWorker", "Directory not found: %1"
+                    ).replace("%1", self.directory_path)
+                )
 
             # Get list of image files in batches to identify unprocessed ones first
             image_extensions = (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif")
             image_files = []
             all_found_count = 0
 
-            self.signals.status.emit("Scanning directory for images...")
+            self.signals.status.emit(
+                QCoreApplication.translate(
+                    "ScreenshotProcessingWorker", "Scanning directory for images..."
+                )
+            )
 
             batch = []
             batch_size = 500
@@ -458,21 +620,39 @@ class ScreenshotProcessingWorker(QRunnable):
                             batch.append(entry.name)
 
                         if not self.overwrite and len(batch) >= batch_size:
-                            unprocessed = self.db.get_unprocessed_files(batch)
+                            unprocessed_names = Screenshot.objects.filter(
+                                name__in=batch, processed=True
+                            ).values_list("name", flat=True)
+                            unprocessed = [
+                                f for f in batch if f not in unprocessed_names
+                            ]
                             image_files.extend(unprocessed)
                             batch = []
                             self.signals.status.emit(
-                                f"Scanned {all_found_count} files, found {len(image_files)} new images..."
+                                QCoreApplication.translate(
+                                    "ScreenshotProcessingWorker",
+                                    "Scanned %1 files, found %2 new images...",
+                                )
+                                .replace("%1", str(all_found_count))
+                                .replace("%2", str(len(image_files)))
                             )
 
             if not self.overwrite and batch:
-                unprocessed = self.db.get_unprocessed_files(batch)
+                unprocessed_names = Screenshot.objects.filter(
+                    name__in=batch, processed=True
+                ).values_list("name", flat=True)
+                unprocessed = [f for f in batch if f not in unprocessed_names]
                 image_files.extend(unprocessed)
 
             total_files = len(image_files)
             if total_files == 0:
                 if all_found_count > 0:
-                    self.signals.status.emit("All images already processed.")
+                    self.signals.status.emit(
+                        QCoreApplication.translate(
+                            "ScreenshotProcessingWorker",
+                            "All images already processed.",
+                        )
+                    )
                     self.signals.progress.emit(100, 100)
                     self.signals.result.emit(
                         {
@@ -481,22 +661,33 @@ class ScreenshotProcessingWorker(QRunnable):
                             "successful_files": 0,
                             "failed_files": 0,
                             "overwrite": self.overwrite,
-                            "message": "All images already processed",
+                            "message": QCoreApplication.translate(
+                                "ScreenshotProcessingWorker",
+                                "All images already processed",
+                            ),
                         }
                     )
                     return
                 else:
-                    raise ValueError("No image files found in directory")
+                    raise ValueError(
+                        QCoreApplication.translate(
+                            "ScreenshotProcessingWorker",
+                            "No image files found in directory",
+                        )
+                    )
 
             self.signals.status.emit(
-                f"Found {total_files} images to process. Loading workers..."
+                QCoreApplication.translate(
+                    "ScreenshotProcessingWorker",
+                    "Found %1 images to process. Loading workers...",
+                ).replace("%1", total_files)
             )
 
             # Initialize image processor
             from app.image_processing import ImageProcessor
-            from app.utils import get_portable_path
+            from settings import BASE_DIR
 
-            template_dir = get_portable_path("resources", "card_imgs")
+            template_dir = BASE_DIR / "resources" / "card_imgs"
             processor = ImageProcessor(template_dir)
 
             # Load card templates from resources
@@ -504,18 +695,29 @@ class ScreenshotProcessingWorker(QRunnable):
                 if os.path.isdir(template_dir):
                     # Templates are already loaded by constructor, but we want to log it
                     self.signals.status.emit(
-                        f"Loaded {processor.get_template_count()} card templates"
+                        QCoreApplication.translate(
+                            "ScreenshotProcessingWorker", "Loaded %1 card templates"
+                        ).replace("%1", processor.get_template_count())
                     )
                 else:
                     self.signals.status.emit(
-                        f"Error: Template directory not found: {template_dir}"
+                        QCoreApplication.translate(
+                            "ScreenshotProcessingWorker",
+                            "Error: Template directory not found: %1",
+                        ).replace("%1", str(template_dir))
                     )
                     raise FileNotFoundError(
-                        f"Template directory not found: {template_dir}"
+                        QCoreApplication.translate(
+                            "ScreenshotProcessingWorker",
+                            "Template directory not found: %1",
+                        ).replace("%1", str(template_dir))
                     )
             except Exception as template_error:
                 self.signals.status.emit(
-                    f"Error: Could not load card templates: {template_error}"
+                    QCoreApplication.translate(
+                        "ScreenshotProcessingWorker",
+                        "Error: Could not load card templates: %1",
+                    ).replace("%1", str(template_error))
                 )
                 raise
 
@@ -548,7 +750,7 @@ class ScreenshotProcessingWorker(QRunnable):
 
                     if file_size is not None and file_size < 1024:
                         # Store an entry with zero cards and mark as processed
-                        logger.info(
+                        logger.debug(
                             f"Blank image detected ({file_size} bytes) in {filename}. Marking as processed."
                         )
                         # Reuse storage routine with no detected cards
@@ -558,8 +760,17 @@ class ScreenshotProcessingWorker(QRunnable):
                         # Do not count as "with results" but it's successfully handled
                         return False
 
+                    # Try to get existing set if any (e.g. from CSV import)
+                    existing_set = (
+                        Screenshot.objects.filter(name=filename)
+                        .values_list("set", flat=True)
+                        .first()
+                    )
+
                     # Process the image with OpenCV
-                    cards_found = processor.process_screenshot(file_path)
+                    cards_found = processor.process_screenshot(
+                        file_path, force_set=existing_set
+                    )
 
                     # Store results in database
                     if cards_found:
@@ -590,7 +801,12 @@ class ScreenshotProcessingWorker(QRunnable):
                     if self._is_cancelled:
                         # Attempt to cancel remaining tasks without blocking
                         self._shutdown_executor(wait=False, cancel_futures=True)
-                        self.signals.status.emit("Screenshot processing cancelled")
+                        self.signals.status.emit(
+                            QCoreApplication.translate(
+                                "ScreenshotProcessingWorker",
+                                "Screenshot processing cancelled",
+                            )
+                        )
                         return
 
                     try:
@@ -600,7 +816,12 @@ class ScreenshotProcessingWorker(QRunnable):
                     except Exception as e:
                         filename = future_to_file[future]
                         self.signals.status.emit(
-                            f"Critical error processing {filename}: {e}"
+                            QCoreApplication.translate(
+                                "ScreenshotProcessingWorker",
+                                "Critical error processing %1: %2",
+                            )
+                            .replace("%1", filename)
+                            .replace("%2", str(e))
                         )
 
                     processed_count += 1
@@ -609,7 +830,12 @@ class ScreenshotProcessingWorker(QRunnable):
                     if processed_count % 5 == 0 or processed_count == total_files:
                         self.signals.progress.emit(processed_count, total_files)
                         self.signals.status.emit(
-                            f"Processed {processed_count} of {total_files} images"
+                            QCoreApplication.translate(
+                                "ScreenshotProcessingWorker",
+                                "Processed %1 of %2 images",
+                            )
+                            .replace("%1", str(processed_count))
+                            .replace("21", str(total_files))
                         )
             finally:
                 # Ensure executor threads are cleaned up appropriately
@@ -619,7 +845,12 @@ class ScreenshotProcessingWorker(QRunnable):
 
             self.signals.progress.emit(total_files, total_files)
             self.signals.status.emit(
-                f"Successfully processed {total_files} screenshots ({successful_files} with results)"
+                QCoreApplication.translate(
+                    "ScreenshotProcessingWorker",
+                    "Successfully processed %1 screenshots (%2 with results)",
+                )
+                .replace("%1", str(total_files))
+                .replace("%2", str(successful_files))
             )
             self.signals.result.emit(
                 {
@@ -632,7 +863,11 @@ class ScreenshotProcessingWorker(QRunnable):
             )
 
         except Exception as e:
-            self.signals.error.emit(f"Screenshot processing failed: {e}")
+            self.signals.error.emit(
+                QCoreApplication.translate(
+                    "ScreenshotProcessingWorker", "Screenshot processing failed: %1"
+                ).replace("%1", str(e))
+            )
         finally:
             self.signals.finished.emit()
 
@@ -700,119 +935,113 @@ class ScreenshotProcessingWorker(QRunnable):
         logger: logging.Logger = None,
     ):
         """Store processing results in the database"""
+        from app.db.models import (
+            Screenshot,
+            Card,
+            ScreenshotCard,
+            Account,
+            CardSet,
+            translate_set_name,
+        )
+
         if logger is None:
             logger = self.logger
 
         with self._db_lock:
-            max_retries = 5
-            retry_delay = 1.0  # seconds
+            # Identify set from cards found
+            pack_type = self._identify_set(cards_found, logger=logger)
 
-            for attempt in range(max_retries):
-                try:
-                    # Use the database instance from the worker
-                    db = self.db
+            # Fallback to filename if set is unknown
+            if pack_type == "Unknown":
+                pack_type = self._extract_pack_type(filename)
 
-                    # Identify set from cards found
-                    pack_type = self._identify_set(cards_found, logger=logger)
+            try:
+                with transaction.atomic():
+                    # Check if screenshot already exists (might have been created by CSVImportWorker)
+                    screenshot_obj, created = Screenshot.objects.get_or_create(
+                        name=filename,
+                        defaults={
+                            "timestamp": datetime.now().isoformat(),
+                            "set": (
+                                CardSet(translate_set_name(pack_type))
+                                if translate_set_name(pack_type)
+                                else None
+                            ),
+                        },
+                    )
 
-                    # Fallback to filename if set is unknown
-                    if pack_type == "Unknown":
-                        pack_type = self._extract_pack_type(filename)
-
-                    # Add screenshot record
-                    # Default to "Account Unknown" for screenshots without CSV info
-                    screenshot_data = {
-                        "Timestamp": datetime.now().isoformat(),
-                        "OriginalFilename": filename,
-                        "CleanFilename": "Account Unknown",
-                        "Account": "Account Unknown",
-                        "PackType": pack_type,
-                        "CardTypes": ", ".join(
-                            [card["card_name"] for card in cards_found]
-                        ),
-                        "CardCounts": str(len(cards_found)),
-                        "PackScreenshot": filename,  # Use filename as unique key for screenshot
-                        "ScreenshotPath": full_path,
-                        "Shinedust": "",
-                    }
-
-                    with db.transaction():
-                        screenshot_id, is_new = db.add_screenshot(screenshot_data)
-
-                        if not is_new and not self.overwrite:
-                            # If the screenshot already exists, check if it's already been processed
-                            # This allows processing screenshots that were imported via CSV but not yet analyzed
-                            if db.check_screenshot_exists(
-                                filename, screenshot_data["Account"]
-                            ):
-                                self.signals.status.emit(
-                                    f"Skipping {filename}: Already processed in database"
-                                )
-                                return
-                            else:
-                                self.logger.info(
-                                    f"Screenshot {filename} exists in database but is not processed. Continuing."
-                                )
-
-                        # Add each card to database and create relationships
-                        for card_data in cards_found:
-                            # Extract card code if available
-                            card_code = card_data.get("card_code", "")
-                            card_name = card_data.get("card_name", "Unknown")
-                            card_set = card_data.get("card_set", "Unknown")
-
-                            # Try to extract card number from code for better image path
-                            if card_code and "_" in card_code:
-                                set_code, card_number = card_code.split("_", 1)
-                                # Use the card number for the image path
-                                image_path = f"{set_code}/{card_code}.webp"
-                            else:
-                                # Fallback to name-based path
-                                image_path = f"{card_set}/{card_name}.webp"
-
-                            # Add card (if not already exists)
-                            card_id = db.add_card(
-                                card_name=card_name,
-                                card_set=card_set,
-                                image_path=image_path,
-                                rarity="Common",  # Default rarity for now
-                                card_code=card_code,
-                            )
-
-                            # Add relationship between screenshot and card
-                            if card_id:
-                                db.add_screenshot_card(
-                                    screenshot_id=screenshot_id,
-                                    card_id=card_id,
-                                    position=card_data.get("position", 1),
-                                    confidence=card_data.get("confidence", 0.0),
-                                )
-
-                                # Log the card detection
-                                logger.info(
-                                    f"Stored card {card_name} ({card_set}) with confidence {card_data.get('confidence', 0.0):.2f}"
-                                )
-
-                        # Mark screenshot as processed
-                        db.mark_screenshot_processed(screenshot_id)
-
-                    # If we reached here, success!
-                    return
-
-                except Exception as e:
-                    if (
-                        "database is locked" in str(e).lower()
-                        and attempt < max_retries - 1
-                    ):
-                        logger.warning(
-                            f"Database locked while storing {filename}, retrying in {retry_delay}s (attempt {attempt + 1}/{max_retries})"
+                    if not created and not self.overwrite and screenshot_obj.processed:
+                        self.signals.status.emit(
+                            f"Skipping {filename}: Already processed in database"
                         )
-                        time.sleep(retry_delay)
-                        # Exponential backoff could be used here: retry_delay *= 2
-                        continue
+                        return
 
-                    logger.error(f"Error storing results for {filename}: {e}")
-                    raise
+                    # If we are here, we are either newly processing or overwriting.
+                    # Clear existing cards to ensure we only have the latest detection results.
+                    ScreenshotCard.objects.filter(screenshot=screenshot_obj).delete()
+
+                    # Add each card to database and create relationships
+                    for card_data in cards_found:
+                        # Extract card code if available
+                        card_code = card_data.get("card_code", "")
+                        card_name = card_data.get("card_name", "Unknown")
+                        card_set = card_data.get("card_set", "Unknown")
+
+                        # Try to extract card number from code for better image path
+                        if card_code and "_" in card_code:
+                            set_code, card_number = card_code.split("_", 1)
+                            # Use the card number for the image path
+                            image_path = f"{set_code}/{card_code}.webp"
+                        else:
+                            # Fallback to name-based path
+                            image_path = f"{card_set}/{card_name}.webp"
+
+                        # Extract rarity from name if possible
+                        rarity = "1D"
+                        if "(" in card_name:
+                            import re
+
+                            match = re.search(r"\(([^)]+)\)", card_name)
+                            if match:
+                                rarity = match.group(1)
+
+                        # Add card (if not already exists)
+                        # Note: Card table has unique_together = (("code", "set"),)
+                        card_obj, created = Card.objects.get_or_create(
+                            code=card_code,
+                            set=card_set,
+                            defaults={
+                                "name": card_name,
+                                "image_path": image_path,
+                                "rarity": rarity,
+                            },
+                        )
+
+                        # If card already exists but has default rarity, update it
+                        if not created and card_obj.rarity == "1D" and rarity != "1D":
+                            card_obj.rarity = rarity
+                            card_obj.save()
+
+                        # Add relationship between screenshot and card
+                        ScreenshotCard.objects.create(
+                            screenshot=screenshot_obj,
+                            card=card_obj,
+                            position=card_data.get("position", 1),
+                            confidence=card_data.get("confidence", 0.0),
+                        )
+
+                        # Log the card detection
+                        logger.info(
+                            f"Stored card {card_name} ({card_set}) with confidence {card_data.get('confidence', 0.0):.2f}"
+                        )
+
+                    # Mark screenshot as processed
+                    screenshot_obj.processed = True
+                    screenshot_obj.save()
+
+            except Exception as e:
+                logger.error(f"Error storing results for {filename}: {e}")
+                raise
 
     def cancel(self):
         """Cancel the worker"""
@@ -853,12 +1082,18 @@ class DatabaseBackupWorker(QRunnable):
             if self._is_cancelled:
                 return
 
-            self.signals.status.emit("Starting database backup...")
+            self.signals.status.emit(
+                QCoreApplication.translate(
+                    "DatabaseBackupWorker", "Starting database backup..."
+                )
+            )
 
             # Validate source
             if not os.path.exists(self.source_path):
                 raise FileNotFoundError(
-                    f"Source database not found: {self.source_path}"
+                    QCoreApplication.translate(
+                        "DatabaseBackupWorker", "Source database not found: %1"
+                    ).replace("%1", self.source_path)
                 )
 
             # Ensure backup directory exists
@@ -870,16 +1105,28 @@ class DatabaseBackupWorker(QRunnable):
             # In a real implementation, this would copy the database file
             for i in range(10):
                 if self._is_cancelled:
-                    self.signals.status.emit("Database backup cancelled")
+                    self.signals.status.emit(
+                        QCoreApplication.translate(
+                            "DatabaseBackupWorker", "Database backup cancelled"
+                        )
+                    )
                     return
 
                 progress = (i + 1) * 10
                 self.signals.progress.emit(progress, 100)
-                self.signals.status.emit(f"Backup progress: {progress}%")
+                self.signals.status.emit(
+                    QCoreApplication.translate(
+                        "DatabaseBackupWorker", "Backup progress: %1%"
+                    ).replace("%1", progress)
+                )
                 time.sleep(0.2)
 
             self.signals.progress.emit(100, 100)
-            self.signals.status.emit("Database backup completed successfully")
+            self.signals.status.emit(
+                QCoreApplication.translate(
+                    "DatabaseBackupWorker", "Database backup completed successfully"
+                )
+            )
             self.signals.result.emit(
                 {
                     "source_path": self.source_path,
@@ -889,7 +1136,11 @@ class DatabaseBackupWorker(QRunnable):
             )
 
         except Exception as e:
-            self.signals.error.emit(f"Database backup failed: {e}")
+            self.signals.error.emit(
+                QCoreApplication.translate(
+                    "DatabaseBackupWorker", "Database backup failed: %1"
+                ).replace("%1", str(e))
+            )
         finally:
             self.signals.finished.emit()
 
@@ -903,12 +1154,10 @@ class CardDataLoadWorker(QRunnable):
 
     def __init__(
         self,
-        db_path: str = None,
         account_filter: Optional[str] = None,
         task_id: str = None,
     ):
         super().__init__()
-        self.db_path = db_path
         self.account_filter = account_filter
         self.task_id = task_id
         self.signals = WorkerSignals()
@@ -929,60 +1178,55 @@ class CardDataLoadWorker(QRunnable):
             if self._is_cancelled:
                 return
 
-            self.signals.status.emit("Loading cards from database...")
+            self.signals.status.emit(
+                QCoreApplication.translate(
+                    "CardDataLoadWorker", "Loading cards from database..."
+                )
+            )
 
             # Lazy imports to avoid unnecessary main-thread initialization
-            from app.database import Database
+            from app.db.models import Card
             from app.names import (
-                cards as CARD_NAMES,
                 sets as SET_NAMES,
                 rarity as RARITY_MAP,
             )
 
-            db = Database(self.db_path)
-            rows = db.get_all_cards_with_counts(self.account_filter)
+            # Build query based on account filter if provided
+            query = Card.objects.all()
+            if self.account_filter:
+                # Assuming ScreenshotCard links Card to Screenshot, and Screenshot links to Account
+                query = query.filter(
+                    screenshotcard__screenshot__account__name=self.account_filter
+                )
 
-            total = len(rows)
+            # Annotate with total count
+            query = query.annotate(total_count=Count("screenshotcard"))
+
+            total = query.count()
             data: List[Dict[str, Any]] = []
 
-            # Local helper mirrors MainWindow._get_display_name_and_rarity
-            def get_display_name_and_rarity(
-                card_code: str, raw_name: str, raw_rarity: str
-            ):
-                import re
-
-                full_name = raw_name if raw_name else card_code
-                display_name = full_name
-                display_rarity = raw_rarity
-                match = re.search(r"\s*\(([^)]+)\)$", full_name)
-                if match:
-                    rarity_code = match.group(1)
-                    display_name = full_name[: match.start()].strip()
-                    if rarity_code in RARITY_MAP:
-                        display_rarity = RARITY_MAP[rarity_code]
-                    else:
-                        display_rarity = rarity_code
-                return display_name, display_rarity
-
             processed = 0
-            for row in rows:
+            for card in query:
                 if self._is_cancelled:
-                    self.signals.status.emit("Card load cancelled")
+                    self.signals.status.emit(
+                        QCoreApplication.translate(
+                            "CardDataLoadWorker", "Card load cancelled"
+                        )
+                    )
                     return
 
-                # row format: (card_code, card_name, set_name, rarity, total_count, image_path)
-                raw_name = CARD_NAMES.get(row[1], row[1])
-                display_name, display_rarity = get_display_name_and_rarity(
-                    row[0], raw_name, row[3]
+                # card.rarity is the code (e.g. "1D"), we want the display name
+                display_rarity = (
+                    RARITY_MAP.get(card.rarity, card.rarity) if card.rarity else ""
                 )
 
                 card_info = {
-                    "card_code": row[0],
-                    "card_name": display_name,
-                    "set_name": SET_NAMES.get(row[2], row[2]),
+                    "card_code": card.code,
+                    "card_name": clean_card_name(card.name),
+                    "set_name": SET_NAMES.get(card.set, card.set) or "",
                     "rarity": display_rarity,
-                    "count": row[4],
-                    "image_path": row[5],
+                    "count": getattr(card, "total_count", 0),
+                    "image_path": card.image_path,
                 }
                 data.append(card_info)
 
@@ -991,12 +1235,20 @@ class CardDataLoadWorker(QRunnable):
                     self.signals.progress.emit(processed, total)
 
             self.signals.progress.emit(total, total)
-            self.signals.status.emit(f"Loaded {total} cards")
+            self.signals.status.emit(
+                QCoreApplication.translate("CardDataLoadWorker", "Loaded %1 cards").replace("%1", 
+                    str(total)
+                )
+            )
             self.signals.result.emit(data)
 
         except Exception as e:
             self.logger.exception("Error loading card data in worker")
-            self.signals.error.emit(f"Card load failed: {e}")
+            self.signals.error.emit(
+                QCoreApplication.translate(
+                    "CardDataLoadWorker", "Card load failed: %1"
+                ).replace("%1", str(e))
+            )
         finally:
             self.signals.finished.emit()
 
@@ -1058,11 +1310,8 @@ class VersionCheckWorker(QRunnable):
 class DashboardStatsWorker(QRunnable):
     """Worker to load dashboard statistics and recent activity in the background"""
 
-    def __init__(
-        self, db_path: str = None, activity_limit: int = 100, task_id: str = None
-    ):
+    def __init__(self, activity_limit: int = 100, task_id: str = None):
         super().__init__()
-        self.db_path = db_path
         self.activity_limit = activity_limit
         self.task_id = task_id
         self.signals = WorkerSignals()
@@ -1075,16 +1324,63 @@ class DashboardStatsWorker(QRunnable):
     def run(self):
         """Load statistics and activity from database"""
         try:
-            from app.database import Database
+            from app.db.models import Account, Screenshot, ScreenshotCard
+            from django.utils.timezone import now
 
-            db = Database(self.db_path)
+            # Use aggregate for basic stats
+            total_cards = ScreenshotCard.objects.count()
+            unique_cards = (
+                ScreenshotCard.objects.values("card__code").distinct().count()
+            )
+            total_packs = Screenshot.objects.count()
+
+            try:
+                last_processed = (
+                    Screenshot.objects.filter(processed=True)
+                    .latest("created_at")
+                    .created_at
+                )
+            except Screenshot.DoesNotExist:
+                last_processed = None
+
+            # Get recent activity
+            recent_screenshots = Screenshot.objects.filter(processed=True).order_by(
+                "-created_at"
+            )[: self.activity_limit]
+            recent_activity = []
+            for ss in recent_screenshots:
+                # Get card names as a list to avoid issues with QuerySet evaluation in join
+                card_names = list(
+                    ss.screenshotcard_set.values_list("card__name", flat=True)
+                )
+
+                # Format timestamp consistently with what main_window expects (naive ISO string)
+                if ss.created_at:
+                    ts = ss.created_at
+                    # Ensure it's naive for consistent string comparison in the UI
+                    if ts.tzinfo is not None:
+                        ts = ts.astimezone().replace(tzinfo=None)
+                    ts_str = ts.isoformat(timespec="seconds")
+                else:
+                    ts_str = datetime.now().isoformat(timespec="seconds")
+
+                recent_activity.append(
+                    {
+                        "timestamp": ts_str,
+                        "description": QCoreApplication.translate(
+                            "DashboardStatsWorker", "Processed %1 (%2)"
+                        )
+                        .replace("%1", ss.name)
+                        .replace("%2", ", ".join(card_names)),
+                    }
+                )
 
             stats = {
-                "total_cards": db.get_total_cards_count(),
-                "unique_cards": db.get_unique_cards_count(),
-                "total_packs": db.get_total_packs_count(),
-                "last_processed": db.get_last_processed_timestamp(),
-                "recent_activity": db.get_recent_activity(limit=self.activity_limit),
+                "total_cards": total_cards,
+                "unique_cards": unique_cards,
+                "total_packs": total_packs,
+                "last_processed": last_processed,
+                "recent_activity": recent_activity,
             }
 
             self.signals.result.emit(stats)

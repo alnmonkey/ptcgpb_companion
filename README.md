@@ -140,3 +140,51 @@ Notes:
 - Entry point is `main.py` (PyQt6 GUI).
 - There are no assets included. Card images are downloaded on first launch.
 - You can override the output name/version: `APP_NAME=applin APP_VERSION=0.1.0 ./build-linux.sh`
+
+
+## Working with Translations
+
+The translations for QT6 are a pain in the butt. 
+
+### 1. String Extraction
+Use `pylupdate6` to extract strings from the Python source files into Qt Translation Source (`.ts`) files.
+
+- Run the extraction commands:
+  ```bash
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/en.ts && \
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/zh.ts && \
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/ja.ts && \
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/de.ts && \
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/fr.ts && \
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/ko.ts && \
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/es.ts && \
+  uv run pylupdate6 app/*.py app/**/*.py main.py -ts app/translations/it.ts
+  ```
+
+### 2. Translation Process
+Translate the extracted strings in the `.ts` files.
+- Use **Qt Linguist** for a GUI-based translation experience.
+- Target languages:
+    - `en`: English (Source)
+    - `zh`: Chinese (Simplified/Traditional)
+    - `ja`: Japanese
+    - `de`: German
+    - `fr`: French
+    - `ko`: Korean
+    - `es`: Spanish
+    - `it`: Italian
+
+(If you're Joe, run the Google Translate script that has silly things hardcoded into it, which is why it's not in this repo.)
+
+### 3. Compilation
+Compile the `.ts` files into binary `.qm` files that the application can load efficiently at runtime.
+```bash
+lrelease app/translations/en.ts && \
+lrelease app/translations/zh.ts && \
+lrelease app/translations/ja.ts && \
+lrelease app/translations/de.ts && \
+lrelease app/translations/fr.ts && \
+lrelease app/translations/ko.ts && \
+lrelease app/translations/es.ts && \
+lrelease app/translations/it.ts
+```

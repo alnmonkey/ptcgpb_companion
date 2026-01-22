@@ -32,7 +32,7 @@ from PyQt6.QtGui import QIcon, QValidator, QPixmap
 import os
 import csv
 from datetime import datetime
-from app.utils import get_app_version, SECTION_ORDER, record_removed_card
+from app.utils import get_app_version, SECTION_ORDER, record_traded_card
 from typing import Optional, Dict, Any, Callable
 
 
@@ -68,7 +68,7 @@ class CSVImportDialog(QDialog):
 
     def __init__(self, parent=None, initial_path="", settings=None):
         super().__init__(parent)
-        self.setWindowTitle("Import CSV")
+        self.setWindowTitle(self.tr("Import CSV"))
         self.setMinimumSize(500, 400)
 
         self._initial_path = initial_path
@@ -89,20 +89,20 @@ class CSVImportDialog(QDialog):
 
         # File selection section
         file_layout = QHBoxLayout()
-        self.file_path_label = QLabel("No file selected")
+        self.file_path_label = QLabel(self.tr("No file selected"))
         self.file_path_label.setWordWrap(True)
 
-        browse_btn = QPushButton("Browse...")
+        browse_btn = QPushButton(self.tr("Browse..."))
         browse_btn.clicked.connect(self._browse_file)
 
-        file_layout.addWidget(QLabel("CSV File:"))
+        file_layout.addWidget(QLabel(self.tr("CSV File:")))
         file_layout.addWidget(self.file_path_label, 1)
         file_layout.addWidget(browse_btn)
 
         main_layout.addLayout(file_layout)
 
         # CSV preview section
-        preview_label = QLabel("CSV Preview (first 10 rows):")
+        preview_label = QLabel(self.tr("CSV Preview (first 10 rows):"))
         main_layout.addWidget(preview_label)
 
         self.preview_text = QTextEdit()
@@ -125,11 +125,11 @@ class CSVImportDialog(QDialog):
         # Buttons
         button_box = QDialogButtonBox()
         self.import_btn = button_box.addButton(
-            "Import", QDialogButtonBox.ButtonRole.AcceptRole
+            self.tr("Import"), QDialogButtonBox.ButtonRole.AcceptRole
         )
         self.import_btn.setEnabled(False)
         cancel_btn = button_box.addButton(
-            "Cancel", QDialogButtonBox.ButtonRole.RejectRole
+            self.tr("Cancel"), QDialogButtonBox.ButtonRole.RejectRole
         )
 
         self.import_btn.clicked.connect(self._import_csv)
@@ -143,9 +143,9 @@ class CSVImportDialog(QDialog):
         """Open file dialog to select CSV file"""
         file_path, _ = QFileDialog.getOpenFileName(
             self,
-            "Select CSV File",
+            self.tr("Select CSV File"),
             self._initial_path,
-            "CSV Files (*.csv);;All Files (*)",
+            self.tr("CSV Files (*.csv);;All Files (*)"),
         )
 
         if file_path:
@@ -170,12 +170,14 @@ class CSVImportDialog(QDialog):
 
                 self.preview_text.setPlainText("\n".join(rows))
                 self.import_btn.setEnabled(True)
-                self.status_label.setText("CSV file loaded successfully")
+                self.status_label.setText(self.tr("CSV file loaded successfully"))
 
         except Exception as e:
-            self.preview_text.setPlainText(f"Error loading CSV: {e}")
+            self.preview_text.setPlainText(
+                self.tr("Error loading CSV: %1").replace("%1", str(e))
+            )
             self.import_btn.setEnabled(False)
-            self.status_label.setText(f"Error: {e}")
+            self.status_label.setText(self.tr("Error: %1").replace("%1", str(e)))
 
     def _import_csv(self):
         """Import the CSV file"""
@@ -185,8 +187,12 @@ class CSVImportDialog(QDialog):
             self.accept()
 
         except Exception as e:
-            QMessageBox.critical(self, "Import Error", f"Failed to import CSV: {e}")
-            self.status_label.setText(f"Error: {e}")
+            QMessageBox.critical(
+                self,
+                self.tr("Import Error"),
+                self.tr("Failed to import CSV: %1").replace("%1", str(e)),
+            )
+            self.status_label.setText(self.tr("Error: %1").replace("%1", str(e)))
             self.import_btn.setEnabled(True)
 
     def _process_csv_data(self):
@@ -204,7 +210,7 @@ class ScreenshotProcessingDialog(QDialog):
 
     def __init__(self, parent=None, initial_dir="", settings=None):
         super().__init__(parent)
-        self.setWindowTitle("Process Screenshots")
+        self.setWindowTitle(self.tr("Process Screenshots"))
         self.setMinimumSize(500, 300)
 
         self._initial_dir = initial_dir
@@ -224,13 +230,13 @@ class ScreenshotProcessingDialog(QDialog):
 
         # Directory selection section
         dir_layout = QHBoxLayout()
-        self.dir_path_label = QLabel("No directory selected")
+        self.dir_path_label = QLabel(self.tr("No directory selected"))
         self.dir_path_label.setWordWrap(True)
 
-        browse_btn = QPushButton("Browse...")
+        browse_btn = QPushButton(self.tr("Browse..."))
         browse_btn.clicked.connect(self._browse_directory)
 
-        dir_layout.addWidget(QLabel("Screenshots Directory:"))
+        dir_layout.addWidget(QLabel(self.tr("Screenshots Directory:")))
         dir_layout.addWidget(self.dir_path_label, 1)
         dir_layout.addWidget(browse_btn)
 
@@ -240,14 +246,14 @@ class ScreenshotProcessingDialog(QDialog):
         options_layout = QFormLayout()
 
         # Processing options
-        self.overwrite_check = QCheckBox("Overwrite existing results")
+        self.overwrite_check = QCheckBox(self.tr("Overwrite existing results"))
         self.overwrite_check.setChecked(False)
         options_layout.addRow(self.overwrite_check)
 
         main_layout.addLayout(options_layout)
 
         # File list section
-        file_list_label = QLabel("Files to process:")
+        file_list_label = QLabel(self.tr("Files to process:"))
         main_layout.addWidget(file_list_label)
 
         self.file_list_text = QTextEdit()
@@ -267,11 +273,11 @@ class ScreenshotProcessingDialog(QDialog):
         # Buttons
         button_box = QDialogButtonBox()
         self.process_btn = button_box.addButton(
-            "Process", QDialogButtonBox.ButtonRole.AcceptRole
+            self.tr("Process"), QDialogButtonBox.ButtonRole.AcceptRole
         )
         self.process_btn.setEnabled(False)
         cancel_btn = button_box.addButton(
-            "Cancel", QDialogButtonBox.ButtonRole.RejectRole
+            self.tr("Cancel"), QDialogButtonBox.ButtonRole.RejectRole
         )
 
         self.process_btn.clicked.connect(self._process_screenshots)
@@ -284,7 +290,7 @@ class ScreenshotProcessingDialog(QDialog):
     def _browse_directory(self):
         """Open directory dialog to select screenshots directory"""
         dir_path = QFileDialog.getExistingDirectory(
-            self, "Select Screenshots Directory", self._initial_dir
+            self, self.tr("Select Screenshots Directory"), self._initial_dir
         )
 
         if dir_path:
@@ -309,16 +315,22 @@ class ScreenshotProcessingDialog(QDialog):
             if image_files:
                 self.file_list_text.setPlainText("\n".join(image_files))
                 self.process_btn.setEnabled(True)
-                self.status_label.setText(f"Found {len(image_files)} image files")
+                self.status_label.setText(
+                    self.tr("Found %1 image files").replace("%1", str(len(image_files)))
+                )
             else:
-                self.file_list_text.setPlainText("No image files found in directory")
+                self.file_list_text.setPlainText(
+                    self.tr("No image files found in directory")
+                )
                 self.process_btn.setEnabled(False)
-                self.status_label.setText("No image files found")
+                self.status_label.setText(self.tr("No image files found"))
 
         except Exception as e:
-            self.file_list_text.setPlainText(f"Error loading directory: {e}")
+            self.file_list_text.setPlainText(
+                self.tr("Error loading directory: %1").replace("%1", str(e))
+            )
             self.process_btn.setEnabled(False)
-            self.status_label.setText(f"Error: {e}")
+            self.status_label.setText(self.tr("Error: %1").replace("%1", str(e)))
 
     def _process_screenshots(self):
         """Process the screenshot images"""
@@ -326,7 +338,9 @@ class ScreenshotProcessingDialog(QDialog):
             # Validate directory
             if not os.path.isdir(self._directory_path):
                 QMessageBox.warning(
-                    self, "Invalid Directory", "Selected directory does not exist"
+                    self,
+                    self.tr("Invalid Directory"),
+                    self.tr("Selected directory does not exist"),
                 )
                 return
 
@@ -337,9 +351,11 @@ class ScreenshotProcessingDialog(QDialog):
 
         except Exception as e:
             QMessageBox.critical(
-                self, "Processing Error", f"Failed to process screenshots: {e}"
+                self,
+                self.tr("Processing Error"),
+                self.tr("Failed to process screenshots: %1").replace("%1", str(e)),
             )
-            self.status_label.setText(f"Error: {e}")
+            self.status_label.setText(self.tr("Error: %1").replace("%1", str(e)))
             self.process_btn.setEnabled(True)
 
 
@@ -348,7 +364,7 @@ class PreferencesDialog(QDialog):
 
     def __init__(self, parent=None, settings=None):
         super().__init__(parent)
-        self.setWindowTitle("Preferences")
+        self.setWindowTitle(self.tr("Preferences"))
         self.setMinimumSize(600, 400)
         self._settings = settings
         self._inputs = {}
@@ -383,11 +399,24 @@ class PreferencesDialog(QDialog):
 
         # Help messages for settings
         help_messages = {
-            "General/csv_import_path": "Path to the main account database CSV file.",
-            "General/screenshots_dir": "Directory where your PTCGP screenshots are stored.",
-            "Screenshots/watch_directory": "Enable or disable automatic monitoring of the screenshots directory.",
-            "Screenshots/check_interval": "How often (in minutes) to check for new screenshots when monitoring is enabled.",
-            "Debug/max_cores": "Override the maximum number of cores used for processing. Set to 0 to use system default.",
+            "General/csv_import_path": self.tr(
+                "Path to the main account database CSV file."
+            ),
+            "General/screenshots_dir": self.tr(
+                "Directory where your PTCGP screenshots are stored."
+            ),
+            "General/language": self.tr(
+                "Select the display language for the application."
+            ),
+            "Screenshots/watch_directory": self.tr(
+                "Enable or disable automatic monitoring of the screenshots directory."
+            ),
+            "Screenshots/check_interval": self.tr(
+                "How often (in minutes) to check for new screenshots when monitoring is enabled."
+            ),
+            "Debug/max_cores": self.tr(
+                "Override the maximum number of cores used for processing. Set to 0 to use system default."
+            ),
         }
 
         keys = self._settings.settings.allKeys()
@@ -409,6 +438,14 @@ class PreferencesDialog(QDialog):
 
         sorted_sections = sorted(sections_map.keys(), key=section_sort_key)
 
+        # Translation map for section headers
+        section_translations = {
+            "General": self.tr("General"),
+            "Screenshots": self.tr("Screenshots"),
+            "Debug": self.tr("Debug"),
+            "": self.tr("Other"),
+        }
+
         current_section = None
         for section in sorted_sections:
             # Add spacing and a header for the new section
@@ -419,7 +456,7 @@ class PreferencesDialog(QDialog):
                 self.form_layout.addRow(spacer)
 
             # Add a section header
-            header_text = section.upper() if section else "OTHER"
+            header_text = section_translations.get(section, section).upper()
             header_label = QLabel(header_text)
             header_label.setStyleSheet(
                 "font-weight: bold; color: #555; margin-top: 10px;"
@@ -434,7 +471,17 @@ class PreferencesDialog(QDialog):
                 row_layout = QHBoxLayout()
 
                 # Create a label for the key (show only the setting name, not the section)
-                display_name = key.split("/")[-1] if "/" in key else key
+                setting_name = key.split("/")[-1] if "/" in key else key
+                # Translation map for setting names
+                setting_name_translations = {
+                    "csv_import_path": self.tr("CSV Import Path"),
+                    "screenshots_dir": self.tr("Screenshots Directory"),
+                    "language": self.tr("Language"),
+                    "watch_directory": self.tr("Watch Directory"),
+                    "check_interval": self.tr("Check Interval (min)"),
+                    "max_cores": self.tr("Max Cores"),
+                }
+                display_name = setting_name_translations.get(setting_name, setting_name)
                 label = QLabel(display_name)
 
                 # Help message support
@@ -452,8 +499,31 @@ class PreferencesDialog(QDialog):
 
                 input_widget = None
 
+                # Handle language specifically with a combo box
+                if key == "General/language":
+                    combo = QComboBox()
+                    languages = {
+                        "": self.tr("System Default"),
+                        "en": "English",
+                        "zh": "Chinese",
+                        "ja": "Japanese",
+                        "de": "German",
+                        "fr": "French",
+                        "ko": "Korean",
+                        "es": "Spanish",
+                        "it": "Italian",
+                    }
+                    for code, name in languages.items():
+                        combo.addItem(name, code)
+
+                    index = combo.findData(str(value))
+                    if index >= 0:
+                        combo.setCurrentIndex(index)
+
+                    row_layout.addWidget(combo)
+                    input_widget = combo
                 # Handle booleans
-                if isinstance(value, bool) or str(value).lower() in ("true", "false"):
+                elif isinstance(value, bool) or str(value).lower() in ("true", "false"):
                     checkbox = QCheckBox()
                     checkbox.setChecked(str(value).lower() == "true" or value is True)
                     row_layout.addWidget(checkbox)
@@ -465,7 +535,7 @@ class PreferencesDialog(QDialog):
 
                     # Add Browse button for path-like keys
                     if "path" in key.lower() or "dir" in key.lower():
-                        browse_btn = QPushButton("Browse...")
+                        browse_btn = QPushButton(self.tr("Browse..."))
                         browse_btn.clicked.connect(
                             lambda checked, k=key, le=line_edit: self._browse(k, le)
                         )
@@ -478,10 +548,15 @@ class PreferencesDialog(QDialog):
         """Open a file or directory browser based on the key name"""
         current_path = line_edit.text()
         if "dir" in key.lower():
-            path = QFileDialog.getExistingDirectory(self, f"Select {key}", current_path)
+            path = QFileDialog.getExistingDirectory(
+                self, self.tr("Select %1").replace("%1", key), current_path
+            )
         else:
             path, _ = QFileDialog.getOpenFileName(
-                self, f"Select {key}", current_path, "All Files (*)"
+                self,
+                self.tr("Select %1").replace("%1", key),
+                current_path,
+                self.tr("All Files (*)"),
             )
 
         if path:
@@ -490,11 +565,31 @@ class PreferencesDialog(QDialog):
     def accept(self):
         """Save settings and close"""
         if self._settings:
+            restart_required = False
             for key, widget in self._inputs.items():
+                old_value = self._settings.get_setting(key)
+                new_value = None
+
                 if isinstance(widget, QCheckBox):
-                    self._settings.set_setting(key, widget.isChecked())
+                    new_value = widget.isChecked()
                 elif isinstance(widget, QLineEdit):
-                    self._settings.set_setting(key, widget.text())
+                    new_value = widget.text()
+                elif isinstance(widget, QComboBox):
+                    new_value = widget.currentData()
+
+                if new_value is not None:
+                    self._settings.set_setting(key, new_value)
+                    if key == "General/language" and str(old_value) != str(new_value):
+                        restart_required = True
+
+            if restart_required:
+                QMessageBox.information(
+                    self,
+                    self.tr("Restart Required"),
+                    self.tr(
+                        "The language change will take effect after you restart the application."
+                    ),
+                )
         super().accept()
 
 
@@ -503,7 +598,7 @@ class AboutDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("About PTCGPB Companion")
+        self.setWindowTitle(self.tr("About PTCGPB Companion"))
         self.setMinimumSize(400, 100)
 
         self._setup_ui()
@@ -521,18 +616,20 @@ class AboutDialog(QDialog):
         # Application info
         version = get_app_version()
         info_label = QLabel(
-            f"""<h2>PTCGPB Companion</h2>
+            self.tr(
+                """<h2>PTCGPB Companion</h2>
                <p>Pokémon Card Identification Tool</p>
-               <p>Version {version}</p>
+               <p>Version %1</p>
                <p>© 2026 itsthejoker</p>
                <p>MIT License & open source. Made with 🌯.<br><a href="https://github.com/itsthejoker/ptcgpb_companion">https://github.com/itsthejoker/ptcgpb-companion</a></p>
                <p>Built with PyQt6 and OpenCV</p><p></p>"""
+            ).replace("%1", version)
         )
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         main_layout.addWidget(info_label)
 
         # Close button
-        close_btn = QPushButton("Close")
+        close_btn = QPushButton(self.tr("Close"))
         close_btn.clicked.connect(self.accept)
         close_btn.setMinimumWidth(100)
 
@@ -550,20 +647,24 @@ class CardImageDialog(QDialog):
     """Dialog for displaying a full-size card image"""
 
     def __init__(
-            self,
-            image_path: str,
-            card_name: str = "Card Image",
-            parent=None,
-            scale: float = 1.0,
+        self,
+        image_path: str,
+        card_name: str = "Card Image",
+        parent=None,
+        scale: float = 1.0,
     ):
         super().__init__(parent)
         self.setWindowTitle(card_name)
 
         # Load pixmap
-        pixmap = QPixmap(image_path)
+        pixmap = QPixmap(str(image_path))
         if pixmap.isNull():
             # If image failed to load, show an error and close
-            QMessageBox.critical(self, "Error", f"Could not load image: {image_path}")
+            QMessageBox.critical(
+                self,
+                self.tr("Error"),
+                self.tr("Could not load image: %1").replace("%1", image_path),
+            )
             # Use QTimer to close after the event loop starts if needed,
             # but reject() here might be fine if called after super().__init__
             self.reject()
@@ -648,24 +749,25 @@ class AccountCardListDialog(QDialog):
     """Dialog showing a filterable list of accounts that have a specific card"""
 
     def __init__(
-            self,
-            card_name: str,
-            card_code: str,
-            account_data: list,
-            database=None,
-            on_removed: Callable = None,
-            parent=None,
+        self,
+        card_name: str,
+        card_code: str,
+        account_data: list,
+        screenshots_dir: str = "",
+        on_removed: Callable = None,
+        parent=None,
+        **kwargs,
     ):
         super().__init__(parent)
-        self.setWindowTitle(f"Accounts owning {card_name}")
+        self.setWindowTitle(self.tr("Accounts owning %1").replace("%1", card_name))
         self.setMinimumSize(600, 500)
 
         self.card_name = card_name
         self.card_code = card_code
+        self.screenshots_dir = screenshots_dir
         self.all_data = (
             account_data  # List of (account_name, count, screenshot_path, shinedust)
         )
-        self.database = database
         self.on_removed = on_removed
 
         self._setup_ui()
@@ -677,15 +779,15 @@ class AccountCardListDialog(QDialog):
 
         # Header info
         info_label = QLabel(
-            f"Showing account distribution for: <b>{self.card_name}</b>"
+            self.tr("Showing account distribution for: <b>%1</b>").replace("%1", self.card_name)
         )
         layout.addWidget(info_label)
 
         # Search/Filter bar
         filter_layout = QHBoxLayout()
-        filter_layout.addWidget(QLabel("Filter:"))
+        filter_layout.addWidget(QLabel(self.tr("Filter:")))
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Search account name...")
+        self.search_input.setPlaceholderText(self.tr("Search account name..."))
         self.search_input.textChanged.connect(self._filter_data)
         filter_layout.addWidget(self.search_input)
         layout.addLayout(filter_layout)
@@ -694,26 +796,40 @@ class AccountCardListDialog(QDialog):
         self.table = QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels(
-            ["Account Name", "Quantity", "Shinedust", "Age", "Screenshot", "Action"]
+            [
+                self.tr("Account Name"),
+                self.tr("Quantity"),
+                self.tr("Shinedust"),
+                self.tr("Age"),
+                self.tr("Screenshot"),
+                self.tr("Action"),
+            ]
         )
         self.table.horizontalHeader().setSectionResizeMode(
             0, QHeaderView.ResizeMode.Stretch
         )
         self.table.horizontalHeader().setSectionResizeMode(
-            1, QHeaderView.ResizeMode.ResizeToContents
+            1, QHeaderView.ResizeMode.Interactive
         )
         self.table.horizontalHeader().setSectionResizeMode(
-            2, QHeaderView.ResizeMode.ResizeToContents
+            2, QHeaderView.ResizeMode.Interactive
         )
         self.table.horizontalHeader().setSectionResizeMode(
-            3, QHeaderView.ResizeMode.ResizeToContents
+            3, QHeaderView.ResizeMode.Interactive
         )
         self.table.horizontalHeader().setSectionResizeMode(
-            4, QHeaderView.ResizeMode.ResizeToContents
+            4, QHeaderView.ResizeMode.Interactive
         )
         self.table.horizontalHeader().setSectionResizeMode(
-            5, QHeaderView.ResizeMode.ResizeToContents
+            5, QHeaderView.ResizeMode.Interactive
         )
+
+        # Set default widths for small columns to avoid layout jumping
+        self.table.setColumnWidth(1, 60)
+        self.table.setColumnWidth(2, 80)
+        self.table.setColumnWidth(3, 60)
+        self.table.setColumnWidth(4, 100)
+        self.table.setColumnWidth(5, 80)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.setSortingEnabled(True)
@@ -751,7 +867,7 @@ class AccountCardListDialog(QDialog):
                 dt = datetime.strptime(str(account), "%Y%m%d%H%M%S")
                 now = datetime.now()
                 diff = now - dt
-                age_val = f"{diff.days}d"
+                age_val = self.tr("%1d").replace("%1", diff.days)
             except (ValueError, TypeError):
                 pass
             age_item = NumericTableWidgetItem(age_val, is_age=True)
@@ -760,7 +876,7 @@ class AccountCardListDialog(QDialog):
 
             # Screenshot button
             if screenshot_path:
-                screenshot_btn = QPushButton("Screenshot")
+                screenshot_btn = QPushButton(self.tr("Screenshot"))
                 screenshot_btn.clicked.connect(
                     lambda checked, p=screenshot_path: self._view_screenshot(p)
                 )
@@ -769,7 +885,7 @@ class AccountCardListDialog(QDialog):
                 self.table.setItem(i, 4, QTableWidgetItem(""))
 
             # Remove button
-            remove_button = QPushButton("Remove")
+            remove_button = QPushButton(self.tr("Remove"))
             remove_button.clicked.connect(
                 lambda checked, a=account, p=screenshot_path: self._remove_card(a, p)
             )
@@ -778,22 +894,124 @@ class AccountCardListDialog(QDialog):
 
     def _view_screenshot(self, path):
         """Open the screenshot in a new window"""
-        if not path or not os.path.exists(path):
+        # Resolve path if it's not absolute and we have a screenshots_dir
+        resolved_path = path
+        if path and not os.path.isabs(path) and self.screenshots_dir:
+            # Handle potential cross-platform issues by normalizing separators
+            normalized_name = path.replace("\\", os.sep).replace("/", os.sep)
+            resolved_path = os.path.join(self.screenshots_dir, normalized_name)
+
+        if not resolved_path or not os.path.exists(resolved_path):
             QMessageBox.warning(
-                self, "Error", f"The screenshot path could not be found:\n{path}"
+                self,
+                self.tr("Error"),
+                self.tr("The screenshot path could not be found:\n%1").replace("%1", 
+                    resolved_path or path
+                ),
             )
             return
 
-        dialog = CardImageDialog(path, f"{os.path.basename(path)}", self, scale=2.0)
+        dialog = CardImageDialog(
+            resolved_path, f"{os.path.basename(resolved_path)}", self, scale=2.0
+        )
         dialog.exec()
 
     def _remove_card(self, account_name, screenshot_path=None):
         """Handle card removal from an account"""
+        from app.db.models import Card, Account, ScreenshotCard
+        from app.names import SHINEDUST_REQUIREMENTS
+
+        card = Card.objects.filter(code=self.card_code).first()
+        if not card:
+            QMessageBox.warning(
+                self, self.tr("Error"), self.tr("Card not found in database.")
+            )
+            return
+
+        rarity = card.rarity
+        cost = 0
+
+        if rarity == "1S":
+            # Ask 4000 or 10000
+            msg = QMessageBox(self)
+            msg.setWindowTitle(self.tr("Select Shinedust Cost"))
+            msg.setText(
+                self.tr("Is this a 4,000 or 10,000 shinedust move for %1?").replace("%1", 
+                    self.card_name
+                )
+            )
+            btn4k = msg.addButton("4,000", QMessageBox.ButtonRole.ActionRole)
+            btn10k = msg.addButton("10,000", QMessageBox.ButtonRole.ActionRole)
+            msg.addButton(QMessageBox.StandardButton.Cancel)
+            msg.exec()
+            if msg.clickedButton() == btn4k:
+                cost = 4000
+            elif msg.clickedButton() == btn10k:
+                cost = 10000
+            else:
+                return  # Cancelled
+        elif rarity == "2S":
+            # Ask 25000 or 30000
+            msg = QMessageBox(self)
+            msg.setWindowTitle(self.tr("Select Shinedust Cost"))
+            msg.setText(
+                self.tr("Is this a 25,000 or 30,000 shinedust move for %1?").replace("%1", 
+                    self.card_name
+                )
+            )
+            btn25k = msg.addButton("25,000", QMessageBox.ButtonRole.ActionRole)
+            btn30k = msg.addButton("30,000", QMessageBox.ButtonRole.ActionRole)
+            msg.addButton(QMessageBox.StandardButton.Cancel)
+            msg.exec()
+            if msg.clickedButton() == btn25k:
+                cost = 25000
+            elif msg.clickedButton() == btn30k:
+                cost = 30000
+            else:
+                return  # Cancelled
+        else:
+            cost = SHINEDUST_REQUIREMENTS.get(rarity, 0)
+
+        # Get account and check shinedust
+        account = Account.objects.filter(name=account_name).first()
+        if not account:
+            QMessageBox.warning(
+                self,
+                self.tr("Error"),
+                self.tr("Account '%1' not found.").replace("%1", account_name),
+            )
+            return
+
+        try:
+            current_shinedust = int(account.shinedust) if account.shinedust else 0
+        except (ValueError, TypeError):
+            current_shinedust = 0
+
+        if current_shinedust < cost:
+            QMessageBox.warning(
+                self,
+                self.tr("Insufficient Shinedust"),
+                self.tr(
+                    "Account <b>%1</b> does not have enough shinedust (%2) "
+                    "to perform this action (cost: %3)."
+                )
+                .replace("%1", account_name)
+                .replace("%2", f"{current_shinedust:,}")
+                .replace("%3", f"{cost:,}"),
+            )
+            return
+
         msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("Remove Card?")
+        msg_box.setWindowTitle(self.tr("Remove Card?"))
         msg_box.setText(
-            f"One instance of <b>{self.card_name}</b> will be removed from account <b>{account_name}</b>.<br><br>"
-            "If the account has multiples of this same card, only one will be removed."
+            self.tr(
+                "One instance of <b>%1</b> will be removed from account <b>%2</b>.<br><br>"
+                "This will cost <b>%3</b> shinedust.<br><br>"
+                "If the account has multiples of this same card, only one will be removed."
+            )
+            .replace("%1", self.card_name)
+            .replace("%2", account_name)
+            .replace("%3", f"{cost:,}")
         )
         msg_box.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -801,51 +1019,70 @@ class AccountCardListDialog(QDialog):
         msg_box.setDefaultButton(QMessageBox.StandardButton.No)
 
         if msg_box.exec() == QMessageBox.StandardButton.Yes:
-            if self.database:
-                # Try to use screenshot_path if available for more precise removal
-                if hasattr(self.database, "remove_card_from_account_precise"):
-                    success = self.database.remove_card_from_account_precise(
-                        self.card_code, account_name, screenshot_path
-                    )
-                else:
-                    success = self.database.remove_card_from_account(
-                        self.card_code, account_name
-                    )
+            # Find one instance to remove
+            query = ScreenshotCard.objects.filter(
+                screenshot__account__name=account_name, card__code=self.card_code
+            )
 
-                if success:
-                    record_removed_card(account_name, self.card_code)
+            if screenshot_path:
+                query = query.filter(screenshot__name=screenshot_path)
 
-                    # Update local data
-                    for i, row in enumerate(self.all_data):
-                        acc = row[0]
+            sc = query.first()
+            if sc:
+                # Update shinedust
+                account.shinedust = str(current_shinedust - cost)
+                account.save()
+
+                sc.delete()
+                success = True
+            else:
+                success = False
+
+            if success:
+                record_traded_card(account_name, self.card_code)
+
+                # Update local data
+                new_shinedust_str = str(current_shinedust - cost)
+                to_remove_idx = -1
+                for i in range(len(self.all_data)):
+                    row = self.all_data[i]
+                    acc = row[0]
+                    if acc == account_name:
+                        new_row = list(row)
+                        if len(new_row) > 3:
+                            new_row[3] = new_shinedust_str
+
                         count = row[1]
                         spath = row[2] if len(row) > 2 else None
 
-                        # Match by account AND screenshot path if possible
-                        if acc == account_name and (
-                                screenshot_path is None or spath == screenshot_path
+                        # Match by account AND screenshot path if possible for the one to remove
+                        if to_remove_idx == -1 and (
+                            screenshot_path is None or spath == screenshot_path
                         ):
                             if count > 1:
-                                # Preserve all columns, just update count
-                                new_row = list(row)
                                 new_row[1] = count - 1
                                 self.all_data[i] = tuple(new_row)
+                                to_remove_idx = -2  # Handled
                             else:
-                                self.all_data.pop(i)
-                            break
+                                to_remove_idx = i
+                        else:
+                            self.all_data[i] = tuple(new_row)
 
-                    # Refresh table
-                    self._filter_data(self.search_input.text())
+                if to_remove_idx >= 0:
+                    self.all_data.pop(to_remove_idx)
 
-                    # Notify callback
-                    if self.on_removed:
-                        self.on_removed()
-                else:
-                    QMessageBox.warning(
-                        self, "Error", "Could not remove card from database."
-                    )
+                # Refresh table
+                self._filter_data(self.search_input.text())
+
+                # Notify callback
+                if self.on_removed:
+                    self.on_removed()
             else:
-                QMessageBox.warning(self, "Error", "Database not available.")
+                QMessageBox.warning(
+                    self,
+                    self.tr("Error"),
+                    self.tr("Could not find card in database to remove."),
+                )
 
     def _filter_data(self, text):
         """Filter table data based on search text"""

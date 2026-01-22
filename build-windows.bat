@@ -43,6 +43,7 @@ set "PYI_OPTS=--noconfirm --clean --name %APP_NAME% --windowed"
 REM Copy the below line for each asset or folder that you wish to copy in.
 SET "PYI_OPTS=!PYI_OPTS! --add-data=_internal\ptcgpb-companion-icon.ico;."
 SET "PYI_OPTS=!PYI_OPTS! --add-data=pyproject.toml;."
+SET "PYI_OPTS=!PYI_OPTS! --add-data=app\translations\*.qm;app\translations"
 
 REM If you have an application icon, uncomment and adjust:
 set "PYI_OPTS=%PYI_OPTS% --icon=_internal\ptcgpb-companion-icon.ico"

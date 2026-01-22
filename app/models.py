@@ -1,13 +1,16 @@
-from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex, pyqtSignal
-from PyQt6.QtGui import QIcon, QPixmap
-from typing import List, Dict, Any, Optional
+from pathlib import Path
+
+from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PyQt6.QtGui import QIcon
+from typing import Optional
 import os
 
-from app.utils import get_portable_path
-from app.names import rarity as RARITY_MAP
+from settings import BASE_DIR
+
+# from app.db.models import Card
 
 # Define rarity order for sorting
-RARITY_ORDER = {name: i for i, name in enumerate(RARITY_MAP.values())}
+# RARITY_ORDER = {name: i for i, name in enumerate(Card.Rarity.values())}
 
 
 class CardModel(QAbstractTableModel):
@@ -58,7 +61,7 @@ class CardModel(QAbstractTableModel):
             # Try to find card image
             resolved_path = self._find_card_image(card_code, image_path)
             if resolved_path and os.path.exists(resolved_path):
-                return QIcon(resolved_path)
+                return QIcon(str(resolved_path))
 
         elif role == Qt.ItemDataRole.ToolTipRole:
             # Return tooltip with detailed information
@@ -87,23 +90,27 @@ class CardModel(QAbstractTableModel):
 
     def sort(self, column, order=Qt.SortOrder.AscendingOrder):
         """Sort model by column"""
+        from app.db.models import Card
+
         self.layoutAboutToBeChanged.emit()
 
         is_ascending = order == Qt.SortOrder.AscendingOrder
 
         def sort_key(item):
             if column == 1:  # Card
-                return item.get("card_name", "").lower()
+                return (item.get("card_name") or "").lower()
             elif column == 2:  # Set
                 # Sort by set name, then card name
                 return (
-                    item.get("set_name", "").lower(),
-                    item.get("card_name", "").lower(),
+                    (item.get("set_name") or "").lower(),
+                    (item.get("card_name") or "").lower(),
                 )
             elif column == 3:  # Rarity
-                rarity_name = item.get("rarity", "")
-                # Return the index from RARITY_ORDER, or a high number if not found
-                return RARITY_ORDER.get(rarity_name, 999), rarity_name.lower()
+                rarity = {
+                    label: count for count, label in enumerate(list(Card.Rarity.labels))
+                }
+                rarity_name = item.get("rarity") or ""
+                return rarity.get(rarity_name, 999), rarity_name.lower()
             elif column == 4:  # Count
                 return item.get("count", 0)
             return ""
@@ -120,8 +127,7 @@ class CardModel(QAbstractTableModel):
             # Check various relative locations for the image_path
             check_paths = [
                 image_path,
-                get_portable_path("resources", "card_imgs", image_path),
-                get_portable_path("static", "card_imgs", image_path),
+                BASE_DIR / "resources" / "card_imgs" / image_path,
             ]
 
             # If image_path contains a slash or backslash, also try without the first part
@@ -131,43 +137,27 @@ class CardModel(QAbstractTableModel):
                 filename = parts[-1]
                 set_code = parts[0]
                 check_paths.append(
-                    get_portable_path("resources", "card_imgs", set_code, filename)
+                    BASE_DIR / "resources" / "card_imgs" / set_code / filename
                 )
                 check_paths.append(
-                    get_portable_path("static", "card_imgs", set_code, filename)
+                    BASE_DIR / "static" / "card_imgs" / set_code / filename
                 )
 
             for path in check_paths:
                 if os.path.exists(path):
-                    return path
+                    return str(path)
 
         # Try to find card image in resources based on card code
-        # Card code format can be SET_NUMBER (e.g., A1_1) or NAME_SET (e.g., A1_1_A1)
+        # Card code format can be SET_NUMBER (e.g., A1_1)
         if card_code and "_" in card_code:
-            # If we have multiple underscores, it's likely NAME_SET format
-            if card_code.count("_") >= 2:
-                name, set_code = card_code.rsplit("_", 1)
-            else:
-                # Fallback for simpler format
-                set_code, _ = card_code.split("_", 1)
-                name = card_code
+            set_code, _ = card_code.split("_", 1)
+            name = card_code
 
             # Try different resource paths
-            for base_dir in ["resources", "static"]:
-                for ext in [".webp", ".png", ".jpg"]:
-                    # Try set_code/name.ext
-                    path = get_portable_path(
-                        base_dir, "card_imgs", set_code, f"{name}{ext}"
-                    )
-                    if os.path.exists(path):
-                        return path
-                    # Also try the original card_code just in case
-                    path = get_portable_path(
-                        base_dir, "card_imgs", set_code, f"{card_code}{ext}"
-                    )
-                    if os.path.exists(path):
-                        return path
-
+            for base_dir in ["resources"]:
+                path = BASE_DIR / base_dir / "card_imgs" / set_code / f"{name}.webp"
+                if path.exists():
+                    return str(path)
         return None
 
 
@@ -234,11 +224,11 @@ class ProcessingTaskModel(QAbstractTableModel):
             if column == 0:  # Task ID
                 return item.get("task_id", "")
             elif column == 1:  # Status
-                return item.get("status", "").lower()
+                return (item.get("status") or "").lower()
             elif column == 2:  # Progress
                 return item.get("progress", 0)
             elif column == 3:  # Description
-                return item.get("description", "").lower()
+                return (item.get("description") or "").lower()
             return ""
 
         self._data.sort(key=sort_key, reverse=not is_ascending)

@@ -51,6 +51,7 @@ PYI_OPTS=(
 ADD_DATA=(
   "_internal/ptcgpb-companion-icon.ico:."
   "pyproject.toml:."
+  "app/translations/*.qm:app/translations"
 )
 
 for spec in "${ADD_DATA[@]}"; do

@@ -26,7 +26,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QProgressBar,
 )
-from PyQt6.QtCore import Qt, QSize, QTimer
+from PyQt6.QtCore import QSize, QTimer
 from PyQt6.QtGui import QAction
 import os
 import sys
@@ -61,15 +61,15 @@ from PyQt6.QtCore import QThreadPool, Qt, QUrl
 from PyQt6.QtGui import QDesktopServices
 from app.utils import (
     PortableSettings,
-    get_portable_path,
     get_app_version,
-    get_removed_cards,
-    clear_removed_cards,
+    get_traded_cards,
     get_task_id,
+    clean_card_name,
 )
-from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
+from settings import BASE_DIR
+import humanize
 
 
 class ScreenshotChangeHandler(FileSystemEventHandler):
@@ -100,51 +100,47 @@ class MainWindow(QMainWindow):
         """Initialize the main window"""
         super().__init__()
 
-        # Set window properties
         self.setWindowTitle("PTCGPB Companion")
         self.setMinimumSize(800, 600)
 
-        # Initialize settings
         self.settings = PortableSettings()
 
         # Track combined import flow state
         self._combined_import_request = None
+        self._migration_in_progress = False
 
         # Initialize core non-UI components first
-        self._init_database()
         self._init_thread_pool()
         self._setup_processing_status()
+        logger.info("finished processing status")
         # Cards tab async loading state
         self._cards_load_generation = 0
         self._current_card_load_worker = None
 
-        # Version check state
         self.new_version_available = False
         self.latest_version_info = {}
 
-        # Dashboard statistics debounce timer
         self._dashboard_timer = QTimer()
+        logger.info("firing dashboard timer")
         self._dashboard_timer.setSingleShot(True)
         self._dashboard_timer.timeout.connect(self._update_dashboard_statistics)
-
-        # Initialize UI components
+        logger.info("setting up status bar")
         self._setup_status_bar()  # Initialize status bar early so it can be used by other setup methods
+        logger.info("setting up menu bar")
         self._setup_menu_bar()
+        logger.info("setting up central widget")
         self._setup_central_widget()
 
         # Set initial state for combined import availability
         self._update_load_new_data_availability()
 
-        # Ensure card art templates are available
         QTimer.singleShot(100, self._start_art_download_if_needed)
+        QTimer.singleShot(150, self._check_for_database_migration)
 
-        # Load initial dashboard statistics
         QTimer.singleShot(200, self._update_dashboard_statistics)
 
-        # Check for updates
         QTimer.singleShot(300, self._check_for_updates)
 
-        # Mark app as loaded in recent activity
         self.recent_activity_messages.append(
             {
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -159,11 +155,10 @@ class MainWindow(QMainWindow):
     def _start_art_download_if_needed(self):
         """Check for card art directory and start background download if missing"""
         try:
-            from app.utils import get_portable_path
+            from settings import BASE_DIR
 
-            template_dir = get_portable_path("resources", "card_imgs")
+            template_dir = BASE_DIR / "resources" / "card_imgs"
             if not os.path.isdir(template_dir):
-                # Ask user if they want to download art now or quit
                 msg_box = QMessageBox(self)
                 msg_box.setWindowTitle("Download Card Art")
                 msg_box.setText(
@@ -225,6 +220,32 @@ class MainWindow(QMainWindow):
             logger.error(f"Failed to start art download worker: {e}")
             self._update_status_message(f"Failed to start art download: {e}")
 
+    def _check_for_database_migration(self):
+        """Check if an old database exists and prompt for migration if so"""
+        old_db_path = BASE_DIR / "data" / "cardcounter.db"
+        if os.path.exists(old_db_path):
+            msg_box = QMessageBox(self)
+            msg_box.setWindowTitle("Database Migration")
+            msg_box.setText(
+                "We are very sorry, but due to database changes we need to rebuild the data.\n\n"
+                "To continue, we need to perform a combined import of your CSV and screenshots. "
+            )
+            start_button = msg_box.addButton("Start", QMessageBox.ButtonRole.AcceptRole)
+            cancel_button = msg_box.addButton(
+                "Cancel", QMessageBox.ButtonRole.RejectRole
+            )
+            msg_box.setDefaultButton(start_button)
+            msg_box.setIcon(QMessageBox.Icon.Information)
+
+            msg_box.exec()
+
+            if msg_box.clickedButton() == cancel_button:
+                logger.info("User cancelled database migration; quitting")
+                sys.exit(0)
+
+            self._migration_in_progress = True
+            self._on_load_new_data()
+
     def _workers_are_running(self) -> bool:
         return any(
             isinstance(w, ScreenshotProcessingWorker)
@@ -232,32 +253,6 @@ class MainWindow(QMainWindow):
             or isinstance(w, CardArtDownloadWorker)
             for w in self.active_workers
         )
-
-    def _init_database(self):
-        """Initialize database connection"""
-        try:
-            from app.database import Database
-
-            self.db = Database()
-            logger.info("Database initialized successfully")
-
-            # If migration was applied, trigger a CSV re-import to fill the new columns
-            if self.db.migration_applied:
-                logger.info("Migration applied, triggering automatic CSV re-import")
-                csv_path = self.settings.get_setting("General/csv_import_path", "")
-                if csv_path and os.path.exists(csv_path):
-                    # Use a small delay to ensure everything is ready
-                    QTimer.singleShot(1000, lambda: self._on_csv_imported(csv_path))
-                else:
-                    logger.warning(
-                        "Migration applied but no CSV path found in settings for re-import"
-                    )
-        except Exception as e:
-            logger.error(f"Failed to initialize database: {e}")
-            # Show error message to user
-            from app.utils import show_error_message
-
-            show_error_message("Database Error", f"Failed to initialize database: {e}")
 
     def _init_thread_pool(self):
         """Initialize thread pool for background processing"""
@@ -302,53 +297,53 @@ class MainWindow(QMainWindow):
         menu_bar = self.menuBar()
 
         # File menu
-        file_menu = menu_bar.addMenu("&File")
+        file_menu = menu_bar.addMenu(self.tr("&File"))
 
         # Import CSV action
-        import_csv_action = QAction("&Import CSV", self)
+        import_csv_action = QAction(self.tr("&Import CSV"), self)
         import_csv_action.setShortcut("Ctrl+I")
         import_csv_action.triggered.connect(self._on_import_csv)
         file_menu.addAction(import_csv_action)
 
         # Process Screenshots action
-        process_action = QAction("&Process Screenshots", self)
+        process_action = QAction(self.tr("&Process Screenshots"), self)
         process_action.setShortcut("Ctrl+P")
         process_action.triggered.connect(self._on_process_screenshots)
         file_menu.addAction(process_action)
 
         # Combined import action
-        self.load_new_data_action = QAction("&Load New Data", self)
+        self.load_new_data_action = QAction(self.tr("&Load New Data"), self)
         self.load_new_data_action.triggered.connect(self._on_load_new_data)
         self.load_new_data_action.setEnabled(False)
         file_menu.addAction(self.load_new_data_action)
 
         # Process Removed Cards action
-        process_removed_action = QAction("Process &Removed Cards", self)
+        process_removed_action = QAction(self.tr("Process &Removed Cards"), self)
         process_removed_action.triggered.connect(self._on_process_removed_cards)
         file_menu.addAction(process_removed_action)
 
         # Preferences action
-        preferences_action = QAction("&Preferences", self)
+        preferences_action = QAction(self.tr("&Preferences"), self)
         preferences_action.setShortcut("Ctrl+,")
         preferences_action.triggered.connect(self._on_preferences)
         file_menu.addSeparator()
         file_menu.addAction(preferences_action)
 
         # Exit action
-        exit_action = QAction("E&xit", self)
+        exit_action = QAction(self.tr("E&xit"), self)
         exit_action.setShortcut("Ctrl+Q")
         exit_action.triggered.connect(self.close)
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
 
         # View menu. Not currently used, but keeping in case we need it eventually
-        # view_menu = menu_bar.addMenu("&View")
+        # view_menu = menu_bar.addMenu(self.tr("&View"))
 
         # Help menu
-        help_menu = menu_bar.addMenu("&Help")
+        help_menu = menu_bar.addMenu(self.tr("&Help"))
 
         # About action
-        about_action = QAction("&About", self)
+        about_action = QAction(self.tr("&About"), self)
         about_action.triggered.connect(self._on_about)
         help_menu.addAction(about_action)
 
@@ -382,22 +377,22 @@ class MainWindow(QMainWindow):
         stats_layout = QGridLayout()
 
         # Total cards statistic
-        self.total_cards_label = QLabel("Total Cards: 0")
+        self.total_cards_label = QLabel(self.tr("Total Cards: 0"))
         self.total_cards_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         stats_layout.addWidget(self.total_cards_label, 0, 0)
 
         # Total packs statistic
-        self.total_packs_label = QLabel("Total Packs: 0")
+        self.total_packs_label = QLabel(self.tr("Total Packs: 0"))
         self.total_packs_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         stats_layout.addWidget(self.total_packs_label, 0, 1)
 
         # Unique cards statistic
-        self.unique_cards_label = QLabel("Unique Cards: 0")
+        self.unique_cards_label = QLabel(self.tr("Unique Cards: 0"))
         self.unique_cards_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         stats_layout.addWidget(self.unique_cards_label, 1, 0)
 
         # Last processed statistic
-        self.last_processed_label = QLabel("Last Processed: Never")
+        self.last_processed_label = QLabel(self.tr("Last Processed: Never"))
         self.last_processed_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         stats_layout.addWidget(self.last_processed_label, 1, 1)
 
@@ -406,15 +401,15 @@ class MainWindow(QMainWindow):
         # Quick actions section
         actions_layout = QHBoxLayout()
 
-        self.import_csv_btn = QPushButton("Import CSV")
+        self.import_csv_btn = QPushButton(self.tr("Import CSV"))
         self.import_csv_btn.clicked.connect(self._on_import_csv)
         actions_layout.addWidget(self.import_csv_btn)
 
-        self.import_screenshots_btn = QPushButton("Load Screenshots")
+        self.import_screenshots_btn = QPushButton(self.tr("Load Screenshots"))
         self.import_screenshots_btn.clicked.connect(self._on_process_screenshots)
         actions_layout.addWidget(self.import_screenshots_btn)
 
-        self.load_new_data_btn = QPushButton("Load New Data")
+        self.load_new_data_btn = QPushButton(self.tr("Load New Data"))
         self.load_new_data_btn.clicked.connect(self._on_load_new_data)
         actions_layout.addWidget(self.load_new_data_btn)
 
@@ -422,12 +417,12 @@ class MainWindow(QMainWindow):
 
         # Recent activity section
         recent_header_layout = QHBoxLayout()
-        recent_label = QLabel("Recent Activity:")
+        recent_label = QLabel(self.tr("Recent Activity:"))
         recent_header_layout.addWidget(recent_label)
 
         recent_header_layout.addStretch()
 
-        clear_recent_btn = QPushButton("Clear")
+        clear_recent_btn = QPushButton(self.tr("Clear"))
         clear_recent_btn.setFixedWidth(80)
         clear_recent_btn.clicked.connect(self._clear_recent_activity)
         recent_header_layout.addWidget(clear_recent_btn)
@@ -442,7 +437,7 @@ class MainWindow(QMainWindow):
         dashboard_layout.addWidget(self.recent_activity_list)
 
         dashboard_widget.setLayout(dashboard_layout)
-        self.tab_widget.addTab(dashboard_widget, "Dashboard")
+        self.tab_widget.addTab(dashboard_widget, self.tr("Dashboard"))
 
         # Dashboard statistics will be loaded after status bar is initialized
 
@@ -453,42 +448,56 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            if hasattr(self, "db") and self.db:
-                # Use a worker to avoid hanging the UI thread
-                limit = getattr(self, "recent_activity_limit", 100)
-                worker = DashboardStatsWorker(
-                    db_path=self.db.db_path, activity_limit=limit
-                )
-                worker.signals.result.connect(self._on_dashboard_stats_ready)
-                worker.signals.error.connect(
-                    lambda e: logger.error(f"Dashboard stats error: {e}")
-                )
-                self.thread_pool.start(worker)
-            else:
-                self._update_status_message("Database not available for statistics")
+            # Use a worker to avoid hanging the UI thread
+            limit = getattr(self, "recent_activity_limit", 100)
+            worker = DashboardStatsWorker(activity_limit=limit)
+            worker.signals.result.connect(self._on_dashboard_stats_ready)
+            worker.signals.error.connect(
+                lambda e: logger.error(f"Dashboard stats error: {e}")
+            )
+            self.thread_pool.start(worker)
 
         except Exception as e:
             logger.error(f"Error starting dashboard statistics update: {e}")
-            self._update_status_message(f"Error updating statistics: {e}")
+            self._update_status_message(
+                self.tr("Error updating statistics: %1").replace("%1", str(e))
+            )
 
     def _on_dashboard_stats_ready(self, stats):
         """Handle statistics loaded from background worker"""
         try:
             # Update UI labels
-            self.total_cards_label.setText(f"Total Cards: {stats['total_cards']}")
-            self.unique_cards_label.setText(f"Unique Cards: {stats['unique_cards']}")
-            self.total_packs_label.setText(f"Total Packs: {stats['total_packs']}")
+            self.total_cards_label.setText(
+                self.tr("Total Cards: %1").replace("%1", str(stats["total_cards"]))
+            )
+            self.unique_cards_label.setText(
+                self.tr("Unique Cards: %1").replace("%1", str(stats["unique_cards"]))
+            )
+            self.total_packs_label.setText(
+                self.tr("Total Packs: %1").replace("%1", str(stats["total_packs"]))
+            )
 
             if stats.get("last_processed"):
+                last_processed = stats["last_processed"]
+                if isinstance(last_processed, str):
+                    last_processed = datetime.fromisoformat(last_processed)
+
+                now = datetime.now()
+                # Ensure both are naive for comparison if one is naive
+                if last_processed.tzinfo is not None:
+                    now = now.astimezone(last_processed.tzinfo)
+
                 self.last_processed_label.setText(
-                    f"Last Processed: {stats['last_processed']}"
+                    self.tr("Last Processed: %1").replace(
+                        "%1", humanize.naturaltime(now - last_processed)
+                    )
                 )
             else:
-                self.last_processed_label.setText("Last Processed: Never")
+                self.last_processed_label.setText(self.tr("Last Processed: Never"))
 
             # Update recent activity list with the database results
             self._update_recent_activity(db_activities=stats.get("recent_activity", []))
-            self._update_status_message("Dashboard statistics updated")
+            self._update_status_message(self.tr("Dashboard statistics updated"))
 
         except Exception as e:
             logger.error(f"Error updating dashboard UI: {e}")
@@ -517,6 +526,11 @@ class MainWindow(QMainWindow):
 
             # DB activities come newest first from SQL, so reverse them for bottom-newest
             for activity in reversed(db_activities):
+                if isinstance(activity, str):
+                    # Robustness: handle legacy string format
+                    all_items.append({"text": activity, "color": None})
+                    continue
+
                 raw_ts = activity.get("timestamp")
                 if not raw_ts:
                     continue
@@ -526,7 +540,8 @@ class MainWindow(QMainWindow):
                 ss = session_start.replace("T", " ") if session_start else None
                 if ss and ts < ss:
                     continue
-                item_text = f"{raw_ts} - {activity['description']}"
+                description = activity.get("description", "Unknown activity")
+                item_text = f"{raw_ts} - {description}"
                 all_items.append({"text": item_text, "color": None})
 
             # 2. Add session status messages
@@ -597,7 +612,7 @@ class MainWindow(QMainWindow):
                     last_item.setForeground(item_data["color"])
 
             if not all_items:
-                self.recent_activity_list.addItem("No recent activity")
+                self.recent_activity_list.addItem(self.tr("No recent activity"))
             else:
                 # Scroll to bottom to show newest entries
                 self.recent_activity_list.scrollToBottom()
@@ -605,7 +620,7 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logger.error(f"Error updating recent activity: {e}")
             self.recent_activity_list.clear()
-            self.recent_activity_list.addItem("Error loading activity")
+            self.recent_activity_list.addItem(self.tr("Error loading activity"))
 
     def _setup_cards_tab(self):
         """Set up the cards tab"""
@@ -617,26 +632,26 @@ class MainWindow(QMainWindow):
 
         # Set filter
         self.set_filter = QComboBox()
-        self.set_filter.addItem("All Sets")
+        self.set_filter.addItem(self.tr("All Sets"))
         self.set_filter.setMinimumWidth(150)
-        filter_layout.addWidget(QLabel("Set:"))
+        filter_layout.addWidget(QLabel(self.tr("Set:")))
         filter_layout.addWidget(self.set_filter)
 
         # Rarity filter
         self.rarity_filter = QComboBox()
-        self.rarity_filter.addItem("All Rarities")
+        self.rarity_filter.addItem(self.tr("All Rarities"))
         self.rarity_filter.setMinimumWidth(150)
-        filter_layout.addWidget(QLabel("Rarity:"))
+        filter_layout.addWidget(QLabel(self.tr("Rarity:")))
         filter_layout.addWidget(self.rarity_filter)
 
         # Search box
         self.search_box = QLineEdit()
-        self.search_box.setPlaceholderText("Search cards...")
+        self.search_box.setPlaceholderText(self.tr("Search cards..."))
         self.search_box.setMinimumWidth(200)
         filter_layout.addWidget(self.search_box)
 
         # Refresh button
-        self.refresh_cards_btn = QPushButton("Refresh")
+        self.refresh_cards_btn = QPushButton(self.tr("Refresh"))
         self.refresh_cards_btn.clicked.connect(self._refresh_cards_tab)
         filter_layout.addWidget(self.refresh_cards_btn)
 
@@ -669,7 +684,7 @@ class MainWindow(QMainWindow):
         self._setup_card_model()
 
         cards_widget.setLayout(cards_layout)
-        self.cards_tab_index = self.tab_widget.addTab(cards_widget, "Cards")
+        self.cards_tab_index = self.tab_widget.addTab(cards_widget, self.tr("Cards"))
 
     def _on_tab_changed(self, index):
         """Handle tab changes to refresh content"""
@@ -712,7 +727,7 @@ class MainWindow(QMainWindow):
         self.task_table.setSortingEnabled(True)
         # Show an empty-state message when no rows are present
         try:
-            self.task_table.setPlaceholderText("No active tasks")
+            self.task_table.setPlaceholderText(self.tr("No active tasks"))
         except Exception:
             # setPlaceholderText not available in some environments; ignore gracefully
             pass
@@ -722,7 +737,7 @@ class MainWindow(QMainWindow):
         horizontal_header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         # Dynamic label to reflect whether any tasks are currently running/queued
-        self.active_tasks_label = QLabel("Active Tasks:")
+        self.active_tasks_label = QLabel(self.tr("Active Tasks:"))
         processing_layout.addWidget(self.active_tasks_label)
         processing_layout.addWidget(self.task_table)
 
@@ -730,24 +745,24 @@ class MainWindow(QMainWindow):
         self.task_details_text = QTextEdit()
         self.task_details_text.setReadOnly(True)
         self.task_details_text.setMinimumHeight(150)
-        processing_layout.addWidget(QLabel("Task Details:"))
+        processing_layout.addWidget(QLabel(self.tr("Task Details:")))
         processing_layout.addWidget(self.task_details_text)
 
         # Control buttons
         control_layout = QHBoxLayout()
 
-        cancel_btn = QPushButton("Cancel Selected")
+        cancel_btn = QPushButton(self.tr("Cancel Selected"))
         cancel_btn.clicked.connect(self._cancel_selected_task)
         control_layout.addWidget(cancel_btn)
 
-        clear_btn = QPushButton("Clear Completed")
+        clear_btn = QPushButton(self.tr("Clear Completed"))
         clear_btn.clicked.connect(self._clear_completed_tasks)
         control_layout.addWidget(clear_btn)
 
         processing_layout.addLayout(control_layout)
 
         processing_widget.setLayout(processing_layout)
-        self.tab_widget.addTab(processing_widget, "Processing")
+        self.tab_widget.addTab(processing_widget, self.tr("Processing"))
         # Initialize the label state
         self._refresh_processing_status()
 
@@ -767,7 +782,7 @@ class MainWindow(QMainWindow):
                     if hasattr(worker, "task_id") and worker.task_id == task_id:
                         worker.cancel()
                         self._update_task_status(
-                            task_id, "Cancelled", "Cancelled by user"
+                            task_id, self.tr("Cancelled"), "Cancelled by user"
                         )
                         self._update_status_message(f"Task {task_id} cancelled")
                         break
@@ -880,12 +895,15 @@ class MainWindow(QMainWindow):
         horizontal_header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         horizontal_header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
 
-        # Rarity and count columns size to their content
+        # Rarity and count columns use a stable sizing strategy
+        # Initially size to contents, then allow interactive resizing
+        self.cards_table.setColumnWidth(3, 100)
+        self.cards_table.setColumnWidth(4, 60)
         horizontal_header.setSectionResizeMode(
-            3, QHeaderView.ResizeMode.ResizeToContents
+            3, QHeaderView.ResizeMode.Interactive
         )
         horizontal_header.setSectionResizeMode(
-            4, QHeaderView.ResizeMode.ResizeToContents
+            4, QHeaderView.ResizeMode.Interactive
         )
 
         # Ensure the art column remains just wider than the icon size
@@ -929,9 +947,7 @@ class MainWindow(QMainWindow):
                         pass
 
                 # Create worker
-                worker = CardDataLoadWorker(
-                    db_path=self.db.db_path if hasattr(self, "db") else None
-                )
+                worker = CardDataLoadWorker()
                 self._current_card_load_worker = worker
 
                 # Connect signals
@@ -963,47 +979,6 @@ class MainWindow(QMainWindow):
 
         # Defer to allow the tab to render first
         QTimer.singleShot(0, start_worker)
-
-    def _load_card_data(self):
-        """Load card data from database"""
-        try:
-            if hasattr(self, "db") and self.db:
-                # Get all cards with counts and account information
-                cards = self.db.get_all_cards_with_counts()
-
-                # Process data for the model
-                card_data = []
-                for card in cards:
-                    # Get proper name and resolve rarity
-                    raw_name = CARD_NAMES.get(card[1], card[1])
-                    display_name, display_rarity = self._get_display_name_and_rarity(
-                        card[1], raw_name, card[3]
-                    )
-
-                    card_info = {
-                        "card_code": card[0],
-                        "card_name": display_name,
-                        "set_name": SET_NAMES.get(card[2], card[2]),
-                        "rarity": display_rarity,
-                        "count": card[4],
-                        "image_path": card[5],
-                    }
-                    card_data.append(card_info)
-
-                # Store full data copy for filtering
-                self.all_card_data = card_data
-
-                # Update filter options (this will not trigger _apply_filters due to signal blocking)
-                self._update_filter_options(card_data)
-
-                # Apply current filters (this will also update the model and status bar)
-                self._apply_filters()
-            else:
-                self._update_status_message("Database not available")
-
-        except Exception as e:
-            print(f"Error loading card data: {e}")
-            self._update_status_message(f"Error loading card data: {e}")
 
     def _on_cards_load_status(self, status: str):
         """Update status during async card load"""
@@ -1077,12 +1052,12 @@ class MainWindow(QMainWindow):
 
             current_set = self.set_filter.currentText()
             self.set_filter.clear()
-            self.set_filter.addItem("All Sets")
+            self.set_filter.addItem(self.tr("All Sets"))
             for set_name in sorted(sets):
                 self.set_filter.addItem(set_name)
 
             # Restore previous selection if possible
-            if current_set != "All Sets" and current_set in sets:
+            if current_set != self.tr("All Sets") and current_set in sets:
                 index = self.set_filter.findText(current_set)
                 if index >= 0:
                     self.set_filter.setCurrentIndex(index)
@@ -1095,7 +1070,7 @@ class MainWindow(QMainWindow):
 
             current_rarity = self.rarity_filter.currentText()
             self.rarity_filter.clear()
-            self.rarity_filter.addItem("All Rarities")
+            self.rarity_filter.addItem(self.tr("All Rarities"))
 
             # Sort rarities according to the order in RARITY_MAP
             rarity_order = list(RARITY_MAP.values())
@@ -1107,7 +1082,7 @@ class MainWindow(QMainWindow):
                 self.rarity_filter.addItem(rarity)
 
             # Restore previous selection if possible
-            if current_rarity != "All Rarities" and current_rarity in rarities:
+            if current_rarity != self.tr("All Rarities") and current_rarity in rarities:
                 index = self.rarity_filter.findText(current_rarity)
                 if index >= 0:
                     self.rarity_filter.setCurrentIndex(index)
@@ -1134,21 +1109,24 @@ class MainWindow(QMainWindow):
             filtered_cards = []
             for card in all_cards:
                 # Apply set filter
-                if set_filter != "All Sets" and card.get("set_name") != set_filter:
+                if (
+                    set_filter != self.tr("All Sets")
+                    and card.get("set_name") != set_filter
+                ):
                     continue
 
                 # Apply rarity filter
                 if (
-                    rarity_filter != "All Rarities"
+                    rarity_filter != self.tr("All Rarities")
                     and card.get("rarity") != rarity_filter
                 ):
                     continue
 
                 # Apply search filter
                 if search_text:
-                    card_name = card.get("card_name", "").lower()
-                    set_name = card.get("set_name", "").lower()
-                    rarity = card.get("rarity", "").lower()
+                    card_name = (card.get("card_name") or "").lower()
+                    set_name = (card.get("set_name") or "").lower()
+                    rarity = (card.get("rarity") or "").lower()
 
                     if (
                         search_text not in card_name
@@ -1162,12 +1140,16 @@ class MainWindow(QMainWindow):
             # Update model with filtered data
             self.card_model.update_data(filtered_cards)
             self._update_status_message(
-                f"Showing {len(filtered_cards)} of {len(all_cards)} cards"
+                self.tr("Showing %1 of %2 unique cards")
+                .replace("%1", str(len(filtered_cards)))
+                .replace("%2", str(len(all_cards)))
             )
 
         except Exception as e:
             print(f"Error applying filters: {e}")
-            self._update_status_message(f"Error applying filters: {e}")
+            self._update_status_message(
+                self.tr("Error applying filters: %1").replace("%1", str(e))
+            )
 
     def _on_card_table_clicked(self, index):
         """Handle click on card table"""
@@ -1181,7 +1163,8 @@ class MainWindow(QMainWindow):
             resolved_path = self.card_model._find_card_image(card_code, image_path)
             if resolved_path:
                 self._show_full_card_image(
-                    resolved_path, card_name + " (" + card_data.get("set_name") + ")"
+                    resolved_path,
+                    card_name + " (" + (card_data.get("set_name") or "Unknown") + ")",
                 )
         else:
             # Handle other columns
@@ -1195,33 +1178,64 @@ class MainWindow(QMainWindow):
     def _show_account_distribution(self, card_code: str, card_name: str):
         """Show dialog with account distribution for a card"""
         try:
-            if hasattr(self, "db") and self.db:
-                # Get account distribution from database
-                account_data = self.db.get_accounts_for_card(card_code)
+            from app.db.models import ScreenshotCard
+            from django.db.models import Count
 
-                if account_data:
-                    dialog = AccountCardListDialog(
-                        card_name,
-                        card_code,
-                        account_data,
-                        database=self.db,
-                        on_removed=self._refresh_after_removal,
-                        parent=self,
+            # Get account distribution from database using Django ORM
+            sc_entries = (
+                ScreenshotCard.objects.filter(card__code=card_code)
+                .values(
+                    "screenshot__account__name",
+                    "screenshot__name",
+                    "screenshot__account__shinedust",
+                )
+                .annotate(card_count=Count("id"))
+                .order_by("-card_count", "screenshot__account__name")
+            )
+
+            account_data = []
+            for entry in sc_entries:
+                account_data.append(
+                    (
+                        entry["screenshot__account__name"],
+                        entry["card_count"],
+                        entry["screenshot__name"],
+                        entry["screenshot__account__shinedust"],
                     )
-                    dialog.show()
-                else:
-                    QMessageBox.information(
-                        self,
-                        "No Data",
-                        f"No account distribution found for {card_name}",
-                    )
+                )
+
+            if account_data:
+                # Get screenshots directory from settings
+                screenshots_dir = self.settings.get_setting(
+                    "General/screenshots_dir", ""
+                )
+
+                dialog = AccountCardListDialog(
+                    card_name,
+                    card_code,
+                    account_data,
+                    screenshots_dir=screenshots_dir,
+                    on_removed=self._refresh_after_removal,
+                    parent=self,
+                )
+                dialog.show()
             else:
-                QMessageBox.warning(self, "Error", "Database not available")
+                QMessageBox.information(
+                    self,
+                    self.tr("No Data"),
+                    self.tr("No account distribution found for %1").replace(
+                        "%1", card_name
+                    ),
+                )
 
         except Exception as e:
             logger.error(f"Error showing account distribution: {e}")
             QMessageBox.warning(
-                self, "Error", f"Could not show account distribution: {e}"
+                self,
+                self.tr("Error"),
+                self.tr("Could not show account distribution: %1").replace(
+                    "%1", str(e)
+                ),
             )
 
     def _on_search_table_clicked(self, index):
@@ -1235,8 +1249,7 @@ class MainWindow(QMainWindow):
             if image_path:
                 check_paths = [
                     image_path,
-                    get_portable_path("resources", "card_imgs", image_path),
-                    get_portable_path("static", "card_imgs", image_path),
+                    BASE_DIR / "resources" / "card_imgs" / image_path,
                 ]
 
                 normalized_path = image_path.replace("\\", "/")
@@ -1245,10 +1258,7 @@ class MainWindow(QMainWindow):
                     filename = parts[-1]
                     set_code = parts[0]
                     check_paths.append(
-                        get_portable_path("resources", "card_imgs", set_code, filename)
-                    )
-                    check_paths.append(
-                        get_portable_path("static", "card_imgs", set_code, filename)
+                        BASE_DIR / "resources" / "card_imgs" / set_code / filename,
                     )
 
                 resolved_path = None
@@ -1260,7 +1270,10 @@ class MainWindow(QMainWindow):
                 if resolved_path:
                     self._show_full_card_image(
                         resolved_path,
-                        card_name + " (" + result_data.get("set_name") + ")",
+                        card_name
+                        + " ("
+                        + (result_data.get("set_name") or "Unknown")
+                        + ")",
                     )
 
     def _show_full_card_image(self, image_path: str, card_name: str):
@@ -1311,6 +1324,7 @@ class MainWindow(QMainWindow):
         # Also push this status message to the Recent Activity session log
         # but filter out frequent progress updates to keep the UI responsive
         # and the log clean.
+        # TODO: How am I gonna do this in a multilingual way?
         skip_log_keywords = [
             "Progress:",
             "Processed ",
@@ -1358,18 +1372,15 @@ class MainWindow(QMainWindow):
 
     def _update_db_status(self):
         """Update database connection status"""
-        if hasattr(self, "db") and self.db:
-            self.db_status.setText("DB: Connected")
-            self.db_status.setStyleSheet("color: green;")
-        else:
-            self.db_status.setText("DB: Disconnected")
-            self.db_status.setStyleSheet("color: red;")
+        # Since we use Django ORM, we assume it's connected if we got this far
+        self.db_status.setText(self.tr("DB: Connected"))
+        self.db_status.setStyleSheet("color: green;")
 
     def _update_task_status(
         self,
         task_id: str = None,
         status: str = None,
-        progress: int = None,
+        progress: int | str = None,
         error: str = None,
     ):
         """Update task status indicator and specific task status"""
@@ -1408,7 +1419,7 @@ class MainWindow(QMainWindow):
             if task["status"] in ["Queued", "Running"]
         )
 
-        self.task_status.setText(f"Tasks: {active_tasks}")
+        self.task_status.setText(self.tr("Tasks: %1").replace("%1", str(active_tasks)))
         if active_tasks > 0:
             self.task_status.setStyleSheet("color: orange;")
         else:
@@ -1503,8 +1514,8 @@ class MainWindow(QMainWindow):
         if self._combined_import_request:
             QMessageBox.information(
                 self,
-                "Load New Data",
-                "A data import is already in progress. Please wait for it to finish.",
+                self.tr("Load New Data"),
+                self.tr("A data import is already in progress. Please wait for it to finish."),
             )
             return
 
@@ -1512,21 +1523,22 @@ class MainWindow(QMainWindow):
 
         issues = []
         if not csv_path:
-            issues.append("CSV file path is not set.")
+            issues.append(self.tr("CSV file path is not set."))
         elif not os.path.isfile(csv_path):
-            issues.append(f"CSV file not found: {csv_path}")
+            issues.append(self.tr("CSV file not found: %1").replace("%1", csv_path))
 
         if not screenshots_dir:
-            issues.append("Screenshots directory is not set.")
+            issues.append(self.tr("Screenshots directory is not set."))
         elif not os.path.isdir(screenshots_dir):
-            issues.append(f"Screenshots directory not found: {screenshots_dir}")
+            issues.append(self.tr("Screenshots directory not found: %1").replace("%1", screenshots_dir))
 
         if issues:
             QMessageBox.warning(
                 self,
-                "Load New Data",
+                self.tr("Load New Data"),
                 "\n".join(issues)
-                + "\n\nPlease use the Import CSV or Process Screenshots options to set the correct locations.",
+                + "\n\n"
+                + self.tr("Please use the Import CSV or Process Screenshots options to set the correct locations."),
             )
             self._update_load_new_data_availability()
             return
@@ -1536,12 +1548,11 @@ class MainWindow(QMainWindow):
             "screenshots_dir": screenshots_dir,
         }
 
-        self._update_status_message("Starting data import…")
+        self._update_status_message(self.tr("Starting data import…"))
         self._on_csv_imported(csv_path, combined=True)
 
     def _on_import_csv(self):
         """Handle Import CSV action"""
-        print("Import CSV action triggered")
 
         try:
             # Get initial path from settings
@@ -1554,28 +1565,31 @@ class MainWindow(QMainWindow):
             dialog.csv_imported.connect(self._on_csv_imported)
 
             if dialog.exec() == QDialog.DialogCode.Accepted:
-                self._update_status_message("CSV import completed")
+                self._update_status_message(self.tr("CSV import completed"))
             else:
-                self._update_status_message("CSV import cancelled")
+                self._update_status_message(self.tr("CSV import cancelled"))
 
             # Update combined import availability after any dialog interaction
             self._update_load_new_data_availability()
 
         except Exception as e:
             print(f"Error importing CSV: {e}")
-            self._update_status_message(f"Error importing CSV: {e}")
+            self._update_status_message(
+                self.tr("Error importing CSV: %1").replace("%1", str(e))
+            )
 
     def _on_csv_imported(self, file_path: str, combined: bool = False):
         """Handle successful CSV import - start background processing"""
         print(f"Starting background CSV import from: {file_path}")
-        self._update_status_message(f"Starting background CSV import...")
+        self._update_status_message(self.tr("Starting background CSV import..."))
 
         try:
             task_id = get_task_id()
 
             # Add task to tracking system
             self._add_processing_task(
-                task_id, f"CSV Import: {os.path.basename(file_path)}"
+                task_id,
+                self.tr("CSV Import: %1").replace("%1", os.path.basename(file_path)),
             )
 
             if combined and self._combined_import_request is not None:
@@ -1586,7 +1600,6 @@ class MainWindow(QMainWindow):
             worker = CSVImportWorker(
                 file_path=file_path,
                 task_id=task_id,
-                db_path=self.db.db_path,
                 screenshots_dir=screenshots_dir,
             )
 
@@ -1615,15 +1628,23 @@ class MainWindow(QMainWindow):
             self._update_task_status(task_id, "Running")
             self._request_dashboard_update()
 
-            self._update_status_message("CSV import started in background")
+            self._update_status_message(self.tr("CSV import started in background"))
 
         except Exception as e:
             print(f"Error starting CSV import worker: {e}")
-            self._update_status_message(f"Error starting CSV import: {e}")
+            self._update_status_message(
+                self.tr("Error starting CSV import: %1").replace("%1", str(e))
+            )
 
     def _on_csv_import_progress(self, current: int, total: int, task_id: str = None):
         """Handle CSV import progress updates"""
-        self._update_progress(current, total, f"CSV import: {current}/{total}")
+        self._update_progress(
+            current,
+            total,
+            self.tr("CSV import: %1/%2")
+            .replace("%1", str(current))
+            .replace("%2", str(total)),
+        )
 
         # Update task progress if task_id provided
         if task_id:
@@ -1642,7 +1663,9 @@ class MainWindow(QMainWindow):
         """Handle CSV import result"""
         print(f"CSV import result: {result}")
         self._update_status_message(
-            f"CSV import completed: {result.get('total_rows', 0)} packs imported"
+            self.tr("CSV import completed: %1 packs imported").replace(
+                "%1", str(result.get("total_rows", 0))
+            )
         )
 
         # Increase activity limit to show new items
@@ -1657,14 +1680,15 @@ class MainWindow(QMainWindow):
             and self._combined_import_request.get("csv_task_id") == task_id
         ):
             self._update_status_message(
-                "Starting screenshot processing from saved directory…"
+                self.tr("Starting screenshot processing from saved directory…")
             )
             self._start_combined_screenshot_step()
 
     def _on_csv_import_error(self, error: str, task_id: str = None):
         """Handle CSV import errors"""
-        print(f"CSV import error: {error}")
-        self._update_status_message(f"CSV import error: {error}")
+        self._update_status_message(
+            self.tr("CSV import error: %1").replace("%1", str(error))
+        )
 
         if task_id:
             self._update_task_status(task_id, "Failed", error=error)
@@ -1674,15 +1698,14 @@ class MainWindow(QMainWindow):
             and self._combined_import_request.get("csv_task_id") == task_id
         ):
             self._update_status_message(
-                "Combined import stopped due to CSV import error."
+                self.tr("Combined import stopped due to CSV import error.")
             )
             self._combined_import_request = None
             self._update_load_new_data_availability()
 
     def _on_csv_import_finished(self, worker=None):
         """Handle CSV import completion"""
-        print("CSV import finished")
-        self._update_status_message("CSV import finished")
+        self._update_status_message(self.tr("CSV import finished"))
 
         # Clean up worker
         if worker and worker in self.active_workers:
@@ -1702,10 +1725,11 @@ class MainWindow(QMainWindow):
             return
 
         screenshots_dir = self._combined_import_request.get("screenshots_dir")
-
         if not screenshots_dir or not os.path.isdir(screenshots_dir):
             self._update_status_message(
-                "Combined import stopped: saved screenshots directory is unavailable."
+                self.tr(
+                    "Combined import stopped: saved screenshots directory is unavailable."
+                )
             )
             self._combined_import_request = None
             self._update_load_new_data_availability()
@@ -1719,7 +1743,11 @@ class MainWindow(QMainWindow):
     ):
         """Handle screenshot processing progress updates"""
         self._update_progress(
-            current, total, f"Screenshot processing: {current}/{total}"
+            current,
+            total,
+            self.tr("Screenshot processing: %1/%2")
+            .replace("%1", str(current))
+            .replace("%2", str(total)),
         )
 
         # Update task progress if task_id provided
@@ -1732,14 +1760,14 @@ class MainWindow(QMainWindow):
 
     def _on_screenshot_processing_status(self, status: str):
         """Handle screenshot processing status updates"""
-        print(f"Screenshot processing status: {status}")
         self._update_status_message(status)
 
     def _on_screenshot_processing_result(self, result: dict, task_id: str = None):
         """Handle screenshot processing result"""
-        print(f"Screenshot processing result: {result}")
         self._update_status_message(
-            f"Screenshot processing completed: {result.get('total_files', 0)} files processed"
+            self.tr("Screenshot processing completed: %1 files processed").replace(
+                "%1", str(result.get("total_files", 0))
+            )
         )
 
         # Increase activity limit to show new items
@@ -1752,14 +1780,31 @@ class MainWindow(QMainWindow):
             self._combined_import_request
             and self._combined_import_request.get("screenshot_task_id") == task_id
         ):
-            self._update_status_message("Data import finished!")
+            self._update_status_message(self.tr("Data import finished!"))
+
+            # If this was part of a migration, rename the old database
+            if self._migration_in_progress:
+                try:
+                    old_db_path = BASE_DIR / "data" / "cardcounter.db"
+                    new_path = BASE_DIR / "data" / "cardcounter.db.old"
+                    if os.path.exists(old_db_path):
+                        if os.path.exists(new_path):
+                            os.remove(new_path)
+                        os.rename(old_db_path, new_path)
+                        logger.info(f"Migration complete. Renamed {old_db_path} to {new_path}")
+                except Exception as e:
+                    logger.error(f"Failed to rename old database after migration: {e}")
+                finally:
+                    self._migration_in_progress = False
+
             self._combined_import_request = None
             self._update_load_new_data_availability()
 
     def _on_screenshot_processing_error(self, error: str, task_id: str = None):
         """Handle screenshot processing errors"""
-        print(f"Screenshot processing error: {error}")
-        self._update_status_message(f"Screenshot processing error: {error}")
+        self._update_status_message(
+            self.tr("Screenshot processing error: %1").replace("%1", str(error))
+        )
 
         if task_id:
             self._update_task_status(task_id, "Failed", error=error)
@@ -1769,15 +1814,14 @@ class MainWindow(QMainWindow):
             and self._combined_import_request.get("screenshot_task_id") == task_id
         ):
             self._update_status_message(
-                "Combined import stopped due to screenshot processing error."
+                self.tr("Combined import stopped due to screenshot processing error.")
             )
             self._combined_import_request = None
             self._update_load_new_data_availability()
 
     def _on_screenshot_processing_finished(self, worker=None):
         """Handle screenshot processing completion"""
-        print("Screenshot processing finished")
-        self._update_status_message("Screenshot processing finished")
+        self._update_status_message(self.tr("Screenshot processing finished"))
 
         # Clean up worker
         if worker and worker in self.active_workers:
@@ -1800,32 +1844,34 @@ class MainWindow(QMainWindow):
 
     def _on_process_screenshots(self):
         """Handle Process Screenshots action"""
-        print("Process Screenshots action triggered")
-
         # Check if cards are loaded first
         try:
-            if hasattr(self, "db") and self.db:
-                total_packs = self.db.get_total_packs_count()
-                if total_packs == 0:
-                    from PyQt6.QtWidgets import QMessageBox
+            from app.db.models import Screenshot
 
-                    QMessageBox.warning(
-                        self,
-                        "Missing Screenshot Data",
+            total_packs = Screenshot.objects.count()
+            if total_packs == 0:
+                from PyQt6.QtWidgets import QMessageBox
+
+                QMessageBox.warning(
+                    self,
+                    self.tr("Missing Screenshot Data"),
+                    self.tr(
                         "No screenshot records found in database. Please import a CSV file first (File -> Import CSV) "
-                        "before processing screenshots.",
-                    )
-                    self._update_status_message(
+                        "before processing screenshots."
+                    ),
+                )
+                self._update_status_message(
+                    self.tr(
                         "Aborted screenshot processing: No screenshot records in database"
                     )
-                    return
-            else:
-                self._update_status_message("Database not available")
+                )
                 return
         except Exception as e:
             logger.error(f"Error checking card count: {e}")
             # Continue anyway? Or abort? Aborting is safer.
-            self._update_status_message(f"Error checking card count: {e}")
+            self._update_status_message(
+                self.tr("Error checking card count: %1").replace("%1", str(e))
+            )
             return
 
         try:
@@ -1839,30 +1885,34 @@ class MainWindow(QMainWindow):
             dialog.processing_started.connect(self._on_processing_started)
 
             if dialog.exec() == QDialog.DialogCode.Accepted:
-                self._update_status_message("Screenshot processing completed")
+                self._update_status_message(self.tr("Screenshot processing completed"))
             else:
-                self._update_status_message("Screenshot processing cancelled")
+                self._update_status_message(self.tr("Screenshot processing cancelled"))
 
             # Update combined import availability after any dialog interaction
             self._update_load_new_data_availability()
 
         except Exception as e:
             print(f"Error processing screenshots: {e}")
-            self._update_status_message(f"Error processing screenshots: {e}")
+            self._update_status_message(
+                self.tr("Error processing screenshots: %1").replace("%1", str(e))
+            )
 
     def _on_processing_started(self, directory_path: str, overwrite: bool):
         """Handle successful processing start - create and start screenshot processing worker"""
-        print(
-            f"Processing started for directory: {directory_path}, overwrite: {overwrite}"
+        self._update_status_message(
+            self.tr("Starting background screenshot processing...")
         )
-        self._update_status_message(f"Starting background screenshot processing...")
 
         try:
             task_id = get_task_id()
 
             # Add task to tracking system
             self._add_processing_task(
-                task_id, f"Screenshot Processing: {os.path.basename(directory_path)}"
+                task_id,
+                self.tr("Screenshot Processing: %1").replace(
+                    "%1", os.path.basename(directory_path)
+                ),
             )
 
             if (
@@ -1904,17 +1954,23 @@ class MainWindow(QMainWindow):
             self._update_task_status(task_id, "Running")
             self._request_dashboard_update()
 
-            self._update_status_message("Screenshot processing started in background")
+            self._update_status_message(
+                self.tr("Screenshot processing started in background")
+            )
 
         except Exception as e:
             print(f"Error starting screenshot processing worker: {e}")
-            self._update_status_message(f"Error starting screenshot processing: {e}")
+            self._update_status_message(
+                self.tr("Error starting screenshot processing: %1").replace(
+                    "%1", str(e)
+                )
+            )
 
     def _on_art_download_progress(self, current: int, total: int, task_id: str = None):
         """Progress updates for card art download (also updates task model)."""
         try:
             # Update visible progress bar and message
-            self._update_progress(current, total, "Downloading card art")
+            self._update_progress(current, total, self.tr("Downloading card art"))
 
             # Update the processing task percentage
             if total > 0 and task_id:
@@ -1931,19 +1987,21 @@ class MainWindow(QMainWindow):
         try:
             images = result.get("images_saved", 0) if isinstance(result, dict) else 0
             self._update_status_message(
-                f"Card art download complete: {images} images saved"
+                self.tr("Card art download complete: %1 images saved").replace(
+                    "%1", str(images)
+                )
             )
             if task_id:
                 self._update_task_status(task_id, "Completed", progress=100)
         except Exception:
-            self._update_status_message("Card art download complete")
+            self._update_status_message(self.tr("Card art download complete"))
             if task_id:
                 self._update_task_status(task_id, "Completed", progress=100)
 
     def _on_art_download_error(self, error: str, task_id: str = None):
-        self._update_status_message(f"Card art download error: {error}")
-        if task_id:
-            self._update_task_status(task_id, "Failed", error=error)
+        self._update_status_message(
+            self.tr("Card art download error: %1").replace("%1", str(error))
+        )
 
     def _on_art_download_finished(self, worker=None, task_id: str = None):
         try:
@@ -1960,16 +2018,15 @@ class MainWindow(QMainWindow):
 
     def _on_about(self):
         """Handle About action"""
-        print("About action triggered")
-
         try:
             # Create and show about dialog
             dialog = AboutDialog(self)
             dialog.exec()
 
         except Exception as e:
-            print(f"Error showing about dialog: {e}")
-            self._update_status_message(f"Error showing about dialog: {e}")
+            self._update_status_message(
+                self.tr("Error showing about dialog: %1").replace("%1", str(e))
+            )
 
     def _on_preferences(self):
         """Show preferences dialog"""
@@ -1980,8 +2037,9 @@ class MainWindow(QMainWindow):
                 self._update_load_new_data_availability()
                 self._setup_watchdog()
         except Exception as e:
-            logger.error(f"Error showing preferences dialog: {e}")
-            self._update_status_message(f"Error showing preferences dialog: {e}")
+            self._update_status_message(
+                self.tr("Error showing preferences dialog: %1").replace("%1", str(e))
+            )
 
     def _init_watchdog(self):
         """Initialize the screenshot directory watchdog system"""
@@ -2001,7 +2059,7 @@ class MainWindow(QMainWindow):
 
     def _trigger_catchup_scan(self):
         """Trigger an initial scan to catch up on any changes while the app was closed"""
-        logger.info("Triggering initial catch-up scan for screenshots...")
+        logger.debug("Triggering initial catch-up scan for screenshots...")
         if not hasattr(self, "_watchdog_handler"):
             return
 
@@ -2012,7 +2070,7 @@ class MainWindow(QMainWindow):
         else:
             # If something is already running, we don't need to force it,
             # it's already doing a scan.
-            logger.info("Catch-up scan skipped: processing already in progress.")
+            logger.debug("Catch-up scan skipped: processing already in progress.")
 
     def _setup_watchdog(self):
         """Setup or refresh the watchdog observer based on settings"""
@@ -2118,7 +2176,7 @@ class MainWindow(QMainWindow):
 
         # Display the closing message
         self._update_status_message(
-            "Closing application. Cleaning up... this may take a moment."
+            self.tr("Closing application. Cleaning up... this may take a moment.")
         )
 
         # Force the UI to process the status update
@@ -2146,14 +2204,6 @@ class MainWindow(QMainWindow):
                         cancel()
                     except Exception:
                         pass
-
-            # Clean up database connections for the main thread
-            if hasattr(self, "db"):
-                try:
-                    self.db.close()
-                    print("Database connections closed")
-                except Exception:
-                    pass
         except Exception as e:
             print(f"Error during shutdown: {e}")
 
@@ -2173,18 +2223,16 @@ class MainWindow(QMainWindow):
         Returns:
             tuple: (display_name, display_rarity)
         """
-        import re
-
         full_name = raw_name if raw_name else card_code
-        display_name = full_name
+        display_name = clean_card_name(full_name)
         display_rarity = raw_rarity
 
-        # Look for modifier in parentheses at the end of the name
+        # Resolve rarity display name if possible
+        import re
+
         match = re.search(r"\s*\(([^)]+)\)$", full_name)
         if match:
             rarity_code = match.group(1)
-            display_name = full_name[: match.start()].strip()
-
             # Map rarity code to display name if it exists in the map
             if rarity_code in RARITY_MAP:
                 display_rarity = RARITY_MAP[rarity_code]
@@ -2202,16 +2250,20 @@ class MainWindow(QMainWindow):
 
     def _on_process_removed_cards(self):
         """Handle 'Process Removed Cards' menu action"""
-        removed_cards = get_removed_cards()
+        removed_cards = get_traded_cards()
         if not removed_cards:
-            QMessageBox.information(self, "No Removed Cards", "No cards to process.")
+            QMessageBox.information(
+                self, self.tr("No Removed Cards"), self.tr("No cards to process.")
+            )
             return
 
         msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("Process Removed Cards?")
+        msg_box.setWindowTitle(self.tr("Process Removed Cards?"))
         msg_box.setText(
-            f"This will process <b>{len(removed_cards)}</b> recorded card removals from the database.<br><br>"
-            "This is useful if you have re-imported screenshots that might have brought back cards you previously removed."
+            self.tr(
+                "This will process <b>%1</b> recorded card removals from the database.<br><br>"
+                "This is useful if you have re-imported screenshots that might have brought back cards you previously removed."
+            ).replace("%1", str(len(removed_cards)))
         )
         msg_box.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -2219,18 +2271,29 @@ class MainWindow(QMainWindow):
         msg_box.setDefaultButton(QMessageBox.StandardButton.No)
 
         if msg_box.exec() == QMessageBox.StandardButton.Yes:
+            from app.db.models import ScreenshotCard
+
             processed_count = 0
             for item in removed_cards:
                 account = item.get("account")
                 card_code = item.get("card_code")
                 if account and card_code:
-                    if self.db.remove_card_from_account(card_code, account):
+                    # Remove one instance of this card for this account
+                    sc = ScreenshotCard.objects.filter(
+                        screenshot__account__name=account, card__code=card_code
+                    ).first()
+                    if sc:
+                        sc.delete()
                         processed_count += 1
 
             QMessageBox.information(
                 self,
-                "Process Complete",
-                f"Processed {len(removed_cards)} records. {processed_count} cards were actually found and removed.",
+                self.tr("Process Complete"),
+                self.tr(
+                    "Processed %1 records. %2 cards were actually found and removed."
+                )
+                .replace("%1", str(len(removed_cards)))
+                .replace("%2", str(processed_count)),
             )
 
             if processed_count > 0:

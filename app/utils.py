@@ -8,7 +8,6 @@ Utility functions for the Card Counter application including:
 - Error handling
 """
 
-import sys
 import os
 import logging
 import tomllib
@@ -18,12 +17,14 @@ import uuid
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtCore import QSettings
 
-logger = logging.getLogger(__name__)
+from settings import BASE_DIR
 
+logger = logging.getLogger(__name__)
 
 DEFAULT_SETTINGS = {
     "General/csv_import_path": "",
     "General/screenshots_dir": "",
+    "General/language": "",
     "Screenshots/watch_directory": True,
     "Screenshots/check_interval": 5,
     "Logging/enabled": False,
@@ -32,32 +33,6 @@ DEFAULT_SETTINGS = {
 
 # Order in which sections should be displayed in the Preferences dialog
 SECTION_ORDER = ["General", "Screenshots", "Logging", "Debug"]
-
-
-def get_portable_path(*parts):
-    """
-    Get absolute path relative to application root
-
-    Args:
-        *parts: Path components to join
-
-    Returns:
-        str: Absolute path
-    """
-    if hasattr(sys, "_MEIPASS"):  # PyInstaller
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        # Go up one level to get to the root directory
-        base_path = os.path.dirname(base_path)
-
-    # If the path starts with 'data', ensure it's in '_internal/data'
-    # unless base_path already points to '_internal'
-    if parts and parts[0] == "data":
-        if os.path.basename(base_path) != "_internal":
-            return os.path.join(base_path, "_internal", *parts)
-
-    return os.path.join(base_path, *parts)
 
 
 def get_app_version():
@@ -77,7 +52,7 @@ def get_app_version():
 
     # Fallback to pyproject.toml
     try:
-        pyproject_path = get_portable_path("pyproject.toml")
+        pyproject_path = BASE_DIR / "pyproject.toml"
         if os.path.exists(pyproject_path):
             with open(pyproject_path, "rb") as f:
                 data = tomllib.load(f)
@@ -97,25 +72,25 @@ def initialize_data_directory():
       - logs/
       - cardcounter.db (if doesn't exist)
     """
-    data_dir = get_portable_path("data")
+    data_dir = BASE_DIR / "data"
     os.makedirs(data_dir, exist_ok=True)
-    os.makedirs(os.path.join(data_dir, "logs"), exist_ok=True)
+    os.makedirs(data_dir / "logs", exist_ok=True)
 
     # Initialize settings and ensure defaults are set
     PortableSettings()
 
     # Initialize database if it doesn't exist
-    db_path = os.path.join(data_dir, "cardcounter.db")
-    if not os.path.exists(db_path):
-        from app.database import Database
-
-        try:
-            db = Database(db_path)
-            db._initialize_database()
-            logger.info(f"Initialized new database at {db_path}")
-        except Exception as e:
-            logger.error(f"Failed to initialize database: {e}")
-            raise
+    # db_path = os.path.join(data_dir, "cardcounter.db")
+    # if not os.path.exists(db_path):
+    #     from app.database import Database
+    #
+    #     try:
+    #         db = Database(db_path)
+    #         db._initialize_database()
+    #         logger.info(f"Initialized new database at {db_path}")
+    #     except Exception as e:
+    #         logger.error(f"Failed to initialize database: {e}")
+    #         raise
 
 
 def check_dependencies():
@@ -144,7 +119,7 @@ def check_dependencies():
     return True
 
 
-def record_removed_card(account: str, card_code: str):
+def record_traded_card(account: str, card_code: str):
     """
     Record a removed card in removed_cards.json
 
@@ -153,7 +128,7 @@ def record_removed_card(account: str, card_code: str):
         card_code: Card code
     """
     try:
-        file_path = get_portable_path("data", "removed_cards.json")
+        file_path = BASE_DIR / "data" / "removed_cards.json"
         removed_cards = []
 
         if os.path.exists(file_path):
@@ -173,14 +148,14 @@ def record_removed_card(account: str, card_code: str):
         logger.error(f"Failed to record removed card: {e}")
 
 
-def get_removed_cards() -> list:
+def get_traded_cards() -> list:
     """
     Get the list of removed cards from removed_cards.json
 
     Returns:
         list: List of dicts with account and card_code
     """
-    file_path = get_portable_path("data", "removed_cards.json")
+    file_path = BASE_DIR / "data" / "removed_cards.json"
     if not os.path.exists(file_path):
         return []
 
@@ -192,11 +167,11 @@ def get_removed_cards() -> list:
         return []
 
 
-def clear_removed_cards():
+def clear_traded_cards():
     """
     Clear the removed_cards.json file
     """
-    file_path = get_portable_path("data", "removed_cards.json")
+    file_path = BASE_DIR / "data" / "removed_cards.json"
     if os.path.exists(file_path):
         try:
             os.remove(file_path)
@@ -213,10 +188,10 @@ class PortableSettings:
     """
 
     def __init__(self):
-        config_path = get_portable_path("data", "config.ini")
+        config_path = BASE_DIR / "data" / "config.ini"
         # Ensure directory exists
         os.makedirs(os.path.dirname(config_path), exist_ok=True)
-        self.settings = QSettings(config_path, QSettings.Format.IniFormat)
+        self.settings = QSettings(str(config_path), QSettings.Format.IniFormat)
         self._initialize_defaults()
 
     def _initialize_defaults(self):
@@ -292,3 +267,14 @@ def show_info_message(title, message):
 
 def get_task_id() -> str:
     return str(uuid.uuid4()).split("-")[0]
+
+
+def clean_card_name(full_name: str) -> str:
+    """
+    Remove the rarity suffix from a card name (e.g., 'Bulbasaur (1D)' -> 'Bulbasaur').
+    """
+    import re
+
+    if not full_name:
+        return ""
+    return re.sub(r"\s*\([^)]+\)$", "", full_name).strip()

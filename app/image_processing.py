@@ -305,12 +305,15 @@ class ImageProcessor:
                     "metadata": metadata,
                 }
 
-    def process_screenshot(self, image_path: str) -> List[Dict[str, Any]]:
+    def process_screenshot(
+        self, image_path: str, force_set: str = None
+    ) -> List[Dict[str, Any]]:
         """
         Process a screenshot to identify cards using fixed position detection
 
         Args:
             image_path: Path to screenshot image
+            force_set: If provided, only search within this set
 
         Returns:
             List[Dict]: List of identified cards with positions and confidence scores
@@ -322,7 +325,9 @@ class ImageProcessor:
                 )
 
             try:
-                logger.info(f"Processing screenshot: {image_path}")
+                logger.debug(f"Processing screenshot: {image_path}")
+                if force_set:
+                    logger.debug(f"Force set requested: {force_set}")
 
                 # Load and preprocess screenshot
                 screenshot = self._preprocess_screenshot(image_path)
@@ -331,129 +336,71 @@ class ImageProcessor:
                     logger.warning(f"Failed to load screenshot: {image_path}")
                     return []
 
-                logger.info(f"Screenshot loaded: {screenshot.shape}")
+                logger.debug(f"Screenshot loaded: {screenshot.shape}")
 
                 # Detect card positions using fixed layout
                 card_positions = self._detect_card_positions(screenshot)
 
                 num_cards = len(card_positions)
-                logger.info(f"Detected {num_cards} card positions")
+                logger.debug(f"Detected {num_cards} card positions")
 
                 # If 4 cards, it's always A4b / Deluxe Pack Ex
                 # If 5 or 6 cards, it's guaranteed NOT to be A4b
-                forced_set = "A4b" if num_cards == 4 else None
+                forced_set = (
+                    force_set if force_set else ("A4b" if num_cards == 4 else None)
+                )
                 excluded_sets = ["A4b"] if num_cards in (5, 6) else []
 
-                if forced_set:
-                    logger.info(f"Four-card pack detected, forcing set to {forced_set}")
+                if force_set:
+                    logger.debug(f"Set locked to {force_set}")
+                elif forced_set:
+                    logger.debug(
+                        f"Four-card pack detected, forcing set to {forced_set}"
+                    )
                 if excluded_sets:
-                    logger.info(
+                    logger.debug(
                         f"{num_cards}-card pack detected, excluding sets: {excluded_sets}"
                     )
 
-                # Stage 1: Initial identification for all cards
-                initial_results = []
-                set_counts = {}
-
-                for i, (x, y, w, h) in enumerate(card_positions):
-                    logger.info(f"Initial scan: card {i+1} at position ({x}, {y})")
-                    card_region = screenshot[y : y + h, x : x + w]
-                    best_match = self._find_best_card_match(
-                        card_region, force_set=forced_set, exclude_sets=excluded_sets
-                    )
-
-                    initial_results.append(
-                        {
-                            "position": i + 1,
-                            "best_match": best_match,
-                            "x": x,
-                            "y": y,
-                            "w": w,
-                            "h": h,
-                            "card_region": card_region,
-                        }
-                    )
-
-                    # Use slightly lower threshold for majority set identification
-                    if best_match and best_match["confidence"] > 0.2:
-                        card_set = best_match["card_set"]
-                        set_counts[card_set] = set_counts.get(card_set, 0) + 1
-
-                # Determine majority set by weighted confidence
-                majority_set = forced_set
-                if not majority_set and set_counts:
-                    # Sum up confidence for each set to find the most likely set for the whole pack
-                    set_weights = {}
-                    for result in initial_results:
-                        bm = result["best_match"]
-                        if bm and bm["confidence"] > 0.2:
-                            s = bm["card_set"]
-                            set_weights[s] = set_weights.get(s, 0.0) + bm["confidence"]
-
-                    if set_weights:
-                        majority_set = max(set_weights.items(), key=lambda x: x[1])[0]
-                        logger.info(
-                            f"Majority set identified (weighted): {majority_set}"
-                        )
-
-                # Stage 2: Re-process all cards with the majority set as accuracy check
-                # mostly for similar cards (like 80 vs 108) that might have been
-                # misidentified in Stage 1 due to pHash collisions
+                # Identify all cards in a single pass
                 detected_cards = []
-                for result in initial_results:
-                    best_match = result["best_match"]
-                    i = result["position"]
+                for i, (x, y, w, h) in enumerate(card_positions):
+                    logger.debug(f"Scanning card {i+1} at position ({x}, {y})")
+                    card_region = screenshot[y : y + h, x : x + w]
 
-                    if majority_set:
-                        is_outlier = (
-                            not best_match or best_match["card_set"] != majority_set
-                        )
-                        if is_outlier:
-                            logger.info(
-                                f"Re-scanning outlier card {i} in majority set {majority_set} with detailed search"
-                            )
-                        else:
-                            logger.info(
-                                f"Re-scanning card {i} in majority set {majority_set} to confirm identity"
-                            )
+                    # Use force_detailed=True for maximum accuracy since we're only scanning once.
+                    # This ensures we don't just rely on pHash which can have collisions.
+                    best_match = self._find_best_card_match(
+                        card_region,
+                        force_set=forced_set,
+                        exclude_sets=excluded_sets,
+                        force_detailed=True,
+                    )
 
-                        new_match = self._find_best_card_match(
-                            result["card_region"],
-                            force_set=majority_set,
-                            force_detailed=True,
-                        )
-
-                        # Only update if the new match is at least somewhat decent
-                        if new_match and new_match["confidence"] > 0.2:
-                            best_match = new_match
-                        elif not best_match:
-                            best_match = new_match
-
-                    # Final check with lower threshold
                     if best_match and best_match["confidence"] > 0.2:
                         # Get the display name for this card
                         display_name = self._get_display_name(
                             best_match["card_name"], best_match["card_set"]
                         )
                         logger.info(
-                            f"Final result card {i}: {display_name} (confidence: {best_match['confidence']:.2f})"
+                            f"Card {i+1}: {display_name} (confidence: {best_match['confidence']:.2f})"
                         )
 
                         detected_cards.append(
                             {
-                                "position": i,
+                                "position": i + 1,
                                 "card_code": best_match["card_name"],
                                 "card_name": display_name,
                                 "card_set": best_match["card_set"],
                                 "confidence": best_match["confidence"],
-                                "x": result["x"],
-                                "y": result["y"],
-                                "width": result["w"],
-                                "height": result["h"],
+                                "x": x,
+                                "y": y,
+                                "width": w,
+                                "height": h,
                             }
                         )
                     else:
-                        logger.info(f"No card match found for position {i}")
+                        logger.info(f"No card match found for position {i+1}")
 
                 logger.info(f"Found {len(detected_cards)} cards in {image_path}")
                 return detected_cards

@@ -14,6 +14,17 @@ from PyQt6 import QtCore
 from PyQt6.QtWidgets import QApplication
 from PyQt6 import QtGui
 
+# Turn off bytecode generation
+sys.dont_write_bytecode = True
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+
+import django
+
+django.setup()
+
+from settings import BASE_DIR
+from app.db.models import *  # noqa
+
 # Add the app directory to Python path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -24,14 +35,42 @@ from app.main_window import MainWindow
 from app.utils import (
     check_dependencies,
     initialize_data_directory,
-    get_portable_path,
     get_app_version,
+    PortableSettings,
 )
+from settings import BASE_DIR
+
+
+def setup_translations(app, settings, basedir):
+    """Load translation based on settings or system locale"""
+    translator = QtCore.QTranslator()
+
+    # Get language from settings, fallback to system locale
+    lang = settings.get_setting("General/language")
+    if not lang:
+        lang = QtCore.QLocale.system().name()[:2]
+
+    # Path to translation files - using app/translations as confirmed by ls
+    translations_path = os.path.join(basedir, "app", "translations")
+
+    logger = logging.getLogger(__name__)
+    if translator.load(f"{lang}.qm", translations_path):
+        app.installTranslator(translator)
+        logger.info(f"Loaded translation for {lang}")
+    else:
+        # Fallback to English if the system locale is not supported
+        if lang != "en":
+            if translator.load("en.qm", translations_path):
+                app.installTranslator(translator)
+                logger.info("Loaded English fallback translation")
+
+    return translator  # Keep reference to avoid garbage collection
 
 
 def setup_logging():
     """Set up logging configuration"""
-    log_file = get_portable_path("data", "logs", "app.log")
+
+    log_file = BASE_DIR / "data" / "logs" / "app.log"
 
     # Ensure log directory exists
     log_dir = os.path.dirname(log_file)
@@ -70,6 +109,27 @@ def main():
         logger.error(f"Failed to initialize data directory: {e}")
         sys.exit(1)
 
+    # Run database migrations
+    try:
+        from django.core.management import call_command
+
+        logger.info("Running database migrations...")
+        call_command("migrate", interactive=False)
+        logger.info("Database migrations completed successfully")
+
+        # One-time fix for card names and rarities
+        from app.db.models import Card
+
+        cards_to_fix = Card.objects.filter(name__contains="(")
+        if cards_to_fix.exists():
+            logger.info(f"Fixing {cards_to_fix.count()} card records...")
+            for card in cards_to_fix:
+                card.save()
+            logger.info("Card records fixed.")
+    except Exception as e:
+        logger.error(f"Database migration failed: {e}")
+        sys.exit(1)
+
     # Check dependencies
     if not check_dependencies():
         logger.error("Dependency check failed")
@@ -77,6 +137,11 @@ def main():
 
     # Create Qt application
     app = QApplication(sys.argv)
+
+    # Setup translations
+    settings = PortableSettings()
+    translator = setup_translations(app, settings, basedir)
+
     app.setApplicationName("PTCGP Card Tracker")
     app.setOrganizationName("CardCounter")
     app.setOrganizationDomain("cardcounter.local")

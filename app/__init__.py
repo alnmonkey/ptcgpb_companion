@@ -6,7 +6,6 @@ card counter application.
 """
 
 from .main_window import MainWindow
-from .database import Database
 from .image_processing import ImageProcessor
 from .utils import get_app_version
 
