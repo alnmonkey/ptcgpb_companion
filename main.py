@@ -80,13 +80,17 @@ def setup_logging():
         if not os.path.exists(log_file):
             with open(log_file, "a"):
                 pass
-        handlers = [logging.FileHandler(log_file), logging.StreamHandler()]
+        handlers = [logging.FileHandler(log_file)]
+        if sys.stderr is not None:
+            handlers.append(logging.StreamHandler())
     except Exception as e:
-        print(
-            f"Warning: Could not initialize file logging at {log_file}: {e}",
-            file=sys.stderr,
-        )
-        handlers = [logging.StreamHandler()]
+        handlers = []
+        if sys.stderr is not None:
+            print(
+                f"Warning: Could not initialize file logging at {log_file}: {e}",
+                file=sys.stderr,
+            )
+            handlers.append(logging.StreamHandler())
 
     logging.basicConfig(
         level=logging.INFO,
@@ -99,6 +103,24 @@ def setup_logging():
 def main():
     """Main application entry point"""
     logger = setup_logging()
+
+    # Redirect stdout and stderr to logger when running in windowed mode
+    class StreamToLogger:
+        def __init__(self, log_func):
+            self.log_func = log_func
+
+        def write(self, buf):
+            for line in buf.rstrip().splitlines():
+                self.log_func(line.rstrip())
+
+        def flush(self):
+            pass
+
+    if sys.stdout is None:
+        sys.stdout = StreamToLogger(logger.info)
+    if sys.stderr is None:
+        sys.stderr = StreamToLogger(logger.error)
+
     logger.info("Starting PTCGP Card Tracker application")
 
     # Initialize data directory structure
@@ -114,7 +136,12 @@ def main():
         from django.core.management import call_command
 
         logger.info("Running database migrations...")
-        call_command("migrate", interactive=False)
+        import io
+
+        out = io.StringIO()
+        call_command("migrate", interactive=False, stdout=out, stderr=out)
+        for line in out.getvalue().splitlines():
+            logger.info(f"Migration: {line}")
         logger.info("Database migrations completed successfully")
 
         # One-time fix for card names and rarities
