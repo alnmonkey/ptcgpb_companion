@@ -34,6 +34,7 @@ sets = {
     "A4b": "Deluxe Pack Ex",
     "B1": "Mega Rising",
     "B1a": "Crimson Blaze",
+    "B2": "Fantastical Parade",
     "P-A": "Promo A",
     "P-B": "Promo B",
 }
@@ -60,6 +61,8 @@ ptcgpb_set_translation = {
     "Pikachu": "A1",
     "Palkia": "A2",
     "MegaGyarados": "B1",
+    # just a guess as to what it's going to be called
+    "Gardevoir": "B2",
 }
 
 cards = {

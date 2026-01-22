@@ -59,7 +59,7 @@ class ImageProcessor:
             return False
 
         try:
-            with open(hash_file, "r") as f:
+            with open(hash_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 for set_name, cards in data.items():
                     if set_name not in self.phash_templates:
@@ -84,8 +84,8 @@ class ImageProcessor:
                 for card_name, h in cards.items():
                     data[set_name][card_name] = str(h)
 
-            with open(hash_file, "w") as f:
-                json.dump(data, f, indent=4)
+            with open(hash_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
             logger.info(f"Saved pHashes to {hash_file}")
         except Exception as e:
             logger.error(f"Failed to save pHashes to {hash_file}: {e}")

@@ -78,9 +78,9 @@ def setup_logging():
         os.makedirs(log_dir, exist_ok=True)
         # Create the log file if it doesn't exist
         if not os.path.exists(log_file):
-            with open(log_file, "a"):
+            with open(log_file, "a", encoding="utf-8"):
                 pass
-        handlers = [logging.FileHandler(log_file)]
+        handlers = [logging.FileHandler(log_file, encoding="utf-8")]
         if sys.stderr is not None:
             handlers.append(logging.StreamHandler())
     except Exception as e:
@@ -102,6 +102,20 @@ def setup_logging():
 
 def main():
     """Main application entry point"""
+    # Ensure standard streams use UTF-8 encoding if possible
+    import io
+
+    if sys.stdout is not None:
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
+        except (AttributeError, io.UnsupportedOperation):
+            pass
+    if sys.stderr is not None:
+        try:
+            sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
+        except (AttributeError, io.UnsupportedOperation):
+            pass
+
     logger = setup_logging()
 
     # Redirect stdout and stderr to logger when running in windowed mode
