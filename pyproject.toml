@@ -1,13 +1,12 @@
 [project]
 name = "ptcgpb-companion"
-version = "0.8.1"
+version = "1.0.0"
 description = "Companion app for PTCGPB that lets you see what card is in what account."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "beautifulsoup4>=4.14.3",
     "django>=6.0.1",
-    "google-cloud-translate>=3.24.0",
     "httpx>=0.28.1",
     "humanize>=4.15.0",
     "imagehash>=4.3.2",
@@ -21,4 +20,5 @@ dependencies = [
 [dependency-groups]
 dev = [
     "black>=25.12.0",
+    "google-cloud-translate>=3.24.0",
 ]
