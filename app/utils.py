@@ -13,6 +13,7 @@ import logging
 import tomllib
 import json
 import uuid
+from datetime import datetime
 
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtCore import QSettings
@@ -165,6 +166,98 @@ def clear_traded_cards():
             logger.info(f"Cleared {file_path}")
         except Exception as e:
             logger.error(f"Failed to clear removed cards: {e}")
+
+
+def extract_screenshot_date(filename: str):
+    """
+    Extract date from screenshot filename.
+
+    Expected format starts with YYYYMMDD, optionally followed by time.
+    """
+    if not filename:
+        return None
+
+    base_name = os.path.basename(filename)
+    if len(base_name) < 8:
+        return None
+
+    date_part = base_name[:8]
+    if not date_part.isdigit():
+        return None
+
+    try:
+        return datetime.strptime(date_part, "%Y%m%d").date()
+    except ValueError:
+        return None
+
+
+def _get_skipped_screenshots_path():
+    return BASE_DIR / "data" / "skipped_screenshots.json"
+
+
+def load_skipped_screenshots():
+    """
+    Load skipped screenshots list and count.
+    """
+    file_path = _get_skipped_screenshots_path()
+    if not os.path.exists(file_path):
+        return set(), 0
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to read skipped screenshots: {e}")
+        return set(), 0
+
+    if isinstance(payload, list):
+        files = payload
+        count = len(payload)
+    elif isinstance(payload, dict):
+        files = payload.get("files", [])
+        count = payload.get("count", len(files))
+    else:
+        return set(), 0
+
+    try:
+        count = int(count)
+    except (TypeError, ValueError):
+        count = len(files)
+
+    if count < len(files):
+        count = len(files)
+
+    return set(files), count
+
+
+def record_skipped_screenshots(filenames):
+    """
+    Record skipped screenshot filenames and return (newly_added, total_count).
+    """
+    if not filenames:
+        return 0, load_skipped_screenshots()[1]
+
+    file_path = _get_skipped_screenshots_path()
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    existing_files, existing_count = load_skipped_screenshots()
+    before_count = len(existing_files)
+    existing_files.update(filenames)
+    added_count = len(existing_files) - before_count
+    total_count = existing_count + added_count
+
+    payload = {
+        "files": sorted(existing_files),
+        "count": total_count,
+    }
+
+    try:
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=4)
+    except Exception as e:
+        logger.error(f"Failed to write skipped screenshots: {e}")
+
+    return added_count, total_count
 
 
 class PortableSettings:

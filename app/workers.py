@@ -19,7 +19,13 @@ from functools import reduce
 
 from django.db.models import Count, Q
 
-from app.utils import PortableSettings, clean_card_name
+from app.utils import (
+    PortableSettings,
+    clean_card_name,
+    extract_screenshot_date,
+    load_skipped_screenshots,
+    record_skipped_screenshots,
+)
 
 from django.db import transaction
 
@@ -626,6 +632,9 @@ class ScreenshotProcessingWorker(QRunnable):
             image_extensions = (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif")
             image_files = []
             all_found_count = 0
+            cutoff_date = datetime(2025, 10, 28).date()
+            skipped_files, skipped_total_count = load_skipped_screenshots()
+            newly_skipped = []
 
             self.signals.status.emit(
                 QCoreApplication.translate(
@@ -644,6 +653,15 @@ class ScreenshotProcessingWorker(QRunnable):
                         image_extensions
                     ):
                         all_found_count += 1
+                        if entry.name in skipped_files:
+                            continue
+
+                        file_date = extract_screenshot_date(entry.name)
+                        if file_date and file_date < cutoff_date:
+                            newly_skipped.append(entry.name)
+                            skipped_files.add(entry.name)
+                            continue
+
                         if self.overwrite:
                             image_files.append(entry.name)
                         else:
@@ -674,6 +692,20 @@ class ScreenshotProcessingWorker(QRunnable):
                 unprocessed = [f for f in batch if f not in unprocessed_names]
                 image_files.extend(unprocessed)
 
+            if newly_skipped:
+                added_count, skipped_total_count = record_skipped_screenshots(
+                    newly_skipped
+                )
+                if added_count > 0:
+                    self.signals.status.emit(
+                        QCoreApplication.translate(
+                            "ScreenshotProcessingWorker",
+                            "Skipped %1 pre-S4T screenshots (total skipped: %2)",
+                        )
+                        .replace("%1", str(added_count))
+                        .replace("%2", str(skipped_total_count))
+                    )
+
             total_files = len(image_files)
             if total_files == 0:
                 if all_found_count > 0:
@@ -691,6 +723,8 @@ class ScreenshotProcessingWorker(QRunnable):
                             "successful_files": 0,
                             "failed_files": 0,
                             "overwrite": self.overwrite,
+                            "skipped_files": 0,
+                            "skipped_total": skipped_total_count,
                             "message": QCoreApplication.translate(
                                 "ScreenshotProcessingWorker",
                                 "All images already processed",
@@ -905,6 +939,8 @@ class ScreenshotProcessingWorker(QRunnable):
                     "successful_files": successful_files,
                     "failed_files": total_files - successful_files,
                     "overwrite": self.overwrite,
+                    "skipped_files": len(newly_skipped),
+                    "skipped_total": skipped_total_count,
                 }
             )
 

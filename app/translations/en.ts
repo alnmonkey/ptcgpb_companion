@@ -10,8 +10,8 @@
             <translation>About PTCGPB Companion</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="619" />
-            <location filename="../dialogs.py" line="619" />
+            <location filename="../dialogs.py" line="618" />
+            <location filename="../dialogs.py" line="618" />
             <source>&lt;h2&gt;PTCGPB Companion&lt;/h2&gt;
                &lt;p&gt;Pokémon Card Identification Tool&lt;/p&gt;
                &lt;p&gt;Version %1&lt;/p&gt;
@@ -26,8 +26,8 @@
                &lt;p&gt;Built with PyQt6 and OpenCV&lt;/p&gt;&lt;p&gt;&lt;/p&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="632" />
-            <location filename="../dialogs.py" line="632" />
+            <location filename="../dialogs.py" line="628" />
+            <location filename="../dialogs.py" line="628" />
             <source>Close</source>
             <translation>Close</translation>
         </message>
@@ -35,158 +35,158 @@
     <context>
         <name>AccountCardListDialog</name>
         <message>
-            <location filename="../dialogs.py" line="762" />
-            <location filename="../dialogs.py" line="762" />
+            <location filename="../dialogs.py" line="758" />
+            <location filename="../dialogs.py" line="758" />
             <source>Accounts owning %1</source>
             <translation>Accounts owning %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="782" />
-            <location filename="../dialogs.py" line="782" />
+            <location filename="../dialogs.py" line="778" />
+            <location filename="../dialogs.py" line="778" />
             <source>Showing account distribution for: &lt;b&gt;%1&lt;/b&gt;</source>
             <translation>Showing account distribution for: &lt;b&gt;%1&lt;/b&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="788" />
-            <location filename="../dialogs.py" line="788" />
+            <location filename="../dialogs.py" line="786" />
+            <location filename="../dialogs.py" line="786" />
             <source>Filter:</source>
             <translation>Filter:</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="790" />
-            <location filename="../dialogs.py" line="790" />
+            <location filename="../dialogs.py" line="788" />
+            <location filename="../dialogs.py" line="788" />
             <source>Search account name...</source>
             <translation>Search account name...</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="800" />
-            <location filename="../dialogs.py" line="800" />
+            <location filename="../dialogs.py" line="798" />
+            <location filename="../dialogs.py" line="798" />
             <source>Account Name</source>
             <translation>Account Name</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="801" />
-            <location filename="../dialogs.py" line="801" />
+            <location filename="../dialogs.py" line="799" />
+            <location filename="../dialogs.py" line="799" />
             <source>Quantity</source>
             <translation>Quantity</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="802" />
-            <location filename="../dialogs.py" line="802" />
+            <location filename="../dialogs.py" line="800" />
+            <location filename="../dialogs.py" line="800" />
             <source>Shinedust</source>
             <translation>Shinedust</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="803" />
-            <location filename="../dialogs.py" line="803" />
+            <location filename="../dialogs.py" line="801" />
+            <location filename="../dialogs.py" line="801" />
             <source>Age</source>
             <translation>Age</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="879" />
-            <location filename="../dialogs.py" line="804" />
-            <location filename="../dialogs.py" line="879" />
-            <location filename="../dialogs.py" line="804" />
+            <location filename="../dialogs.py" line="877" />
+            <location filename="../dialogs.py" line="802" />
+            <location filename="../dialogs.py" line="877" />
+            <location filename="../dialogs.py" line="802" />
             <source>Screenshot</source>
             <translation>Screenshot</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="805" />
-            <location filename="../dialogs.py" line="805" />
+            <location filename="../dialogs.py" line="803" />
+            <location filename="../dialogs.py" line="803" />
             <source>Action</source>
             <translation>Action</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="870" />
-            <location filename="../dialogs.py" line="870" />
+            <location filename="../dialogs.py" line="868" />
+            <location filename="../dialogs.py" line="868" />
             <source>%1d</source>
             <translation>%1d</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="888" />
-            <location filename="../dialogs.py" line="888" />
+            <location filename="../dialogs.py" line="886" />
+            <location filename="../dialogs.py" line="886" />
             <source>Remove</source>
             <translation>Remove</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1083" />
-            <location filename="../dialogs.py" line="980" />
-            <location filename="../dialogs.py" line="927" />
-            <location filename="../dialogs.py" line="907" />
-            <location filename="../dialogs.py" line="1083" />
-            <location filename="../dialogs.py" line="980" />
-            <location filename="../dialogs.py" line="927" />
-            <location filename="../dialogs.py" line="907" />
+            <location filename="../dialogs.py" line="1081" />
+            <location filename="../dialogs.py" line="978" />
+            <location filename="../dialogs.py" line="925" />
+            <location filename="../dialogs.py" line="905" />
+            <location filename="../dialogs.py" line="1081" />
+            <location filename="../dialogs.py" line="978" />
+            <location filename="../dialogs.py" line="925" />
+            <location filename="../dialogs.py" line="905" />
             <source>Error</source>
             <translation>Error</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="908" />
-            <location filename="../dialogs.py" line="908" />
+            <location filename="../dialogs.py" line="906" />
+            <location filename="../dialogs.py" line="906" />
             <source>The screenshot path could not be found:
 %1</source>
             <translation>The screenshot path could not be found:
 %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="927" />
-            <location filename="../dialogs.py" line="927" />
+            <location filename="../dialogs.py" line="925" />
+            <location filename="../dialogs.py" line="925" />
             <source>Card not found in database.</source>
             <translation>Card not found in database.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="956" />
-            <location filename="../dialogs.py" line="937" />
-            <location filename="../dialogs.py" line="956" />
-            <location filename="../dialogs.py" line="937" />
+            <location filename="../dialogs.py" line="954" />
+            <location filename="../dialogs.py" line="935" />
+            <location filename="../dialogs.py" line="954" />
+            <location filename="../dialogs.py" line="935" />
             <source>Select Shinedust Cost</source>
             <translation>Select Shinedust Cost</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="939" />
-            <location filename="../dialogs.py" line="939" />
+            <location filename="../dialogs.py" line="937" />
+            <location filename="../dialogs.py" line="937" />
             <source>Is this a 4,000 or 10,000 shinedust move for %1?</source>
             <translation>Is this a 4,000 or 10,000 shinedust move for %1?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="958" />
-            <location filename="../dialogs.py" line="958" />
+            <location filename="../dialogs.py" line="956" />
+            <location filename="../dialogs.py" line="956" />
             <source>Is this a 25,000 or 30,000 shinedust move for %1?</source>
             <translation>Is this a 25,000 or 30,000 shinedust move for %1?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="981" />
-            <location filename="../dialogs.py" line="981" />
+            <location filename="../dialogs.py" line="979" />
+            <location filename="../dialogs.py" line="979" />
             <source>Account '%1' not found.</source>
             <translation>Account '%1' not found.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="993" />
-            <location filename="../dialogs.py" line="993" />
+            <location filename="../dialogs.py" line="991" />
+            <location filename="../dialogs.py" line="991" />
             <source>Insufficient Shinedust</source>
             <translation>Insufficient Shinedust</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="994" />
-            <location filename="../dialogs.py" line="994" />
+            <location filename="../dialogs.py" line="992" />
+            <location filename="../dialogs.py" line="992" />
             <source>Account &lt;b&gt;%1&lt;/b&gt; does not have enough shinedust (%2) to perform this action (cost: %3).</source>
             <translation>Account &lt;b&gt;%1&lt;/b&gt; does not have enough shinedust (%2) to perform this action (cost: %3).</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1005" />
-            <location filename="../dialogs.py" line="1005" />
+            <location filename="../dialogs.py" line="1003" />
+            <location filename="../dialogs.py" line="1003" />
             <source>Remove Card?</source>
             <translation>Remove Card?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1007" />
-            <location filename="../dialogs.py" line="1007" />
+            <location filename="../dialogs.py" line="1005" />
+            <location filename="../dialogs.py" line="1005" />
             <source>One instance of &lt;b&gt;%1&lt;/b&gt; will be removed from account &lt;b&gt;%2&lt;/b&gt;.&lt;br&gt;&lt;br&gt;This will cost &lt;b&gt;%3&lt;/b&gt; shinedust.&lt;br&gt;&lt;br&gt;If the account has multiples of this same card, only one will be removed.</source>
             <translation>One instance of &lt;b&gt;%1&lt;/b&gt; will be removed from account &lt;b&gt;%2&lt;/b&gt;.&lt;br&gt;&lt;br&gt;This will cost &lt;b&gt;%3&lt;/b&gt; shinedust.&lt;br&gt;&lt;br&gt;If the account has multiples of this same card, only one will be removed.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1084" />
-            <location filename="../dialogs.py" line="1084" />
+            <location filename="../dialogs.py" line="1082" />
+            <location filename="../dialogs.py" line="1082" />
             <source>Could not find card in database to remove.</source>
             <translation>Could not find card in database to remove.</translation>
         </message>
@@ -283,50 +283,50 @@
     <context>
         <name>CSVImportWorker</name>
         <message>
-            <location filename="../workers.py" line="76" />
-            <location filename="../workers.py" line="76" />
+            <location filename="../workers.py" line="85" />
+            <location filename="../workers.py" line="85" />
             <source>Starting CSV import...</source>
             <translation>Starting CSV import...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="82" />
-            <location filename="../workers.py" line="82" />
+            <location filename="../workers.py" line="91" />
+            <location filename="../workers.py" line="91" />
             <source>CSV file not found: %1</source>
             <translation>CSV file not found: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="95" />
-            <location filename="../workers.py" line="95" />
+            <location filename="../workers.py" line="104" />
+            <location filename="../workers.py" line="104" />
             <source>Failed to parse CSV file: %1</source>
             <translation>Failed to parse CSV file: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="103" />
-            <location filename="../workers.py" line="103" />
+            <location filename="../workers.py" line="112" />
+            <location filename="../workers.py" line="112" />
             <source>CSV file is empty or only contains header</source>
             <translation>CSV file is empty or only contains header</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="115" />
-            <location filename="../workers.py" line="115" />
+            <location filename="../workers.py" line="124" />
+            <location filename="../workers.py" line="124" />
             <source>Importing %1 rows...</source>
             <translation>Importing %1 rows...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="234" />
-            <location filename="../workers.py" line="234" />
+            <location filename="../workers.py" line="250" />
+            <location filename="../workers.py" line="250" />
             <source>Error processing screenshot %1: %2</source>
             <translation>Error processing screenshot %1: %2</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="258" />
-            <location filename="../workers.py" line="258" />
+            <location filename="../workers.py" line="274" />
+            <location filename="../workers.py" line="274" />
             <source>CSV import cancelled</source>
             <translation>CSV import cancelled</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="266" />
-            <location filename="../workers.py" line="266" />
+            <location filename="../workers.py" line="282" />
+            <location filename="../workers.py" line="282" />
             <source>Successfully imported %1 packs (%2 new)</source>
             <translation>Successfully imported %1 packs (%2 new)</translation>
         </message>
@@ -334,26 +334,26 @@
     <context>
         <name>CardArtDownloadWorker</name>
         <message>
-            <location filename="../workers.py" line="358" />
-            <location filename="../workers.py" line="358" />
+            <location filename="../workers.py" line="396" />
+            <location filename="../workers.py" line="396" />
             <source>Fetching card set list…</source>
             <translation>Fetching card set list…</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="369" />
-            <location filename="../workers.py" line="369" />
+            <location filename="../workers.py" line="406" />
+            <location filename="../workers.py" line="406" />
             <source>Failed to fetch set list: %1</source>
             <translation>Failed to fetch set list: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="382" />
-            <location filename="../workers.py" line="382" />
+            <location filename="../workers.py" line="413" />
+            <location filename="../workers.py" line="413" />
             <source>No set IDs found on the listing page</source>
             <translation>No set IDs found on the listing page</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="399" />
-            <location filename="../workers.py" line="399" />
+            <location filename="../workers.py" line="431" />
+            <location filename="../workers.py" line="431" />
             <source>Downloading card art for %1 sets using %2 threads…</source>
             <translation>Downloading card art for %1 sets using %2 threads…</translation>
         </message>
@@ -361,26 +361,26 @@
     <context>
         <name>CardDataLoadWorker</name>
         <message>
-            <location filename="../workers.py" line="1182" />
-            <location filename="../workers.py" line="1182" />
+            <location filename="../workers.py" line="1270" />
+            <location filename="../workers.py" line="1270" />
             <source>Loading cards from database...</source>
             <translation>Loading cards from database...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1212" />
-            <location filename="../workers.py" line="1212" />
+            <location filename="../workers.py" line="1296" />
+            <location filename="../workers.py" line="1296" />
             <source>Card load cancelled</source>
             <translation>Card load cancelled</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1239" />
-            <location filename="../workers.py" line="1239" />
+            <location filename="../workers.py" line="1323" />
+            <location filename="../workers.py" line="1323" />
             <source>Loaded %1 cards</source>
             <translation>Loaded %1 cards</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1248" />
-            <location filename="../workers.py" line="1248" />
+            <location filename="../workers.py" line="1332" />
+            <location filename="../workers.py" line="1332" />
             <source>Card load failed: %1</source>
             <translation>Card load failed: %1</translation>
         </message>
@@ -388,14 +388,14 @@
     <context>
         <name>CardImageDialog</name>
         <message>
-            <location filename="../dialogs.py" line="665" />
-            <location filename="../dialogs.py" line="665" />
+            <location filename="../dialogs.py" line="661" />
+            <location filename="../dialogs.py" line="661" />
             <source>Error</source>
             <translation>Error</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="666" />
-            <location filename="../dialogs.py" line="666" />
+            <location filename="../dialogs.py" line="662" />
+            <location filename="../dialogs.py" line="662" />
             <source>Could not load image: %1</source>
             <translation>Could not load image: %1</translation>
         </message>
@@ -403,8 +403,8 @@
     <context>
         <name>DashboardStatsWorker</name>
         <message>
-            <location filename="../workers.py" line="1370" />
-            <location filename="../workers.py" line="1370" />
+            <location filename="../workers.py" line="1485" />
+            <location filename="../workers.py" line="1485" />
             <source>Processed %1 (%2)</source>
             <translation>Processed %1 (%2)</translation>
         </message>
@@ -412,38 +412,38 @@
     <context>
         <name>DatabaseBackupWorker</name>
         <message>
-            <location filename="../workers.py" line="1086" />
-            <location filename="../workers.py" line="1086" />
+            <location filename="../workers.py" line="1174" />
+            <location filename="../workers.py" line="1174" />
             <source>Starting database backup...</source>
             <translation>Starting database backup...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1094" />
-            <location filename="../workers.py" line="1094" />
+            <location filename="../workers.py" line="1182" />
+            <location filename="../workers.py" line="1182" />
             <source>Source database not found: %1</source>
             <translation>Source database not found: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1109" />
-            <location filename="../workers.py" line="1109" />
+            <location filename="../workers.py" line="1197" />
+            <location filename="../workers.py" line="1197" />
             <source>Database backup cancelled</source>
             <translation>Database backup cancelled</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1118" />
-            <location filename="../workers.py" line="1118" />
+            <location filename="../workers.py" line="1206" />
+            <location filename="../workers.py" line="1206" />
             <source>Backup progress: %1%</source>
             <translation>Backup progress: %1%</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1126" />
-            <location filename="../workers.py" line="1126" />
+            <location filename="../workers.py" line="1214" />
+            <location filename="../workers.py" line="1214" />
             <source>Database backup completed successfully</source>
             <translation>Database backup completed successfully</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1140" />
-            <location filename="../workers.py" line="1140" />
+            <location filename="../workers.py" line="1228" />
+            <location filename="../workers.py" line="1228" />
             <source>Database backup failed: %1</source>
             <translation>Database backup failed: %1</translation>
         </message>
@@ -451,620 +451,620 @@
     <context>
         <name>MainWindow</name>
         <message>
-            <location filename="../main_window.py" line="300" />
-            <location filename="../main_window.py" line="300" />
+            <location filename="../main_window.py" line="379" />
+            <location filename="../main_window.py" line="379" />
             <source>&amp;File</source>
             <translation>&amp;File</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="303" />
-            <location filename="../main_window.py" line="303" />
+            <location filename="../main_window.py" line="382" />
+            <location filename="../main_window.py" line="382" />
             <source>&amp;Import CSV</source>
             <translation>&amp;Import CSV</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="309" />
-            <location filename="../main_window.py" line="309" />
+            <location filename="../main_window.py" line="388" />
+            <location filename="../main_window.py" line="388" />
             <source>&amp;Process Screenshots</source>
             <translation>&amp;Process Screenshots</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="315" />
-            <location filename="../main_window.py" line="315" />
+            <location filename="../main_window.py" line="394" />
+            <location filename="../main_window.py" line="394" />
             <source>&amp;Load New Data</source>
             <translation>&amp;Load New Data</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="321" />
-            <location filename="../main_window.py" line="321" />
+            <location filename="../main_window.py" line="400" />
+            <location filename="../main_window.py" line="400" />
             <source>Process &amp;Removed Cards</source>
             <translation>Process &amp;Removed Cards</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="326" />
-            <location filename="../main_window.py" line="326" />
+            <location filename="../main_window.py" line="405" />
+            <location filename="../main_window.py" line="405" />
             <source>&amp;Preferences</source>
             <translation>&amp;Preferences</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="333" />
-            <location filename="../main_window.py" line="333" />
+            <location filename="../main_window.py" line="412" />
+            <location filename="../main_window.py" line="412" />
             <source>E&amp;xit</source>
             <translation>E&amp;xit</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="343" />
-            <location filename="../main_window.py" line="343" />
+            <location filename="../main_window.py" line="422" />
+            <location filename="../main_window.py" line="422" />
             <source>&amp;Help</source>
             <translation>&amp;Help</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="346" />
-            <location filename="../main_window.py" line="346" />
+            <location filename="../main_window.py" line="425" />
+            <location filename="../main_window.py" line="425" />
             <source>&amp;About</source>
             <translation>&amp;About</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="380" />
-            <location filename="../main_window.py" line="380" />
+            <location filename="../main_window.py" line="459" />
+            <location filename="../main_window.py" line="459" />
             <source>Total Cards: 0</source>
             <translation>Total Cards: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="385" />
-            <location filename="../main_window.py" line="385" />
+            <location filename="../main_window.py" line="464" />
+            <location filename="../main_window.py" line="464" />
             <source>Total Packs: 0</source>
             <translation>Total Packs: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="390" />
-            <location filename="../main_window.py" line="390" />
+            <location filename="../main_window.py" line="469" />
+            <location filename="../main_window.py" line="469" />
             <source>Unique Cards: 0</source>
             <translation>Unique Cards: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="496" />
-            <location filename="../main_window.py" line="395" />
-            <location filename="../main_window.py" line="496" />
-            <location filename="../main_window.py" line="395" />
+            <location filename="../main_window.py" line="583" />
+            <location filename="../main_window.py" line="474" />
+            <location filename="../main_window.py" line="583" />
+            <location filename="../main_window.py" line="474" />
             <source>Last Processed: Never</source>
             <translation>Last Processed: Never</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="404" />
-            <location filename="../main_window.py" line="404" />
+            <location filename="../main_window.py" line="483" />
+            <location filename="../main_window.py" line="483" />
             <source>Import CSV</source>
             <translation>Import CSV</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="408" />
-            <location filename="../main_window.py" line="408" />
+            <location filename="../main_window.py" line="487" />
+            <location filename="../main_window.py" line="487" />
             <source>Load Screenshots</source>
             <translation>Load Screenshots</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1538" />
-            <location filename="../main_window.py" line="1517" />
-            <location filename="../main_window.py" line="412" />
-            <location filename="../main_window.py" line="1538" />
-            <location filename="../main_window.py" line="1517" />
-            <location filename="../main_window.py" line="412" />
+            <location filename="../main_window.py" line="1626" />
+            <location filename="../main_window.py" line="1599" />
+            <location filename="../main_window.py" line="491" />
+            <location filename="../main_window.py" line="1626" />
+            <location filename="../main_window.py" line="1599" />
+            <location filename="../main_window.py" line="491" />
             <source>Load New Data</source>
             <translation>Load New Data</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="420" />
-            <location filename="../main_window.py" line="420" />
+            <location filename="../main_window.py" line="499" />
+            <location filename="../main_window.py" line="499" />
             <source>Recent Activity:</source>
             <translation>Recent Activity:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="425" />
-            <location filename="../main_window.py" line="425" />
+            <location filename="../main_window.py" line="504" />
+            <location filename="../main_window.py" line="504" />
             <source>Clear</source>
             <translation>Clear</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="440" />
-            <location filename="../main_window.py" line="440" />
+            <location filename="../main_window.py" line="519" />
+            <location filename="../main_window.py" line="519" />
             <source>Dashboard</source>
             <translation>Dashboard</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="463" />
-            <location filename="../main_window.py" line="463" />
+            <location filename="../main_window.py" line="550" />
+            <location filename="../main_window.py" line="550" />
             <source>Error updating statistics: %1</source>
             <translation>Error updating statistics: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="471" />
-            <location filename="../main_window.py" line="471" />
+            <location filename="../main_window.py" line="558" />
+            <location filename="../main_window.py" line="558" />
             <source>Total Cards: %1</source>
             <translation>Total Cards: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="474" />
-            <location filename="../main_window.py" line="474" />
+            <location filename="../main_window.py" line="561" />
+            <location filename="../main_window.py" line="561" />
             <source>Unique Cards: %1</source>
             <translation>Unique Cards: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="477" />
-            <location filename="../main_window.py" line="477" />
+            <location filename="../main_window.py" line="564" />
+            <location filename="../main_window.py" line="564" />
             <source>Total Packs: %1</source>
             <translation>Total Packs: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="491" />
-            <location filename="../main_window.py" line="491" />
+            <location filename="../main_window.py" line="578" />
+            <location filename="../main_window.py" line="578" />
             <source>Last Processed: %1</source>
             <translation>Last Processed: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="500" />
-            <location filename="../main_window.py" line="500" />
+            <location filename="../main_window.py" line="587" />
+            <location filename="../main_window.py" line="587" />
             <source>Dashboard statistics updated</source>
             <translation>Dashboard statistics updated</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="615" />
-            <location filename="../main_window.py" line="615" />
+            <location filename="../main_window.py" line="702" />
+            <location filename="../main_window.py" line="702" />
             <source>No recent activity</source>
             <translation>No recent activity</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="623" />
-            <location filename="../main_window.py" line="623" />
+            <location filename="../main_window.py" line="710" />
+            <location filename="../main_window.py" line="710" />
             <source>Error loading activity</source>
             <translation>Error loading activity</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1113" />
-            <location filename="../main_window.py" line="1060" />
-            <location filename="../main_window.py" line="1055" />
-            <location filename="../main_window.py" line="635" />
-            <location filename="../main_window.py" line="1113" />
-            <location filename="../main_window.py" line="1060" />
-            <location filename="../main_window.py" line="1055" />
-            <location filename="../main_window.py" line="635" />
+            <location filename="../main_window.py" line="1201" />
+            <location filename="../main_window.py" line="1153" />
+            <location filename="../main_window.py" line="1143" />
+            <location filename="../main_window.py" line="722" />
+            <location filename="../main_window.py" line="1201" />
+            <location filename="../main_window.py" line="1153" />
+            <location filename="../main_window.py" line="1143" />
+            <location filename="../main_window.py" line="722" />
             <source>All Sets</source>
             <translation>All Sets</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="637" />
-            <location filename="../main_window.py" line="637" />
+            <location filename="../main_window.py" line="724" />
+            <location filename="../main_window.py" line="724" />
             <source>Set:</source>
             <translation>Set:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1120" />
-            <location filename="../main_window.py" line="1085" />
-            <location filename="../main_window.py" line="1073" />
-            <location filename="../main_window.py" line="642" />
-            <location filename="../main_window.py" line="1120" />
-            <location filename="../main_window.py" line="1085" />
-            <location filename="../main_window.py" line="1073" />
-            <location filename="../main_window.py" line="642" />
+            <location filename="../main_window.py" line="1208" />
+            <location filename="../main_window.py" line="1178" />
+            <location filename="../main_window.py" line="1166" />
+            <location filename="../main_window.py" line="729" />
+            <location filename="../main_window.py" line="1208" />
+            <location filename="../main_window.py" line="1178" />
+            <location filename="../main_window.py" line="1166" />
+            <location filename="../main_window.py" line="729" />
             <source>All Rarities</source>
             <translation>All Rarities</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="644" />
-            <location filename="../main_window.py" line="644" />
+            <location filename="../main_window.py" line="731" />
+            <location filename="../main_window.py" line="731" />
             <source>Rarity:</source>
             <translation>Rarity:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="649" />
-            <location filename="../main_window.py" line="649" />
+            <location filename="../main_window.py" line="736" />
+            <location filename="../main_window.py" line="736" />
             <source>Search cards...</source>
             <translation>Search cards...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="654" />
-            <location filename="../main_window.py" line="654" />
+            <location filename="../main_window.py" line="741" />
+            <location filename="../main_window.py" line="741" />
             <source>Refresh</source>
             <translation>Refresh</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="687" />
-            <location filename="../main_window.py" line="687" />
+            <location filename="../main_window.py" line="774" />
+            <location filename="../main_window.py" line="774" />
             <source>Cards</source>
             <translation>Cards</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="730" />
-            <location filename="../main_window.py" line="730" />
+            <location filename="../main_window.py" line="817" />
+            <location filename="../main_window.py" line="817" />
             <source>No active tasks</source>
             <translation>No active tasks</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="740" />
-            <location filename="../main_window.py" line="740" />
+            <location filename="../main_window.py" line="827" />
+            <location filename="../main_window.py" line="827" />
             <source>Active Tasks:</source>
             <translation>Active Tasks:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="748" />
-            <location filename="../main_window.py" line="748" />
+            <location filename="../main_window.py" line="835" />
+            <location filename="../main_window.py" line="835" />
             <source>Task Details:</source>
             <translation>Task Details:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="754" />
-            <location filename="../main_window.py" line="754" />
+            <location filename="../main_window.py" line="841" />
+            <location filename="../main_window.py" line="841" />
             <source>Cancel Selected</source>
             <translation>Cancel Selected</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="758" />
-            <location filename="../main_window.py" line="758" />
+            <location filename="../main_window.py" line="845" />
+            <location filename="../main_window.py" line="845" />
             <source>Clear Completed</source>
             <translation>Clear Completed</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="765" />
-            <location filename="../main_window.py" line="765" />
+            <location filename="../main_window.py" line="852" />
+            <location filename="../main_window.py" line="852" />
             <source>Processing</source>
             <translation>Processing</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="785" />
-            <location filename="../main_window.py" line="785" />
+            <location filename="../main_window.py" line="872" />
+            <location filename="../main_window.py" line="872" />
             <source>Cancelled</source>
             <translation>Cancelled</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1143" />
-            <location filename="../main_window.py" line="1143" />
+            <location filename="../main_window.py" line="1225" />
+            <location filename="../main_window.py" line="1225" />
             <source>Showing %1 of %2 unique cards</source>
             <translation>Showing %1 of %2 unique cards</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1151" />
-            <location filename="../main_window.py" line="1151" />
+            <location filename="../main_window.py" line="1233" />
+            <location filename="../main_window.py" line="1233" />
             <source>Error applying filters: %1</source>
             <translation>Error applying filters: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1225" />
-            <location filename="../main_window.py" line="1225" />
+            <location filename="../main_window.py" line="1307" />
+            <location filename="../main_window.py" line="1307" />
             <source>No Data</source>
             <translation>No Data</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1226" />
-            <location filename="../main_window.py" line="1226" />
+            <location filename="../main_window.py" line="1308" />
+            <location filename="../main_window.py" line="1308" />
             <source>No account distribution found for %1</source>
             <translation>No account distribution found for %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1235" />
-            <location filename="../main_window.py" line="1235" />
+            <location filename="../main_window.py" line="1317" />
+            <location filename="../main_window.py" line="1317" />
             <source>Error</source>
             <translation>Error</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1236" />
-            <location filename="../main_window.py" line="1236" />
+            <location filename="../main_window.py" line="1318" />
+            <location filename="../main_window.py" line="1318" />
             <source>Could not show account distribution: %1</source>
             <translation>Could not show account distribution: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1376" />
-            <location filename="../main_window.py" line="1376" />
+            <location filename="../main_window.py" line="1458" />
+            <location filename="../main_window.py" line="1458" />
             <source>DB: Connected</source>
             <translation>DB: Connected</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1422" />
-            <location filename="../main_window.py" line="1422" />
+            <location filename="../main_window.py" line="1504" />
+            <location filename="../main_window.py" line="1504" />
             <source>Tasks: %1</source>
             <translation>Tasks: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1518" />
-            <location filename="../main_window.py" line="1518" />
+            <location filename="../main_window.py" line="1600" />
+            <location filename="../main_window.py" line="1600" />
             <source>A data import is already in progress. Please wait for it to finish.</source>
             <translation>A data import is already in progress. Please wait for it to finish.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1526" />
-            <location filename="../main_window.py" line="1526" />
+            <location filename="../main_window.py" line="1610" />
+            <location filename="../main_window.py" line="1610" />
             <source>CSV file path is not set.</source>
             <translation>CSV file path is not set.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1528" />
-            <location filename="../main_window.py" line="1528" />
+            <location filename="../main_window.py" line="1612" />
+            <location filename="../main_window.py" line="1612" />
             <source>CSV file not found: %1</source>
             <translation>CSV file not found: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1531" />
-            <location filename="../main_window.py" line="1531" />
+            <location filename="../main_window.py" line="1615" />
+            <location filename="../main_window.py" line="1615" />
             <source>Screenshots directory is not set.</source>
             <translation>Screenshots directory is not set.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1533" />
-            <location filename="../main_window.py" line="1533" />
+            <location filename="../main_window.py" line="1618" />
+            <location filename="../main_window.py" line="1618" />
             <source>Screenshots directory not found: %1</source>
             <translation>Screenshots directory not found: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1541" />
-            <location filename="../main_window.py" line="1541" />
+            <location filename="../main_window.py" line="1629" />
+            <location filename="../main_window.py" line="1629" />
             <source>Please use the Import CSV or Process Screenshots options to set the correct locations.</source>
             <translation>Please use the Import CSV or Process Screenshots options to set the correct locations.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1551" />
-            <location filename="../main_window.py" line="1551" />
+            <location filename="../main_window.py" line="1641" />
+            <location filename="../main_window.py" line="1641" />
             <source>Starting data import…</source>
             <translation>Starting data import…</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1568" />
-            <location filename="../main_window.py" line="1568" />
+            <location filename="../main_window.py" line="1658" />
+            <location filename="../main_window.py" line="1658" />
             <source>CSV import completed</source>
             <translation>CSV import completed</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1570" />
-            <location filename="../main_window.py" line="1570" />
+            <location filename="../main_window.py" line="1660" />
+            <location filename="../main_window.py" line="1660" />
             <source>CSV import cancelled</source>
             <translation>CSV import cancelled</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1578" />
-            <location filename="../main_window.py" line="1578" />
+            <location filename="../main_window.py" line="1668" />
+            <location filename="../main_window.py" line="1668" />
             <source>Error importing CSV: %1</source>
             <translation>Error importing CSV: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1584" />
-            <location filename="../main_window.py" line="1584" />
+            <location filename="../main_window.py" line="1674" />
+            <location filename="../main_window.py" line="1674" />
             <source>Starting background CSV import...</source>
             <translation>Starting background CSV import...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1592" />
-            <location filename="../main_window.py" line="1592" />
+            <location filename="../main_window.py" line="1682" />
+            <location filename="../main_window.py" line="1682" />
             <source>CSV Import: %1</source>
             <translation>CSV Import: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1631" />
-            <location filename="../main_window.py" line="1631" />
+            <location filename="../main_window.py" line="1721" />
+            <location filename="../main_window.py" line="1721" />
             <source>CSV import started in background</source>
             <translation>CSV import started in background</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1636" />
-            <location filename="../main_window.py" line="1636" />
+            <location filename="../main_window.py" line="1726" />
+            <location filename="../main_window.py" line="1726" />
             <source>Error starting CSV import: %1</source>
             <translation>Error starting CSV import: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1644" />
-            <location filename="../main_window.py" line="1644" />
+            <location filename="../main_window.py" line="1734" />
+            <location filename="../main_window.py" line="1734" />
             <source>CSV import: %1/%2</source>
             <translation>CSV import: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1666" />
-            <location filename="../main_window.py" line="1666" />
+            <location filename="../main_window.py" line="1756" />
+            <location filename="../main_window.py" line="1756" />
             <source>CSV import completed: %1 packs imported</source>
             <translation>CSV import completed: %1 packs imported</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1683" />
-            <location filename="../main_window.py" line="1683" />
+            <location filename="../main_window.py" line="1773" />
+            <location filename="../main_window.py" line="1773" />
             <source>Starting screenshot processing from saved directory…</source>
             <translation>Starting screenshot processing from saved directory…</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1690" />
-            <location filename="../main_window.py" line="1690" />
+            <location filename="../main_window.py" line="1780" />
+            <location filename="../main_window.py" line="1780" />
             <source>CSV import error: %1</source>
             <translation>CSV import error: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1701" />
-            <location filename="../main_window.py" line="1701" />
+            <location filename="../main_window.py" line="1791" />
+            <location filename="../main_window.py" line="1791" />
             <source>Combined import stopped due to CSV import error.</source>
             <translation>Combined import stopped due to CSV import error.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1708" />
-            <location filename="../main_window.py" line="1708" />
+            <location filename="../main_window.py" line="1798" />
+            <location filename="../main_window.py" line="1798" />
             <source>CSV import finished</source>
             <translation>CSV import finished</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1730" />
-            <location filename="../main_window.py" line="1730" />
+            <location filename="../main_window.py" line="1820" />
+            <location filename="../main_window.py" line="1820" />
             <source>Combined import stopped: saved screenshots directory is unavailable.</source>
             <translation>Combined import stopped: saved screenshots directory is unavailable.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1748" />
-            <location filename="../main_window.py" line="1748" />
+            <location filename="../main_window.py" line="1838" />
+            <location filename="../main_window.py" line="1838" />
             <source>Screenshot processing: %1/%2</source>
             <translation>Screenshot processing: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1768" />
-            <location filename="../main_window.py" line="1768" />
+            <location filename="../main_window.py" line="1858" />
+            <location filename="../main_window.py" line="1858" />
             <source>Screenshot processing completed: %1 files processed</source>
             <translation>Screenshot processing completed: %1 files processed</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1783" />
-            <location filename="../main_window.py" line="1783" />
+            <location filename="../main_window.py" line="1873" />
+            <location filename="../main_window.py" line="1873" />
             <source>Data import finished!</source>
             <translation>Data import finished!</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1806" />
-            <location filename="../main_window.py" line="1806" />
+            <location filename="../main_window.py" line="1898" />
+            <location filename="../main_window.py" line="1898" />
             <source>Screenshot processing error: %1</source>
             <translation>Screenshot processing error: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1817" />
-            <location filename="../main_window.py" line="1817" />
+            <location filename="../main_window.py" line="1909" />
+            <location filename="../main_window.py" line="1909" />
             <source>Combined import stopped due to screenshot processing error.</source>
             <translation>Combined import stopped due to screenshot processing error.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1824" />
-            <location filename="../main_window.py" line="1824" />
+            <location filename="../main_window.py" line="1916" />
+            <location filename="../main_window.py" line="1916" />
             <source>Screenshot processing finished</source>
             <translation>Screenshot processing finished</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1857" />
-            <location filename="../main_window.py" line="1857" />
+            <location filename="../main_window.py" line="1949" />
+            <location filename="../main_window.py" line="1949" />
             <source>Missing Screenshot Data</source>
             <translation>Missing Screenshot Data</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1858" />
-            <location filename="../main_window.py" line="1858" />
+            <location filename="../main_window.py" line="1950" />
+            <location filename="../main_window.py" line="1950" />
             <source>No screenshot records found in database. Please import a CSV file first (File -&gt; Import CSV) before processing screenshots.</source>
             <translation>No screenshot records found in database. Please import a CSV file first (File -&gt; Import CSV) before processing screenshots.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1864" />
-            <location filename="../main_window.py" line="1864" />
+            <location filename="../main_window.py" line="1956" />
+            <location filename="../main_window.py" line="1956" />
             <source>Aborted screenshot processing: No screenshot records in database</source>
             <translation>Aborted screenshot processing: No screenshot records in database</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1873" />
-            <location filename="../main_window.py" line="1873" />
+            <location filename="../main_window.py" line="1965" />
+            <location filename="../main_window.py" line="1965" />
             <source>Error checking card count: %1</source>
             <translation>Error checking card count: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1888" />
-            <location filename="../main_window.py" line="1888" />
+            <location filename="../main_window.py" line="1980" />
+            <location filename="../main_window.py" line="1980" />
             <source>Screenshot processing completed</source>
             <translation>Screenshot processing completed</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1890" />
-            <location filename="../main_window.py" line="1890" />
+            <location filename="../main_window.py" line="1982" />
+            <location filename="../main_window.py" line="1982" />
             <source>Screenshot processing cancelled</source>
             <translation>Screenshot processing cancelled</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1898" />
-            <location filename="../main_window.py" line="1898" />
+            <location filename="../main_window.py" line="1990" />
+            <location filename="../main_window.py" line="1990" />
             <source>Error processing screenshots: %1</source>
             <translation>Error processing screenshots: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1904" />
-            <location filename="../main_window.py" line="1904" />
+            <location filename="../main_window.py" line="1996" />
+            <location filename="../main_window.py" line="1996" />
             <source>Starting background screenshot processing...</source>
             <translation>Starting background screenshot processing...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1913" />
-            <location filename="../main_window.py" line="1913" />
+            <location filename="../main_window.py" line="2005" />
+            <location filename="../main_window.py" line="2005" />
             <source>Screenshot Processing: %1</source>
             <translation>Screenshot Processing: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1958" />
-            <location filename="../main_window.py" line="1958" />
+            <location filename="../main_window.py" line="2050" />
+            <location filename="../main_window.py" line="2050" />
             <source>Screenshot processing started in background</source>
             <translation>Screenshot processing started in background</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1964" />
-            <location filename="../main_window.py" line="1964" />
+            <location filename="../main_window.py" line="2056" />
+            <location filename="../main_window.py" line="2056" />
             <source>Error starting screenshot processing: %1</source>
             <translation>Error starting screenshot processing: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1973" />
-            <location filename="../main_window.py" line="1973" />
+            <location filename="../main_window.py" line="2065" />
+            <location filename="../main_window.py" line="2065" />
             <source>Downloading card art</source>
             <translation>Downloading card art</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1990" />
-            <location filename="../main_window.py" line="1990" />
+            <location filename="../main_window.py" line="2082" />
+            <location filename="../main_window.py" line="2082" />
             <source>Card art download complete: %1 images saved</source>
             <translation>Card art download complete: %1 images saved</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1997" />
-            <location filename="../main_window.py" line="1997" />
+            <location filename="../main_window.py" line="2089" />
+            <location filename="../main_window.py" line="2089" />
             <source>Card art download complete</source>
             <translation>Card art download complete</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2003" />
-            <location filename="../main_window.py" line="2003" />
+            <location filename="../main_window.py" line="2095" />
+            <location filename="../main_window.py" line="2095" />
             <source>Card art download error: %1</source>
             <translation>Card art download error: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2028" />
-            <location filename="../main_window.py" line="2028" />
+            <location filename="../main_window.py" line="2120" />
+            <location filename="../main_window.py" line="2120" />
             <source>Error showing about dialog: %1</source>
             <translation>Error showing about dialog: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2041" />
-            <location filename="../main_window.py" line="2041" />
+            <location filename="../main_window.py" line="2133" />
+            <location filename="../main_window.py" line="2133" />
             <source>Error showing preferences dialog: %1</source>
             <translation>Error showing preferences dialog: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2179" />
-            <location filename="../main_window.py" line="2179" />
+            <location filename="../main_window.py" line="2271" />
+            <location filename="../main_window.py" line="2271" />
             <source>Closing application. Cleaning up... this may take a moment.</source>
             <translation>Closing application. Cleaning up... this may take a moment.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2256" />
-            <location filename="../main_window.py" line="2256" />
+            <location filename="../main_window.py" line="2368" />
+            <location filename="../main_window.py" line="2368" />
             <source>No Removed Cards</source>
             <translation>No Removed Cards</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2256" />
-            <location filename="../main_window.py" line="2256" />
+            <location filename="../main_window.py" line="2368" />
+            <location filename="../main_window.py" line="2368" />
             <source>No cards to process.</source>
             <translation>No cards to process.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2261" />
-            <location filename="../main_window.py" line="2261" />
+            <location filename="../main_window.py" line="2373" />
+            <location filename="../main_window.py" line="2373" />
             <source>Process Removed Cards?</source>
             <translation>Process Removed Cards?</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2263" />
-            <location filename="../main_window.py" line="2263" />
+            <location filename="../main_window.py" line="2375" />
+            <location filename="../main_window.py" line="2375" />
             <source>This will process &lt;b&gt;%1&lt;/b&gt; recorded card removals from the database.&lt;br&gt;&lt;br&gt;This is useful if you have re-imported screenshots that might have brought back cards you previously removed.</source>
             <translation>This will process &lt;b&gt;%1&lt;/b&gt; recorded card removals from the database.&lt;br&gt;&lt;br&gt;This is useful if you have re-imported screenshots that might have brought back cards you previously removed.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2291" />
-            <location filename="../main_window.py" line="2291" />
+            <location filename="../main_window.py" line="2403" />
+            <location filename="../main_window.py" line="2403" />
             <source>Process Complete</source>
             <translation>Process Complete</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2292" />
-            <location filename="../main_window.py" line="2292" />
+            <location filename="../main_window.py" line="2404" />
+            <location filename="../main_window.py" line="2404" />
             <source>Processed %1 records. %2 cards were actually found and removed.</source>
             <translation>Processed %1 records. %2 cards were actually found and removed.</translation>
         </message>
@@ -1328,104 +1328,110 @@
     <context>
         <name>ScreenshotProcessingWorker</name>
         <message>
-            <location filename="../workers.py" line="582" />
-            <location filename="../workers.py" line="582" />
+            <location filename="../workers.py" line="618" />
+            <location filename="../workers.py" line="618" />
             <source>Starting screenshot processing...</source>
             <translation>Starting screenshot processing...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="590" />
-            <location filename="../workers.py" line="590" />
+            <location filename="../workers.py" line="626" />
+            <location filename="../workers.py" line="626" />
             <source>Directory not found: %1</source>
             <translation>Directory not found: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="601" />
-            <location filename="../workers.py" line="601" />
+            <location filename="../workers.py" line="640" />
+            <location filename="../workers.py" line="640" />
             <source>Scanning directory for images...</source>
             <translation>Scanning directory for images...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="632" />
-            <location filename="../workers.py" line="632" />
+            <location filename="../workers.py" line="680" />
+            <location filename="../workers.py" line="680" />
             <source>Scanned %1 files, found %2 new images...</source>
             <translation>Scanned %1 files, found %2 new images...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="651" />
-            <location filename="../workers.py" line="651" />
+            <location filename="../workers.py" line="701" />
+            <location filename="../workers.py" line="701" />
+            <source>Skipped %1 pre-S4T screenshots (total skipped: %2)</source>
+            <translation>Skipped %1 pre-S4T screenshots (total skipped: %2)</translation>
+        </message>
+        <message>
+            <location filename="../workers.py" line="713" />
+            <location filename="../workers.py" line="713" />
             <source>All images already processed.</source>
             <translation>All images already processed.</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="664" />
-            <location filename="../workers.py" line="664" />
+            <location filename="../workers.py" line="728" />
+            <location filename="../workers.py" line="728" />
             <source>All images already processed</source>
             <translation>All images already processed</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="673" />
-            <location filename="../workers.py" line="673" />
+            <location filename="../workers.py" line="737" />
+            <location filename="../workers.py" line="737" />
             <source>No image files found in directory</source>
             <translation>No image files found in directory</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="680" />
-            <location filename="../workers.py" line="680" />
+            <location filename="../workers.py" line="744" />
+            <location filename="../workers.py" line="744" />
             <source>Found %1 images to process. Loading workers...</source>
             <translation>Found %1 images to process. Loading workers...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="698" />
-            <location filename="../workers.py" line="698" />
+            <location filename="../workers.py" line="762" />
+            <location filename="../workers.py" line="762" />
             <source>Loaded %1 card templates</source>
             <translation>Loaded %1 card templates</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="704" />
-            <location filename="../workers.py" line="704" />
+            <location filename="../workers.py" line="768" />
+            <location filename="../workers.py" line="768" />
             <source>Error: Template directory not found: %1</source>
             <translation>Error: Template directory not found: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="710" />
-            <location filename="../workers.py" line="710" />
+            <location filename="../workers.py" line="774" />
+            <location filename="../workers.py" line="774" />
             <source>Template directory not found: %1</source>
             <translation>Template directory not found: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="717" />
-            <location filename="../workers.py" line="717" />
+            <location filename="../workers.py" line="781" />
+            <location filename="../workers.py" line="781" />
             <source>Error: Could not load card templates: %1</source>
             <translation>Error: Could not load card templates: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="805" />
-            <location filename="../workers.py" line="805" />
+            <location filename="../workers.py" line="880" />
+            <location filename="../workers.py" line="880" />
             <source>Screenshot processing cancelled</source>
             <translation>Screenshot processing cancelled</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="819" />
-            <location filename="../workers.py" line="819" />
+            <location filename="../workers.py" line="896" />
+            <location filename="../workers.py" line="896" />
             <source>Critical error processing %1: %2</source>
             <translation>Critical error processing %1: %2</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="833" />
-            <location filename="../workers.py" line="833" />
+            <location filename="../workers.py" line="910" />
+            <location filename="../workers.py" line="910" />
             <source>Processed %1 of %2 images</source>
             <translation>Processed %1 of %2 images</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="848" />
-            <location filename="../workers.py" line="848" />
+            <location filename="../workers.py" line="928" />
+            <location filename="../workers.py" line="928" />
             <source>Successfully processed %1 screenshots (%2 with results)</source>
             <translation>Successfully processed %1 screenshots (%2 with results)</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="867" />
-            <location filename="../workers.py" line="867" />
+            <location filename="../workers.py" line="949" />
+            <location filename="../workers.py" line="949" />
             <source>Screenshot processing failed: %1</source>
             <translation>Screenshot processing failed: %1</translation>
         </message>
