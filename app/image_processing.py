@@ -367,6 +367,12 @@ class ImageProcessor:
                     logger.debug(f"Scanning card {i+1} at position ({x}, {y})")
                     card_region = screenshot[y : y + h, x : x + w]
 
+                    if self._is_empty_card_region(card_region):
+                        logger.debug(
+                            f"Skipping empty card slot at position {i+1}"
+                        )
+                        continue
+
                     # Use force_detailed=True for maximum accuracy since we're only scanning once.
                     # This ensures we don't just rely on pHash which can have collisions.
                     best_match = self._find_best_card_match(
@@ -501,6 +507,37 @@ class ImageProcessor:
         bottom_positions = [scale_pos(p) for p in bottom_base]
 
         return top_row_positions + bottom_positions
+
+    def _is_empty_card_region(self, card_region: np.ndarray) -> bool:
+        """
+        Determine if a card region is an empty (unrendered) slot based on
+        the average color of a small center box.
+        """
+        if card_region is None or card_region.size == 0:
+            return False
+
+        height, width = card_region.shape[:2]
+        box_size = 20
+        half = box_size // 2
+
+        center_x = width // 2
+        center_y = height // 2
+
+        x0 = max(center_x - half, 0)
+        y0 = max(center_y - half, 0)
+        x1 = min(center_x + half, width)
+        y1 = min(center_y + half, height)
+
+        if x1 <= x0 or y1 <= y0:
+            return False
+
+        center_box = card_region[y0:y1, x0:x1]
+        avg_color = np.mean(center_box.reshape(-1, 3), axis=0)
+
+        empty_color = np.array([189, 206, 226], dtype=np.float32)  # #bdcee2
+        distance = np.linalg.norm(avg_color - empty_color)
+
+        return distance <= 20.0
 
     def _find_best_card_match(
         self,

@@ -872,6 +872,12 @@ class MainWindow(QMainWindow):
                             task_id, self.tr("Cancelled"), "Cancelled by user"
                         )
                         self._update_status_message(f"Task {task_id} cancelled")
+                        if self._combined_import_request and task_id in {
+                            self._combined_import_request.get("csv_task_id"),
+                            self._combined_import_request.get("screenshot_task_id"),
+                        }:
+                            self._combined_import_request = None
+                            self._update_load_new_data_availability()
                         break
             else:
                 self._update_status_message("No task selected")
@@ -1466,6 +1472,21 @@ class MainWindow(QMainWindow):
         error: str = None,
     ):
         """Update task status indicator and specific task status"""
+        selected_task_id = None
+        try:
+            if hasattr(self, "task_table") and self.task_table is not None:
+                selection_model = self.task_table.selectionModel()
+                if selection_model is not None:
+                    selected_rows = selection_model.selectedRows()
+                    if selected_rows:
+                        selected_row = selected_rows[0].row()
+                        if 0 <= selected_row < len(self.task_model._data):
+                            selected_task_id = self.task_model._data[selected_row].get(
+                                "task_id"
+                            )
+        except Exception:
+            selected_task_id = None
+
         if task_id:
             # Update specific task status
             for task in self.processing_tasks:
@@ -1487,6 +1508,15 @@ class MainWindow(QMainWindow):
 
                     # Update model
                     self.task_model.update_data(self.processing_tasks)
+
+                    if selected_task_id:
+                        for row_index, row_task in enumerate(self.processing_tasks):
+                            if row_task.get("task_id") == selected_task_id:
+                                self.task_table.selectRow(row_index)
+                                self.task_table.setCurrentIndex(
+                                    self.task_model.index(row_index, 0)
+                                )
+                                break
 
                     # Log status change if status provided
                     if status:
@@ -1796,6 +1826,16 @@ class MainWindow(QMainWindow):
     def _on_csv_import_finished(self, worker=None):
         """Handle CSV import completion"""
         self._update_status_message(self.tr("CSV import finished"))
+
+        if (
+            worker
+            and getattr(worker, "_is_cancelled", False)
+            and self._combined_import_request
+            and self._combined_import_request.get("csv_task_id")
+            == getattr(worker, "task_id", None)
+        ):
+            self._combined_import_request = None
+            self._update_load_new_data_availability()
 
         # Clean up worker
         if worker and worker in self.active_workers:
