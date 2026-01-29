@@ -1327,6 +1327,26 @@ class CardDataLoadWorker(QRunnable):
                 if processed % 200 == 0:
                     self.signals.progress.emit(processed, total)
 
+            def sort_key(item: Dict[str, Any]):
+                card_code = (item.get("card_code") or "").upper()
+                if "_" in card_code:
+                    set_code, card_number = card_code.split("_", 1)
+                else:
+                    set_code, card_number = card_code, ""
+
+                digits = ""
+                suffix = ""
+                for char in card_number:
+                    if char.isdigit() and not suffix:
+                        digits += char
+                    else:
+                        suffix += char
+
+                number_value = int(digits) if digits else 0
+                return (set_code, number_value, suffix, card_code)
+
+            data.sort(key=sort_key)
+
             self.signals.progress.emit(total, total)
             self.signals.status.emit(
                 QCoreApplication.translate(
