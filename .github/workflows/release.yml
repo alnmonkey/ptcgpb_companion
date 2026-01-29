@@ -28,18 +28,7 @@ jobs:
 
       - name: Add upx to PATH
         shell: pwsh
-        run: |
-          $primary = "C:\\Program Files\\UPX"
-          if (Test-Path "$primary\\upx.exe") {
-            $primary | Out-File -FilePath $env:GITHUB_PATH -Append
-            exit 0
-          }
-          $fallback = Get-ChildItem "C:\\Program Files" -Recurse -Filter upx.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($fallback) {
-            $fallback.DirectoryName | Out-File -FilePath $env:GITHUB_PATH -Append
-            exit 0
-          }
-          Write-Error "upx.exe not found after installation"
+        run: $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
