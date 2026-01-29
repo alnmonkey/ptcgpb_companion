@@ -24,11 +24,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install upx
-        run: winget install -e --id UPX.UPX --accept-source-agreements --accept-package-agreements
-
-      - name: Add upx to PATH
-        shell: pwsh
-        run: $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+        run: winget install -e --id UPX.UPX --scope machine --accept-package-agreements --accept-source-agreements
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
