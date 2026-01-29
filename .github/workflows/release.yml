@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install upx
-        run: winget install -e --id UPX.UPX
+        run: winget install -e --id UPX.UPX --accept-source-agreements --accept-package-agreements
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
