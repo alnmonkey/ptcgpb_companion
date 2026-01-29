@@ -39,7 +39,6 @@ if exist dist rmdir /s /q dist
 
 REM Common PyInstaller options (Windows)
 set "PYI_OPTS=--noconfirm --clean --name %APP_NAME% --windowed"
-SET "PYI_OPTS=!PYI_OPTS! --additional-hooks-dir pyinstaller_hooks"
 SET "PYI_OPTS=!PYI_OPTS! --exclude-module babel --exclude-module gettext"
 
 REM Copy the below line for each asset or folder that you wish to copy in.
