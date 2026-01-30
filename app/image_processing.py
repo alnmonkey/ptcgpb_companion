@@ -534,8 +534,7 @@ class ImageProcessor:
 
         empty_color = np.array([189, 206, 226], dtype=np.float32)  # #bdcee2
         distance = np.linalg.norm(avg_color - empty_color)
-
-        return distance <= 20.0
+        return distance <= 3.0
 
     def _find_best_card_match(
         self,
