@@ -27,7 +27,7 @@ from PyQt6.QtWidgets import (
     QHeaderView,
     QWidget,
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QThread, QSize
+from PyQt6.QtCore import Qt, pyqtSignal, QThread, QSize, QTimer
 from PyQt6.QtGui import QIcon, QValidator, QPixmap
 import os
 import csv
@@ -708,6 +708,214 @@ class CardImageDialog(QDialog):
         dialog_height = min(pixmap.height() + 100, max_height)
 
         self.resize(dialog_width, dialog_height)
+
+
+class DiagnoseImageDialog(QDialog):
+    """Dialog for diagnosing a single screenshot image"""
+
+    def __init__(self, parent=None, initial_path="", settings=None):
+        super().__init__(parent)
+        self.setWindowTitle(self.tr("Diagnose Image"))
+        self.setMinimumSize(700, 500)
+
+        self._initial_path = initial_path
+        self._settings = settings
+        self._image_path = ""
+
+        self._setup_ui()
+
+        if self._initial_path and os.path.isfile(self._initial_path):
+            self._image_path = self._initial_path
+            self.file_path_label.setText(self._initial_path)
+
+    def _setup_ui(self):
+        """Set up the user interface"""
+        layout = QVBoxLayout()
+
+        file_layout = QHBoxLayout()
+        self.file_path_label = QLabel(self.tr("No image selected"))
+        self.file_path_label.setWordWrap(True)
+
+        browse_btn = QPushButton(self.tr("Browse..."))
+        browse_btn.clicked.connect(self._browse_file)
+
+        file_layout.addWidget(QLabel(self.tr("Image File:")))
+        file_layout.addWidget(self.file_path_label, 1)
+        file_layout.addWidget(browse_btn)
+        layout.addLayout(file_layout)
+
+        options_layout = QFormLayout()
+        self.force_set_input = QLineEdit()
+        self.force_set_input.setPlaceholderText(
+            self.tr("Optional set code (e.g., A4b)")
+        )
+        options_layout.addRow(self.tr("Force Set:"), self.force_set_input)
+        layout.addLayout(options_layout)
+
+        self.results_table = QTableWidget()
+        self.results_table.setColumnCount(5)
+        self.results_table.setHorizontalHeaderLabels(
+            [
+                self.tr("#"),
+                self.tr("Status"),
+                self.tr("Name"),
+                self.tr("ID"),
+                self.tr("Confidence"),
+            ]
+        )
+        self.results_table.horizontalHeader().setSectionResizeMode(
+            2, QHeaderView.ResizeMode.Stretch
+        )
+        self.results_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.results_table.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows
+        )
+        self.results_table.setSortingEnabled(False)
+        layout.addWidget(self.results_table)
+
+        self.status_label = QLabel("")
+        layout.addWidget(self.status_label)
+
+        button_box = QDialogButtonBox()
+        self.run_btn = button_box.addButton(
+            self.tr("Run Diagnostics"), QDialogButtonBox.ButtonRole.AcceptRole
+        )
+        close_btn = button_box.addButton(
+            QDialogButtonBox.StandardButton.Close
+        )
+
+        self.run_btn.clicked.connect(self._run_diagnosis)
+        close_btn.clicked.connect(self.reject)
+
+        layout.addWidget(button_box)
+        self.setLayout(layout)
+
+    def _browse_file(self):
+        """Open file dialog to select image"""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            self.tr("Select Image"),
+            self._initial_path,
+            self.tr(
+                "Image Files (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;All Files (*)"
+            ),
+        )
+
+        if file_path:
+            self._image_path = file_path
+            self.file_path_label.setText(file_path)
+
+            if self._settings:
+                self._settings.set_setting("Debug/diagnose_image_path", file_path)
+
+    def _run_diagnosis(self):
+        """Run image diagnosis and populate results"""
+        if not self._image_path or not os.path.isfile(self._image_path):
+            QMessageBox.warning(
+                self,
+                self.tr("Invalid Image"),
+                self.tr("Please select a valid image file."),
+            )
+            return
+
+        self.results_table.setRowCount(0)
+        self.status_label.setText("Running diagnosis...")
+        QTimer.singleShot(100, self._scan_screenshot)
+
+    def _scan_screenshot(self):
+        try:
+            from app.image_processing import ImageProcessor
+            from settings import BASE_DIR
+
+            processor = ImageProcessor()
+            template_dir = BASE_DIR / "resources" / "card_imgs"
+            processor.load_card_templates(template_dir)
+
+            force_set = self.force_set_input.text().strip() or None
+            results = processor.process_screenshot(
+                self._image_path, force_set=force_set
+            )
+
+            empty_flags, _positions = self._get_empty_flags(
+                processor, self._image_path
+            )
+            cards_by_position = {card.get("position"): card for card in results}
+
+            self._populate_results(empty_flags, cards_by_position)
+            self.status_label.setText(
+                self.tr("Detected %1 cards out of %2 slots")
+                .replace("%1", str(len(results)))
+                .replace("%2", str(len(empty_flags)))
+            )
+        except Exception as e:
+            self.results_table.setRowCount(0)
+            self.status_label.setText(self.tr("Error: %1").replace("%1", str(e)))
+            QMessageBox.critical(
+                self,
+                self.tr("Diagnosis Error"),
+                self.tr("Failed to diagnose image: %1").replace("%1", str(e)),
+            )
+
+    def _get_empty_flags(self, processor, image_path):
+        screenshot = processor._preprocess_screenshot(image_path)
+        if screenshot is None:
+            raise ValueError(self.tr("Failed to preprocess screenshot."))
+
+        positions = processor._detect_card_positions(screenshot)
+        if not positions:
+            raise ValueError(self.tr("No card positions detected in screenshot."))
+
+        empty_flags = [
+            processor._is_empty_card_region(screenshot[y : y + h, x : x + w])
+            for x, y, w, h in positions
+        ]
+
+        return empty_flags, positions
+
+    def _populate_results(self, empty_flags, cards_by_position):
+        self.results_table.setRowCount(len(empty_flags))
+
+        for index, is_empty in enumerate(empty_flags, start=1):
+            row = index - 1
+
+            position_item = QTableWidgetItem(str(index))
+            position_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.results_table.setItem(row, 0, position_item)
+
+            if is_empty:
+                status = self.tr("Empty")
+                name = self.tr("Empty")
+                card_id = ""
+                confidence_text = ""
+            else:
+                card = cards_by_position.get(index)
+                if not card:
+                    status = self.tr("Unknown")
+                    name = self.tr("Unknown")
+                    card_id = ""
+                    confidence_text = ""
+                else:
+                    status = self.tr("Matched")
+                    name = card.get("card_name", self.tr("Unknown"))
+                    card_id = f"{card.get('card_set', '')}_{card.get('card_code', '')}"
+                    set_prefix = f"{card.get('card_set', '')}_"
+                    if card_id.startswith(f"{set_prefix}{set_prefix}"):
+                        card_id = card_id[len(set_prefix) :]
+                    confidence = card.get("confidence", 0)
+                    confidence_text = f"{confidence:.4f}"
+
+            status_item = QTableWidgetItem(status)
+            name_item = QTableWidgetItem(name)
+            card_id_item = QTableWidgetItem(card_id)
+            confidence_item = QTableWidgetItem(confidence_text)
+
+            status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            confidence_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+
+            self.results_table.setItem(row, 1, status_item)
+            self.results_table.setItem(row, 2, name_item)
+            self.results_table.setItem(row, 3, card_id_item)
+            self.results_table.setItem(row, 4, confidence_item)
 
 
 class NumericTableWidgetItem(QTableWidgetItem):

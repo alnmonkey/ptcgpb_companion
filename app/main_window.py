@@ -45,6 +45,7 @@ from app.dialogs import (
     CardImageDialog,
     AccountCardListDialog,
     PreferencesDialog,
+    DiagnoseImageDialog,
 )
 
 from app.workers import (
@@ -415,8 +416,12 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
 
-        # View menu. Not currently used, but keeping in case we need it eventually
-        # view_menu = menu_bar.addMenu(self.tr("&View"))
+        debug_menu = menu_bar.addMenu(self.tr("&Debug"))
+
+        diagnose_image = QAction(self.tr("&Diagnose Image"), self)
+        diagnose_image.triggered.connect(self._on_diagnose_image)
+        debug_menu.addAction(diagnose_image)
+
 
         # Help menu
         help_menu = menu_bar.addMenu(self.tr("&Help"))
@@ -1068,6 +1073,22 @@ class MainWindow(QMainWindow):
 
         # Defer to allow the tab to render first
         QTimer.singleShot(0, start_worker)
+
+    def _on_diagnose_image(self):
+        try:
+            initial_path = self.settings.get_setting("Debug/diagnose_image_path", "")
+            dialog = DiagnoseImageDialog(
+                self, initial_path=initial_path, settings=self.settings
+            )
+            dialog.exec()
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                self.tr("Diagnosis Error"),
+                self.tr("Failed to open image diagnosis: %1").replace(
+                    "%1", str(e)
+                ),
+            )
 
     def _on_cards_load_status(self, status: str):
         """Update status during async card load"""
