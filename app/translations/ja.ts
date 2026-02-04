@@ -27,138 +27,143 @@
     <context>
         <name>AccountCardListDialog</name>
         <message>
-            <location filename="../dialogs.py" line="966" />
+            <location filename="../dialogs.py" line="955" />
             <source>Accounts owning %1</source>
             <translation>%1 を所有するアカウント</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="986" />
+            <location filename="../dialogs.py" line="975" />
             <source>Showing account distribution for: &lt;b&gt;%1&lt;/b&gt;</source>
             <translation>&lt;b&gt;%1&lt;/b&gt;のアカウント分布を表示しています</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="994" />
+            <location filename="../dialogs.py" line="983" />
             <source>Filter:</source>
             <translation>フィルター：</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="996" />
+            <location filename="../dialogs.py" line="985" />
             <source>Search account name...</source>
             <translation>アカウント名を検索...</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1006" />
+            <location filename="../dialogs.py" line="995" />
             <source>Account Name</source>
             <translation>アカウント名</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1007" />
+            <location filename="../dialogs.py" line="996" />
             <source>Quantity</source>
             <translation>量</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1008" />
+            <location filename="../dialogs.py" line="997" />
             <source>Shinedust</source>
             <translation>シャインダスト</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1009" />
+            <location filename="../dialogs.py" line="998" />
             <source>Age</source>
             <translation>年</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1088" />
-            <location filename="../dialogs.py" line="1010" />
+            <location filename="../dialogs.py" line="1077" />
+            <location filename="../dialogs.py" line="999" />
             <source>Screenshot</source>
             <translation>スクリーンショット</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1011" />
+            <location filename="../dialogs.py" line="1000" />
             <source>Action</source>
             <translation>アクション</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1046" />
+            <location filename="../dialogs.py" line="1035" />
             <source>Copy all to clipboard</source>
             <translation>すべてをクリップボードにコピー</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1079" />
+            <location filename="../dialogs.py" line="1068" />
             <source>%1d</source>
             <translation>1%</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1097" />
+            <location filename="../dialogs.py" line="1086" />
             <source>Remove</source>
             <translation>取り除く</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1299" />
-            <location filename="../dialogs.py" line="1189" />
-            <location filename="../dialogs.py" line="1136" />
-            <location filename="../dialogs.py" line="1116" />
+            <location filename="../dialogs.py" line="1295" />
+            <location filename="../dialogs.py" line="1180" />
+            <location filename="../dialogs.py" line="1125" />
+            <location filename="../dialogs.py" line="1105" />
             <source>Error</source>
             <translation>エラー</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1117" />
+            <location filename="../dialogs.py" line="1106" />
             <source>The screenshot path could not be found:
 %1</source>
             <translation>スクリーンショットのパスが見つかりませんでした: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1136" />
+            <location filename="../dialogs.py" line="1125" />
             <source>Card not found in database.</source>
             <translation>データベースにカードが見つかりません。</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1165" />
-            <location filename="../dialogs.py" line="1146" />
+            <location filename="../dialogs.py" line="1154" />
+            <location filename="../dialogs.py" line="1135" />
             <source>Select Shinedust Cost</source>
             <translation>Shinedustのコストを選択</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1148" />
+            <location filename="../dialogs.py" line="1137" />
             <source>Is this a 4,000 or 10,000 shinedust move for %1?</source>
             <translation>これは %1 の 4,000 シャインダストの移動ですか、それとも 10,000 シャインダストの移動ですか?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1167" />
+            <location filename="../dialogs.py" line="1156" />
             <source>Is this a 25,000 or 30,000 shinedust move for %1?</source>
             <translation>これは %1 の 25,000 または 30,000 シャインダストの移動ですか?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1190" />
+            <location filename="../dialogs.py" line="1181" />
             <source>Account '%1' not found.</source>
             <translation>アカウント &amp;#39;%1&amp;#39; が見つかりません。</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1201" />
+            <location filename="../dialogs.py" line="1194" />
             <source>Insufficient Shinedust</source>
             <translation>シャインダスト不足</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1203" />
+            <location filename="../dialogs.py" line="1196" />
             <source>Account &lt;b&gt;%1&lt;/b&gt; does not have enough shinedust (%2) to perform this action (cost: %3).</source>
             <translation>アカウント&lt;b&gt;%1 には、&lt;/b&gt;このアクションを実行するのに十分なシャインダスト (%2) がありません (コスト: %3)。</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1212" />
+            <location filename="../dialogs.py" line="1205" />
             <source>Remove anyway</source>
             <translation>とにかく削除</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1221" />
+            <location filename="../dialogs.py" line="1214" />
             <source>Remove Card?</source>
             <translation>カードを削除しますか?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1223" />
+            <location filename="../dialogs.py" line="1215" />
+            <source>Unknown</source>
+            <translation>未知</translation>
+        </message>
+        <message>
+            <location filename="../dialogs.py" line="1217" />
             <source>One instance of &lt;b&gt;%1&lt;/b&gt; will be removed from account &lt;b&gt;%2&lt;/b&gt;.&lt;br&gt;&lt;br&gt;This will cost &lt;b&gt;%3&lt;/b&gt; shinedust.&lt;br&gt;&lt;br&gt;If the account has multiples of this same card, only one will be removed.</source>
             <translation>&lt;b&gt;%1&lt;/b&gt;のインスタンス 1 つがアカウント&lt;b&gt;%2&lt;/b&gt;から削除されます。&lt;br&gt;&lt;br&gt;これにはシャインダストが&lt;b&gt;%3&lt;/b&gt;かかります。&lt;br&gt;&lt;br&gt;アカウントに同じカードが複数ある場合は、 1 枚だけが削除されます。</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1300" />
+            <location filename="../dialogs.py" line="1296" />
             <source>Could not find card in database to remove.</source>
             <translation>削除するカードがデータベース内に見つかりませんでした。</translation>
         </message>
@@ -283,22 +288,22 @@
     <context>
         <name>CardArtDownloadWorker</name>
         <message>
-            <location filename="../workers.py" line="407" />
+            <location filename="../workers.py" line="409" />
             <source>Fetching card set list…</source>
             <translation>カードセットリストを取得しています…</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="417" />
+            <location filename="../workers.py" line="419" />
             <source>Failed to fetch set list: %1</source>
             <translation>セットリストの取得に失敗しました: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="424" />
+            <location filename="../workers.py" line="426" />
             <source>No set IDs found on the listing page</source>
             <translation>リストページにセットIDが見つかりません</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="442" />
+            <location filename="../workers.py" line="478" />
             <source>Downloading card art for %1 sets using %2 threads…</source>
             <translation>%2 スレッドを使用して %1 セットのカード アートをダウンロードしています…</translation>
         </message>
@@ -306,22 +311,22 @@
     <context>
         <name>CardDataLoadWorker</name>
         <message>
-            <location filename="../workers.py" line="1279" />
+            <location filename="../workers.py" line="1338" />
             <source>Loading cards from database...</source>
             <translation>データベースからカードを読み込んでいます...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1305" />
+            <location filename="../workers.py" line="1364" />
             <source>Card load cancelled</source>
             <translation>カードの読み込みがキャンセルされました</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1352" />
+            <location filename="../workers.py" line="1448" />
             <source>Loaded %1 cards</source>
             <translation>%1 枚のカードを読み込みました</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1361" />
+            <location filename="../workers.py" line="1457" />
             <source>Card load failed: %1</source>
             <translation>カードの読み込みに失敗しました: %1</translation>
         </message>
@@ -342,7 +347,7 @@
     <context>
         <name>DashboardStatsWorker</name>
         <message>
-            <location filename="../workers.py" line="1514" />
+            <location filename="../workers.py" line="1610" />
             <source>Processed %1 (%2)</source>
             <translation>%1 (%2) を処理済み</translation>
         </message>
@@ -350,32 +355,32 @@
     <context>
         <name>DatabaseBackupWorker</name>
         <message>
-            <location filename="../workers.py" line="1183" />
+            <location filename="../workers.py" line="1242" />
             <source>Starting database backup...</source>
             <translation>データベースのバックアップを開始しています...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1191" />
+            <location filename="../workers.py" line="1250" />
             <source>Source database not found: %1</source>
             <translation>ソースデータベースが見つかりません: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1206" />
+            <location filename="../workers.py" line="1265" />
             <source>Database backup cancelled</source>
             <translation>データベースのバックアップがキャンセルされました</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1215" />
+            <location filename="../workers.py" line="1274" />
             <source>Backup progress: %1%</source>
             <translation>バックアップの進行状況: %1%</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1223" />
+            <location filename="../workers.py" line="1282" />
             <source>Database backup completed successfully</source>
             <translation>データベースのバックアップが正常に完了しました</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="1237" />
+            <location filename="../workers.py" line="1296" />
             <source>Database backup failed: %1</source>
             <translation>データベースのバックアップに失敗しました: %1</translation>
         </message>
@@ -403,642 +408,640 @@
             <translation>画像ファイル:</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="750" />
-            <source>Optional set code (e.g., A4b)</source>
-            <translation>オプションのセットコード（例：A4b）</translation>
-        </message>
-        <message>
-            <location filename="../dialogs.py" line="752" />
-            <source>Force Set:</source>
-            <translation>フォースセット:</translation>
-        </message>
-        <message>
-            <location filename="../dialogs.py" line="759" />
+            <location filename="../dialogs.py" line="751" />
             <source>#</source>
             <translation>#</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="760" />
+            <location filename="../dialogs.py" line="752" />
             <source>Status</source>
             <translation>状態</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="761" />
+            <location filename="../dialogs.py" line="753" />
             <source>Name</source>
             <translation>名前</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="762" />
+            <location filename="../dialogs.py" line="754" />
             <source>ID</source>
             <translation>ID</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="763" />
+            <location filename="../dialogs.py" line="755" />
             <source>Confidence</source>
             <translation>自信</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="781" />
+            <location filename="../dialogs.py" line="773" />
             <source>Run Diagnostics</source>
             <translation>診断を実行する</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="797" />
+            <location filename="../dialogs.py" line="789" />
             <source>Select Image</source>
             <translation>画像を選択</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="799" />
+            <location filename="../dialogs.py" line="791" />
             <source>Image Files (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;All Files (*)</source>
             <translation>画像ファイル (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;すべてのファイル (*)</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="816" />
+            <location filename="../dialogs.py" line="808" />
             <source>Invalid Image</source>
             <translation>無効な画像</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="817" />
+            <location filename="../dialogs.py" line="809" />
             <source>Please select a valid image file.</source>
             <translation>有効な画像ファイルを選択してください。</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="846" />
+            <location filename="../dialogs.py" line="835" />
             <source>Detected %1 cards out of %2 slots</source>
             <translation>%2 スロットから %1 枚のカードが検出されました</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="852" />
+            <location filename="../dialogs.py" line="841" />
             <source>Error: %1</source>
             <translation>エラー: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="855" />
+            <location filename="../dialogs.py" line="844" />
             <source>Diagnosis Error</source>
             <translation>診断エラー</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="856" />
+            <location filename="../dialogs.py" line="845" />
             <source>Failed to diagnose image: %1</source>
             <translation>イメージの診断に失敗しました: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="862" />
+            <location filename="../dialogs.py" line="851" />
             <source>Failed to preprocess screenshot.</source>
             <translation>スクリーンショットの前処理に失敗しました。</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="866" />
+            <location filename="../dialogs.py" line="855" />
             <source>No card positions detected in screenshot.</source>
             <translation>スクリーンショットでカードの位置が検出されませんでした。</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="887" />
-            <location filename="../dialogs.py" line="886" />
+            <location filename="../dialogs.py" line="876" />
+            <location filename="../dialogs.py" line="875" />
             <source>Empty</source>
             <translation>空の</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="899" />
-            <location filename="../dialogs.py" line="894" />
-            <location filename="../dialogs.py" line="893" />
+            <location filename="../dialogs.py" line="888" />
+            <location filename="../dialogs.py" line="883" />
+            <location filename="../dialogs.py" line="882" />
             <source>Unknown</source>
             <translation>未知</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="898" />
+            <location filename="../dialogs.py" line="887" />
             <source>Matched</source>
             <translation>一致した</translation>
+        </message>
+        <message>
+            <source>Optional set code (e.g., A4b)</source>
+            <translation type="vanished">オプションのセットコード（例：A4b）</translation>
+        </message>
+        <message>
+            <source>Force Set:</source>
+            <translation type="vanished">フォースセット:</translation>
         </message>
     </context>
     <context>
         <name>MainWindow</name>
         <message>
-            <location filename="../main_window.py" line="380" />
+            <location filename="../main_window.py" line="471" />
             <source>&amp;File</source>
             <translation>＆ファイル</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="383" />
+            <location filename="../main_window.py" line="474" />
             <source>&amp;Import CSV</source>
             <translation>CSV をインポート(&amp;amp;I)</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="389" />
+            <location filename="../main_window.py" line="480" />
             <source>&amp;Process Screenshots</source>
             <translation>プロセスのスクリーンショット(&amp;amp;P)</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="395" />
+            <location filename="../main_window.py" line="486" />
             <source>&amp;Load New Data</source>
             <translation>新しいデータをロード(&amp;amp;L)</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="401" />
+            <location filename="../main_window.py" line="492" />
             <source>Process &amp;Removed Cards</source>
             <translation>処理および削除されたカード</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="406" />
+            <location filename="../main_window.py" line="497" />
             <source>&amp;Preferences</source>
             <translation>設定(&amp;amp;P)</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="413" />
+            <location filename="../main_window.py" line="504" />
             <source>E&amp;xit</source>
             <translation>出口</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="419" />
+            <location filename="../main_window.py" line="510" />
             <source>&amp;Debug</source>
             <translation>＆デバッグ</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="421" />
+            <location filename="../main_window.py" line="512" />
             <source>&amp;Diagnose Image</source>
             <translation>イメージを診断(&amp;amp;D)</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="427" />
+            <location filename="../main_window.py" line="518" />
             <source>&amp;Help</source>
             <translation>＆ヘルプ</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="430" />
+            <location filename="../main_window.py" line="521" />
             <source>&amp;About</source>
             <translation>＆について</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="464" />
+            <location filename="../main_window.py" line="555" />
             <source>Total Cards: 0</source>
             <translation>カード合計: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="469" />
+            <location filename="../main_window.py" line="560" />
             <source>Total Packs: 0</source>
             <translation>合計パック数: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="474" />
+            <location filename="../main_window.py" line="565" />
             <source>Unique Cards: 0</source>
             <translation>ユニークカード: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="588" />
-            <location filename="../main_window.py" line="479" />
+            <location filename="../main_window.py" line="679" />
+            <location filename="../main_window.py" line="570" />
             <source>Last Processed: Never</source>
             <translation>最終処理日: なし</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="488" />
+            <location filename="../main_window.py" line="579" />
             <source>Import CSV</source>
             <translation>CSVをインポート</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="492" />
+            <location filename="../main_window.py" line="583" />
             <source>Load Screenshots</source>
             <translation>スクリーンショットを読み込む</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1677" />
-            <location filename="../main_window.py" line="1650" />
-            <location filename="../main_window.py" line="496" />
+            <location filename="../main_window.py" line="1810" />
+            <location filename="../main_window.py" line="1783" />
+            <location filename="../main_window.py" line="587" />
             <source>Load New Data</source>
             <translation>新しいデータを読み込む</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="504" />
+            <location filename="../main_window.py" line="595" />
             <source>Recent Activity:</source>
             <translation>最近のアクティビティ:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="509" />
+            <location filename="../main_window.py" line="600" />
             <source>Clear</source>
             <translation>クリア</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="524" />
+            <location filename="../main_window.py" line="615" />
             <source>Dashboard</source>
             <translation>ダッシュボード</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="555" />
+            <location filename="../main_window.py" line="646" />
             <source>Error updating statistics: %1</source>
             <translation>統計の更新中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="563" />
+            <location filename="../main_window.py" line="654" />
             <source>Total Cards: %1</source>
             <translation>カード合計: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="566" />
+            <location filename="../main_window.py" line="657" />
             <source>Unique Cards: %1</source>
             <translation>ユニークカード: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="569" />
+            <location filename="../main_window.py" line="660" />
             <source>Total Packs: %1</source>
             <translation>合計パック数: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="583" />
+            <location filename="../main_window.py" line="674" />
             <source>Last Processed: %1</source>
             <translation>最終処理日: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="592" />
+            <location filename="../main_window.py" line="683" />
             <source>Dashboard statistics updated</source>
             <translation>ダッシュボードの統計情報が更新されました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="707" />
+            <location filename="../main_window.py" line="798" />
             <source>No recent activity</source>
             <translation>最近のアクティビティはありません</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="715" />
+            <location filename="../main_window.py" line="806" />
             <source>Error loading activity</source>
             <translation>アクティビティの読み込み中にエラーが発生しました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1228" />
-            <location filename="../main_window.py" line="1180" />
-            <location filename="../main_window.py" line="1170" />
-            <location filename="../main_window.py" line="727" />
+            <location filename="../main_window.py" line="1319" />
+            <location filename="../main_window.py" line="1271" />
+            <location filename="../main_window.py" line="1261" />
+            <location filename="../main_window.py" line="818" />
             <source>All Sets</source>
             <translation>すべてのセット</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="729" />
+            <location filename="../main_window.py" line="820" />
             <source>Set:</source>
             <translation>セット：</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1235" />
-            <location filename="../main_window.py" line="1205" />
-            <location filename="../main_window.py" line="1193" />
-            <location filename="../main_window.py" line="734" />
+            <location filename="../main_window.py" line="1326" />
+            <location filename="../main_window.py" line="1296" />
+            <location filename="../main_window.py" line="1284" />
+            <location filename="../main_window.py" line="825" />
             <source>All Rarities</source>
             <translation>すべてのレアリティ</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="736" />
+            <location filename="../main_window.py" line="827" />
             <source>Rarity:</source>
             <translation>レア度:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="741" />
+            <location filename="../main_window.py" line="832" />
             <source>Search cards...</source>
             <translation>カードを検索...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="746" />
+            <location filename="../main_window.py" line="837" />
             <source>Refresh</source>
             <translation>リフレッシュ</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="779" />
+            <location filename="../main_window.py" line="870" />
             <source>Cards</source>
             <translation>カード</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="822" />
+            <location filename="../main_window.py" line="913" />
             <source>No active tasks</source>
             <translation>アクティブなタスクはありません</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="832" />
+            <location filename="../main_window.py" line="923" />
             <source>Active Tasks:</source>
             <translation>アクティブなタスク:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="840" />
+            <location filename="../main_window.py" line="931" />
             <source>Task Details:</source>
             <translation>タスクの詳細:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="846" />
+            <location filename="../main_window.py" line="937" />
             <source>Cancel Selected</source>
             <translation>選択をキャンセル</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="850" />
+            <location filename="../main_window.py" line="941" />
             <source>Clear Completed</source>
             <translation>クリア完了</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="857" />
+            <location filename="../main_window.py" line="948" />
             <source>Processing</source>
             <translation>処理</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="877" />
+            <location filename="../main_window.py" line="968" />
             <source>Cancelled</source>
             <translation>キャンセル</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1087" />
+            <location filename="../main_window.py" line="1178" />
             <source>Diagnosis Error</source>
             <translation>診断エラー</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1088" />
+            <location filename="../main_window.py" line="1179" />
             <source>Failed to open image diagnosis: %1</source>
             <translation>画像診断を開けませんでした: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1252" />
+            <location filename="../main_window.py" line="1343" />
             <source>Showing %1 of %2 unique cards</source>
             <translation>%2 枚中 %1 枚のユニークなカードを表示しています</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1260" />
+            <location filename="../main_window.py" line="1351" />
             <source>Error applying filters: %1</source>
             <translation>フィルターの適用中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1334" />
+            <location filename="../main_window.py" line="1425" />
             <source>No Data</source>
             <translation>データなし</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1335" />
+            <location filename="../main_window.py" line="1426" />
             <source>No account distribution found for %1</source>
             <translation>%1 のアカウント配布が見つかりません</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1344" />
+            <location filename="../main_window.py" line="1435" />
             <source>Error</source>
             <translation>エラー</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1345" />
+            <location filename="../main_window.py" line="1436" />
             <source>Could not show account distribution: %1</source>
             <translation>アカウントの分布を表示できませんでした: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1485" />
+            <location filename="../main_window.py" line="1576" />
             <source>DB: Connected</source>
             <translation>DB: 接続済み</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1555" />
+            <location filename="../main_window.py" line="1646" />
             <source>Tasks: %1</source>
             <translation>タスク: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1651" />
+            <location filename="../main_window.py" line="1784" />
             <source>A data import is already in progress. Please wait for it to finish.</source>
             <translation>データのインポートはすでに進行中です。完了するまでお待ちください。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1661" />
+            <location filename="../main_window.py" line="1794" />
             <source>CSV file path is not set.</source>
             <translation>CSV ファイルのパスが設定されていません。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1663" />
+            <location filename="../main_window.py" line="1796" />
             <source>CSV file not found: %1</source>
             <translation>CSVファイルが見つかりません: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1666" />
+            <location filename="../main_window.py" line="1799" />
             <source>Screenshots directory is not set.</source>
             <translation>スクリーンショットディレクトリが設定されていません。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1669" />
+            <location filename="../main_window.py" line="1802" />
             <source>Screenshots directory not found: %1</source>
             <translation>スクリーンショットディレクトリが見つかりません: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1680" />
+            <location filename="../main_window.py" line="1813" />
             <source>Please use the Import CSV or Process Screenshots options to set the correct locations.</source>
             <translation>正しい場所を設定するには、「CSV のインポート」または「スクリーンショットの処理」オプションを使用してください。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1692" />
+            <location filename="../main_window.py" line="1825" />
             <source>Starting data import…</source>
             <translation>データのインポートを開始しています…</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1709" />
+            <location filename="../main_window.py" line="1842" />
             <source>CSV import completed</source>
             <translation>CSVインポートが完了しました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1711" />
+            <location filename="../main_window.py" line="1844" />
             <source>CSV import cancelled</source>
             <translation>CSVインポートがキャンセルされました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1719" />
+            <location filename="../main_window.py" line="1852" />
             <source>Error importing CSV: %1</source>
             <translation>CSV のインポート中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1725" />
+            <location filename="../main_window.py" line="1858" />
             <source>Starting background CSV import...</source>
             <translation>バックグラウンドで CSV インポートを開始しています...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1733" />
+            <location filename="../main_window.py" line="1866" />
             <source>CSV Import: %1</source>
             <translation>CSV インポート: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1772" />
+            <location filename="../main_window.py" line="1905" />
             <source>CSV import started in background</source>
             <translation>CSVインポートがバックグラウンドで開始されました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1777" />
+            <location filename="../main_window.py" line="1910" />
             <source>Error starting CSV import: %1</source>
             <translation>CSV インポートの開始時にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1785" />
+            <location filename="../main_window.py" line="1918" />
             <source>CSV import: %1/%2</source>
             <translation>CSVインポート: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1807" />
+            <location filename="../main_window.py" line="1940" />
             <source>CSV import completed: %1 packs imported</source>
             <translation>CSV インポートが完了しました: %1 パックがインポートされました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1824" />
+            <location filename="../main_window.py" line="1957" />
             <source>Starting screenshot processing from saved directory…</source>
             <translation>保存されたディレクトリからのスクリーンショット処理を開始しています…</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1831" />
+            <location filename="../main_window.py" line="1964" />
             <source>CSV import error: %1</source>
             <translation>CSV インポート エラー: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1842" />
+            <location filename="../main_window.py" line="1975" />
             <source>Combined import stopped due to CSV import error.</source>
             <translation>CSV インポート エラーのため、結合インポートが停止しました。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1849" />
+            <location filename="../main_window.py" line="1982" />
             <source>CSV import finished</source>
             <translation>CSVインポートが完了しました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1881" />
+            <location filename="../main_window.py" line="2014" />
             <source>Combined import stopped: saved screenshots directory is unavailable.</source>
             <translation>結合インポートが停止しました: 保存されたスクリーンショットのディレクトリが利用できません。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1899" />
+            <location filename="../main_window.py" line="2038" />
             <source>Screenshot processing: %1/%2</source>
             <translation>スクリーンショット処理中: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1919" />
+            <location filename="../main_window.py" line="2058" />
             <source>Screenshot processing completed: %1 files processed</source>
             <translation>スクリーンショットの処理が完了しました: %1 個のファイルが処理されました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1934" />
+            <location filename="../main_window.py" line="2073" />
             <source>Data import finished!</source>
             <translation>データのインポートが完了しました。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1959" />
+            <location filename="../main_window.py" line="2098" />
             <source>Screenshot processing error: %1</source>
             <translation>スクリーンショット処理エラー: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1970" />
+            <location filename="../main_window.py" line="2109" />
             <source>Combined import stopped due to screenshot processing error.</source>
             <translation>スクリーンショット処理エラーのため、結合インポートが停止しました。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1977" />
+            <location filename="../main_window.py" line="2116" />
             <source>Screenshot processing finished</source>
             <translation>スクリーンショット処理が完了しました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2010" />
+            <location filename="../main_window.py" line="2149" />
             <source>Missing Screenshot Data</source>
             <translation>スクリーンショットデータが見つかりません</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2011" />
+            <location filename="../main_window.py" line="2150" />
             <source>No screenshot records found in database. Please import a CSV file first (File -&gt; Import CSV) before processing screenshots. Alternatively, go to File -&gt; Preferences and verify all paths are correct.</source>
             <translation>データベースにスクリーンショットの記録が見つかりません。スクリーンショットを処理する前に、まずCSVファイルをインポートしてください（[ファイル] -&amp;gt; [CSVをインポート]）。または、[ファイル] -&amp;gt; [設定] に移動して、すべてのパスが正しいことを確認してください。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2018" />
+            <location filename="../main_window.py" line="2157" />
             <source>Aborted screenshot processing: No screenshot records in database</source>
             <translation>スクリーンショット処理を中止しました: データベースにスクリーンショット記録がありません</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2027" />
+            <location filename="../main_window.py" line="2166" />
             <source>Error checking card count: %1</source>
             <translation>カード数の確認中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2042" />
+            <location filename="../main_window.py" line="2181" />
             <source>Screenshot processing completed</source>
             <translation>スクリーンショット処理が完了しました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2044" />
+            <location filename="../main_window.py" line="2183" />
             <source>Screenshot processing cancelled</source>
             <translation>スクリーンショット処理がキャンセルされました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2052" />
+            <location filename="../main_window.py" line="2191" />
             <source>Error processing screenshots: %1</source>
             <translation>スクリーンショットの処理中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2058" />
+            <location filename="../main_window.py" line="2197" />
             <source>Starting background screenshot processing...</source>
             <translation>バックグラウンドスクリーンショット処理を開始しています...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2067" />
+            <location filename="../main_window.py" line="2206" />
             <source>Screenshot Processing: %1</source>
             <translation>スクリーンショット処理中: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2112" />
+            <location filename="../main_window.py" line="2251" />
             <source>Screenshot processing started in background</source>
             <translation>スクリーンショット処理がバックグラウンドで開始されました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2118" />
+            <location filename="../main_window.py" line="2257" />
             <source>Error starting screenshot processing: %1</source>
             <translation>スクリーンショット処理の開始中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2127" />
+            <location filename="../main_window.py" line="2266" />
             <source>Downloading card art</source>
             <translation>カードアートをダウンロード</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2144" />
+            <location filename="../main_window.py" line="2283" />
             <source>Card art download complete: %1 images saved</source>
             <translation>カードアートのダウンロードが完了しました: %1 枚の画像が保存されました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2151" />
+            <location filename="../main_window.py" line="2290" />
             <source>Card art download complete</source>
             <translation>カードアートのダウンロードが完了しました</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2157" />
+            <location filename="../main_window.py" line="2296" />
             <source>Card art download error: %1</source>
             <translation>カードアートのダウンロードエラー: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2182" />
+            <location filename="../main_window.py" line="2321" />
             <source>Error showing about dialog: %1</source>
             <translation>ダイアログの表示中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2195" />
+            <location filename="../main_window.py" line="2334" />
             <source>Error showing preferences dialog: %1</source>
             <translation>設定ダイアログの表示中にエラーが発生しました: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2333" />
+            <location filename="../main_window.py" line="2356" />
             <source>Closing application. Cleaning up... this may take a moment.</source>
             <translation>アプリケーションを終了しています。クリーンアップ中です。しばらく時間がかかる場合があります。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2430" />
+            <location filename="../main_window.py" line="2444" />
             <source>No Removed Cards</source>
             <translation>除去されたカードはありません</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2430" />
+            <location filename="../main_window.py" line="2444" />
             <source>No cards to process.</source>
             <translation>処理するカードがありません。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2435" />
+            <location filename="../main_window.py" line="2449" />
             <source>Process Removed Cards?</source>
             <translation>削除されたカードを処理しますか?</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2437" />
+            <location filename="../main_window.py" line="2451" />
             <source>This will process &lt;b&gt;%1&lt;/b&gt; recorded card removals from the database.&lt;br&gt;&lt;br&gt;This is useful if you have re-imported screenshots that might have brought back cards you previously removed.</source>
             <translation>これにより、データベースから記録された&lt;b&gt;%1 枚の&lt;/b&gt;カード削除が処理されます。&lt;br&gt;&lt;br&gt;これは、以前削除したカードが戻ってきた可能性があるスクリーンショットを再インポートした場合に便利です。</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2465" />
+            <location filename="../main_window.py" line="2479" />
             <source>Process Complete</source>
             <translation>プロセス完了</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2466" />
+            <location filename="../main_window.py" line="2480" />
             <source>Processed %1 records. %2 cards were actually found and removed.</source>
             <translation>%1 件のレコードを処理しました。実際には %2 枚のカードが見つかり、削除されました。</translation>
         </message>
@@ -1263,92 +1266,92 @@
     <context>
         <name>ScreenshotProcessingWorker</name>
         <message>
-            <location filename="../workers.py" line="622" />
+            <location filename="../workers.py" line="690" />
             <source>Starting screenshot processing...</source>
             <translation>スクリーンショット処理を開始しています...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="630" />
+            <location filename="../workers.py" line="698" />
             <source>Directory not found: %1</source>
             <translation>ディレクトリが見つかりません: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="644" />
+            <location filename="../workers.py" line="712" />
             <source>Scanning directory for images...</source>
             <translation>画像のディレクトリをスキャンしています...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="684" />
+            <location filename="../workers.py" line="752" />
             <source>Scanned %1 files, found %2 new images...</source>
             <translation>%1 個のファイルをスキャンし、%2 個の新しい画像が見つかりました...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="705" />
+            <location filename="../workers.py" line="773" />
             <source>Skipped %1 pre-S4T screenshots (total skipped: %2)</source>
             <translation>S4T 前のスクリーンショットを %1 枚スキップしました (スキップした合計数: %2)</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="717" />
+            <location filename="../workers.py" line="785" />
             <source>All images already processed.</source>
             <translation>すべての画像はすでに処理済みです。</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="732" />
+            <location filename="../workers.py" line="800" />
             <source>All images already processed</source>
             <translation>すべての画像はすでに処理済みです</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="741" />
+            <location filename="../workers.py" line="809" />
             <source>No image files found in directory</source>
             <translation>ディレクトリ内に画像ファイルが見つかりません</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="748" />
+            <location filename="../workers.py" line="816" />
             <source>Found %1 images to process. Loading workers...</source>
             <translation>処理する画像が %1 個見つかりました。ワーカーを読み込んでいます...</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="766" />
+            <location filename="../workers.py" line="834" />
             <source>Loaded %1 card templates</source>
             <translation>%1 個のカード テンプレートを読み込んだ</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="772" />
+            <location filename="../workers.py" line="840" />
             <source>Error: Template directory not found: %1</source>
             <translation>エラー: テンプレートディレクトリが見つかりません: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="778" />
+            <location filename="../workers.py" line="846" />
             <source>Template directory not found: %1</source>
             <translation>テンプレートディレクトリが見つかりません: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="785" />
+            <location filename="../workers.py" line="853" />
             <source>Error: Could not load card templates: %1</source>
             <translation>エラー: カード テンプレートを読み込めませんでした: %1</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="884" />
+            <location filename="../workers.py" line="943" />
             <source>Screenshot processing cancelled</source>
             <translation>スクリーンショット処理がキャンセルされました</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="900" />
+            <location filename="../workers.py" line="959" />
             <source>Critical error processing %1: %2</source>
             <translation>%1 の処理中に重大なエラーが発生しました: %2</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="914" />
+            <location filename="../workers.py" line="973" />
             <source>Processed %1 of %2 images</source>
             <translation>%2 枚中 %1 枚の画像を処理しました</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="932" />
+            <location filename="../workers.py" line="991" />
             <source>Successfully processed %1 screenshots (%2 with results)</source>
             <translation>%1 枚のスクリーンショットを正常に処理しました (結果を含む %2 枚)</translation>
         </message>
         <message>
-            <location filename="../workers.py" line="953" />
+            <location filename="../workers.py" line="1012" />
             <source>Screenshot processing failed: %1</source>
             <translation>スクリーンショット処理に失敗しました: %1</translation>
         </message>
