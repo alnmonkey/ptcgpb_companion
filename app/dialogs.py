@@ -772,9 +772,7 @@ class DiagnoseImageDialog(QDialog):
         self.run_btn = button_box.addButton(
             self.tr("Run Diagnostics"), QDialogButtonBox.ButtonRole.AcceptRole
         )
-        close_btn = button_box.addButton(
-            QDialogButtonBox.StandardButton.Close
-        )
+        close_btn = button_box.addButton(QDialogButtonBox.StandardButton.Close)
 
         self.run_btn.clicked.connect(self._run_diagnosis)
         close_btn.clicked.connect(self.reject)
@@ -825,9 +823,7 @@ class DiagnoseImageDialog(QDialog):
 
             results = processor.process_screenshot(self._image_path)
 
-            empty_flags, _positions = self._get_empty_flags(
-                processor, self._image_path
-            )
+            empty_flags, _positions = self._get_empty_flags(processor, self._image_path)
             cards_by_position = {card.get("position"): card for card in results}
 
             self._populate_results(empty_flags, cards_by_position)
@@ -1174,7 +1170,9 @@ class AccountCardListDialog(QDialog):
                 msg = QMessageBox(self)
                 msg.setWindowTitle(self.tr("Select Shinedust Cost"))
                 msg.setText(self.tr("Was this card shared?"))
-                btn_shared = msg.addButton(self.tr("Shared"), QMessageBox.ButtonRole.ActionRole)
+                btn_shared = msg.addButton(
+                    self.tr("Shared"), QMessageBox.ButtonRole.ActionRole
+                )
                 btn_standard = msg.addButton(
                     f"{standard_cost:,}", QMessageBox.ButtonRole.ActionRole
                 )
@@ -1206,7 +1204,9 @@ class AccountCardListDialog(QDialog):
             cost = 0
 
         try:
-            current_shinedust = int(account.shinedust) if account and account.shinedust else 0
+            current_shinedust = (
+                int(account.shinedust) if account and account.shinedust else 0
+            )
         except (ValueError, TypeError):
             current_shinedust = 0
 
@@ -1233,7 +1233,9 @@ class AccountCardListDialog(QDialog):
 
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle(self.tr("Remove Card?"))
-        account_display = account_name if account_name is not None else self.tr("Unknown")
+        account_display = (
+            account_name if account_name is not None else self.tr("Unknown")
+        )
         msg_box.setText(
             self.tr(
                 "One instance of <b>%1</b> will be removed from account <b>%2</b>.<br><br>"

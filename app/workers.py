@@ -504,7 +504,9 @@ class CardArtDownloadWorker(QRunnable):
 
                 def has_existing_file(card_code: str) -> bool:
                     for ext in allowed_extensions:
-                        if os.path.exists(os.path.join(dest_root, set_id, f"{card_code}{ext}")):
+                        if os.path.exists(
+                            os.path.join(dest_root, set_id, f"{card_code}{ext}")
+                        ):
                             return True
                     return False
 
@@ -1140,12 +1142,18 @@ class ScreenshotProcessingWorker(QRunnable):
                         # Extract card code if available
                         card_obj_meta = card_data.get("obj")
                         if not card_obj_meta:
-                            logger.warning(f"Card data missing 'obj' field: {card_data}")
+                            logger.warning(
+                                f"Card data missing 'obj' field: {card_data}"
+                            )
                             continue
 
                         card_code = card_obj_meta.id
                         card_name = card_obj_meta.name
-                        card_set = card_obj_meta.set_id.value if hasattr(card_obj_meta.set_id, 'value') else str(card_obj_meta.set_id)
+                        card_set = (
+                            card_obj_meta.set_id.value
+                            if hasattr(card_obj_meta.set_id, "value")
+                            else str(card_obj_meta.set_id)
+                        )
                         rarity = card_obj_meta.rarity
 
                         # Try to extract card number from code for better image path
@@ -1175,7 +1183,10 @@ class ScreenshotProcessingWorker(QRunnable):
                             if card_obj.rarity == "1D" and rarity != "1D":
                                 card_obj.rarity = rarity
                                 needs_save = True
-                            if card_obj.name == card_obj.code and card_name != card_obj.code:
+                            if (
+                                card_obj.name == card_obj.code
+                                and card_name != card_obj.code
+                            ):
                                 card_obj.name = card_name
                                 needs_save = True
                             if needs_save:
@@ -1634,9 +1645,7 @@ class UpdateDownloadWorker(QRunnable):
             with zipfile.ZipFile(zip_path, "r") as zip_file:
                 zip_file.extractall(extract_dir)
 
-            self.signals.result.emit(
-                {"extract_dir": extract_dir, "temp_dir": temp_dir}
-            )
+            self.signals.result.emit({"extract_dir": extract_dir, "temp_dir": temp_dir})
         except Exception as e:
             self.logger.error(f"Error downloading update: {e}")
             self.signals.error.emit(

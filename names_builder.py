@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from collections.abc import Callable
 
-
 # Turn off bytecode generation
 sys.dont_write_bytecode = True
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
@@ -46,7 +45,9 @@ for count, s in enumerate(sets):
 cards = []
 card_set_map = CardSet.set_map()
 
-set2factory: Callable[[CardSet], str] = lambda s_id: s_id.label.lower().replace(" ", "_").replace("-", "_")
+set2factory: Callable[[CardSet], str] = (
+    lambda s_id: s_id.label.lower().replace(" ", "_").replace("-", "_")
+)
 
 for set_id in sets:
     set_cards = [c for c in data if c["set"] == set_id]
@@ -57,7 +58,7 @@ for set_id in sets:
                 card_set_map[set_id],
                 card["number"],
                 card_name,
-                rarity[card['rarity']],
+                rarity[card["rarity"]],
             )
         )
 
@@ -94,5 +95,7 @@ for key in cards:
     )
 card_lines.append("]\n")
 
-updated_lines = names_lines[: start_index + 1] + card_lines + names_lines[end_index + 1 :]
+updated_lines = (
+    names_lines[: start_index + 1] + card_lines + names_lines[end_index + 1 :]
+)
 names_path.write_text("".join(updated_lines), encoding="utf-8")

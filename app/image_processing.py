@@ -4,6 +4,7 @@ Card Counter Image Processing Module
 Image processing functionality for the Card Counter application.
 This module provides card identification from screenshots using OpenCV.
 """
+
 import typing
 
 import cv2
@@ -160,7 +161,6 @@ class ImageProcessor:
         mapping_key = f"{set_name}_{card_name}"
 
         return self.card_names[mapping_key]
-
 
     def _load_and_preprocess_card(self, card_path: str) -> np.ndarray:
         """Load and preprocess a single card image at full resolution"""
@@ -348,9 +348,7 @@ class ImageProcessor:
                 excluded_sets.append("A4b")
 
             if forced_set:
-                logger.debug(
-                    f"Four-card pack detected, forcing set to {forced_set}"
-                )
+                logger.debug(f"Four-card pack detected, forcing set to {forced_set}")
             if excluded_sets:
                 logger.debug(
                     f"{num_cards}-card pack detected, excluding sets: {excluded_sets}"
@@ -410,35 +408,50 @@ class ImageProcessor:
                 for card in detected_cards:
                     card_set = card["obj"].set_id
                     set_counts[card_set] = set_counts.get(card_set, 0) + 1
-                
+
                 # Find the dominant set (most common)
                 dominant_set = max(set_counts, key=set_counts.get)
                 dominant_count = set_counts[dominant_set]
-                
-                logger.debug(f"Dominant set: {dominant_set} with {dominant_count} cards")
+
+                logger.debug(
+                    f"Dominant set: {dominant_set} with {dominant_count} cards"
+                )
                 logger.debug(f"Set distribution: {set_counts}")
-                
+
                 # If there are outliers (cards from different sets), re-evaluate them
-                outliers = [card for card in detected_cards if card["obj"].set_id != dominant_set]
-                
+                outliers = [
+                    card
+                    for card in detected_cards
+                    if card["obj"].set_id != dominant_set
+                ]
+
                 if outliers:
-                    logger.debug(f"Found {len(outliers)} outlier(s) not matching dominant set {dominant_set}")
-                    
+                    logger.debug(
+                        f"Found {len(outliers)} outlier(s) not matching dominant set {dominant_set}"
+                    )
+
                     # Re-evaluate each outlier by forcing search to dominant set
                     for outlier in outliers:
                         pos = outlier["position"]
-                        x, y, w, h = outlier["x"], outlier["y"], outlier["width"], outlier["height"]
+                        x, y, w, h = (
+                            outlier["x"],
+                            outlier["y"],
+                            outlier["width"],
+                            outlier["height"],
+                        )
                         card_region = screenshot[y : y + h, x : x + w]
-                        
-                        logger.debug(f"Re-evaluating card at position {pos} (was {outlier['obj'].id}, forcing to {dominant_set})")
-                        
+
+                        logger.debug(
+                            f"Re-evaluating card at position {pos} (was {outlier['obj'].id}, forcing to {dominant_set})"
+                        )
+
                         # Re-match with forced set
                         best_match = self._find_best_card_match(
                             card_region,
                             force_detailed=True,
                             force_set=dominant_set,
                         )
-                        
+
                         if best_match and best_match["confidence"] > 0.5:
                             card_obj: C = self._get_card_obj(
                                 best_match["card_name"], best_match["card_set"]
@@ -446,7 +459,7 @@ class ImageProcessor:
                             logger.debug(
                                 f"Re-evaluated card {pos}: {card_obj.name} (confidence: {best_match['confidence']:.2f})"
                             )
-                            
+
                             # Update the card in detected_cards
                             for i, card in enumerate(detected_cards):
                                 if card["position"] == pos:
@@ -630,10 +643,14 @@ class ImageProcessor:
 
         # Filter indices based on force_set or exclude_sets
         if force_set:
-            indices = [i for i, m in enumerate(self.phash_metadata) if m[0] == force_set]
+            indices = [
+                i for i, m in enumerate(self.phash_metadata) if m[0] == force_set
+            ]
         elif exclude_sets:
             exclude_set = set(exclude_sets)
-            indices = [i for i, m in enumerate(self.phash_metadata) if m[0] not in exclude_set]
+            indices = [
+                i for i, m in enumerate(self.phash_metadata) if m[0] not in exclude_set
+            ]
         else:
             indices = list(range(len(self.phash_metadata)))
 
@@ -715,7 +732,9 @@ class ImageProcessor:
             if best_set_hybrid > best_hybrid_score + 0.005:
                 is_better = True
             elif abs(best_set_hybrid - best_hybrid_score) <= 0.005:
-                if search_set == best_set_name and (best_match is None or best_match["card_set"] != best_set_name):
+                if search_set == best_set_name and (
+                    best_match is None or best_match["card_set"] != best_set_name
+                ):
                     is_better = True
                 elif best_match and search_set == best_match.get("card_set"):
                     if float(corr_scores[best_idx]) > best_match.get("corr_score", 0):

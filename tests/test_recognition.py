@@ -34,20 +34,138 @@ TEST_IMAGE_DIR = Path(__file__).resolve().parent / "test_images"
 TEMPLATE_DIR = BASE_DIR / "resources" / "card_imgs"
 
 cards_to_test = [
-    CardImg("img.png", CardSet.DELUXE_PACK_EX, d['A4b_249'], d['A4b_27'], d['A4b_273'], d['A4b_232'], None, None),
-    CardImg("img_1.png", CardSet.DELUXE_PACK_EX, d['A4b_320'], d['A4b_206'], d['A4b_203'], d['A4b_160'], None, None),
-    CardImg("img_2.png", CardSet.FANTASTICAL_PARADE, d['B2_71'], d['B2_144'], d['B2_84'], d['B2_111'], d['B2_80'], d['B2_223']),
-    CardImg("img_3.png", CardSet.MEGA_RISING, d['B1_42'], d['B1_44'], d['B1_178'], d['B1_161'], d['B1_163'], d["B1_287"]),
-    CardImg("img_4.png", CardSet.CRIMSON_BLAZE, d['B1a_28'], d['B1a_17'], d['B1a_28'], d['B1a_18'], d['B1a_85'], None),
-    CardImg("charizard.png", CardSet.SHINING_REVELRY, d['A2b_60'], d['A2b_49'], d['A2b_59'], d['A2b_4'], d['A2b_80'], None),
-    CardImg("charizard_shiny.png", CardSet.SHINING_REVELRY, d['A2b_45'], d['A2b_23'], d['A2b_34'], d['A2b_37'], d['A2b_108'], None),
-    CardImg("wugtrio.png", CardSet.SHINING_REVELRY, d['A2b_37'], d['A2b_1'], d['A2b_81'], d['A2b_50'], d['A2b_49'], None),
-    CardImg("wugtrio_shiny.png", CardSet.SHINING_REVELRY, d['A2b_18'], d['A2b_66'], d['A2b_41'], d['A2b_53'], d['A2b_109'], None),
-    CardImg("img_5.png", CardSet.EXTRADIMENSIONAL_CRISIS, d['A3a_32'], d['A3a_26'], d['A3a_32'], d['A3a_23'], d['A3a_100'], None),
-    CardImg("img_6.png", CardSet.SHINING_REVELRY, d['A2b_66'], d['A2b_6'], d['A2b_64'], d['A2b_41'], d['A2b_57'], None),
-    CardImg("img_7.png", CardSet.GENETIC_APEX, d['A1_172'], d['A1_174'], d['A1_179'], d['A1_175'], d['A1_129'], None),
-    CardImg("img_8.png", CardSet.FANTASTICAL_PARADE, d['B2_40'], d['B2_38'], d['B2_121'], d['B2_152'], d['B2_138'], None),
+    CardImg(
+        "img.png",
+        CardSet.DELUXE_PACK_EX,
+        d["A4b_249"],
+        d["A4b_27"],
+        d["A4b_273"],
+        d["A4b_232"],
+        None,
+        None,
+    ),
+    CardImg(
+        "img_1.png",
+        CardSet.DELUXE_PACK_EX,
+        d["A4b_320"],
+        d["A4b_206"],
+        d["A4b_203"],
+        d["A4b_160"],
+        None,
+        None,
+    ),
+    CardImg(
+        "img_2.png",
+        CardSet.FANTASTICAL_PARADE,
+        d["B2_71"],
+        d["B2_144"],
+        d["B2_84"],
+        d["B2_111"],
+        d["B2_80"],
+        d["B2_223"],
+    ),
+    CardImg(
+        "img_3.png",
+        CardSet.MEGA_RISING,
+        d["B1_42"],
+        d["B1_44"],
+        d["B1_178"],
+        d["B1_161"],
+        d["B1_163"],
+        d["B1_287"],
+    ),
+    CardImg(
+        "img_4.png",
+        CardSet.CRIMSON_BLAZE,
+        d["B1a_28"],
+        d["B1a_17"],
+        d["B1a_28"],
+        d["B1a_18"],
+        d["B1a_85"],
+        None,
+    ),
+    CardImg(
+        "charizard.png",
+        CardSet.SHINING_REVELRY,
+        d["A2b_60"],
+        d["A2b_49"],
+        d["A2b_59"],
+        d["A2b_4"],
+        d["A2b_80"],
+        None,
+    ),
+    CardImg(
+        "charizard_shiny.png",
+        CardSet.SHINING_REVELRY,
+        d["A2b_45"],
+        d["A2b_23"],
+        d["A2b_34"],
+        d["A2b_37"],
+        d["A2b_108"],
+        None,
+    ),
+    CardImg(
+        "wugtrio.png",
+        CardSet.SHINING_REVELRY,
+        d["A2b_37"],
+        d["A2b_1"],
+        d["A2b_81"],
+        d["A2b_50"],
+        d["A2b_49"],
+        None,
+    ),
+    CardImg(
+        "wugtrio_shiny.png",
+        CardSet.SHINING_REVELRY,
+        d["A2b_18"],
+        d["A2b_66"],
+        d["A2b_41"],
+        d["A2b_53"],
+        d["A2b_109"],
+        None,
+    ),
+    CardImg(
+        "img_5.png",
+        CardSet.EXTRADIMENSIONAL_CRISIS,
+        d["A3a_32"],
+        d["A3a_26"],
+        d["A3a_32"],
+        d["A3a_23"],
+        d["A3a_100"],
+        None,
+    ),
+    CardImg(
+        "img_6.png",
+        CardSet.SHINING_REVELRY,
+        d["A2b_66"],
+        d["A2b_6"],
+        d["A2b_64"],
+        d["A2b_41"],
+        d["A2b_57"],
+        None,
+    ),
+    CardImg(
+        "img_7.png",
+        CardSet.GENETIC_APEX,
+        d["A1_172"],
+        d["A1_174"],
+        d["A1_179"],
+        d["A1_175"],
+        d["A1_129"],
+        None,
+    ),
+    CardImg(
+        "img_8.png",
+        CardSet.FANTASTICAL_PARADE,
+        d["B2_40"],
+        d["B2_38"],
+        d["B2_121"],
+        d["B2_152"],
+        d["B2_138"],
+        None,
+    ),
 ]
+
 
 @pytest.fixture(scope="session")
 def processor():
@@ -80,15 +198,17 @@ def test_recognition(processor, card_img):
         assert not is_empty, f"Empty slot {index} for {card_img.path}"
         card = cards_by_position.get(index)
 
-        assert card is not None, f"Missing card match for slot {index} for {card_img.path}"
+        assert (
+            card is not None
+        ), f"Missing card match for slot {index} for {card_img.path}"
 
         card_obj = card.get("obj")
         assert (
             card_obj.set_id == expected_card.set_id
         ), f"Card {expected_card.id} set mismatch: expected {expected_card.set_id}, got {card_obj.set_id} for {card_img.path}"
 
-        assert (
-            card_obj.id == str(expected_card.id)
+        assert card_obj.id == str(
+            expected_card.id
         ), f"Card {expected_card.id} misidentified as {card_obj.id} for {card_img.path}"
 
 

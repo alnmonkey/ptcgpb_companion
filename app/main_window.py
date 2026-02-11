@@ -223,8 +223,7 @@ class MainWindow(QMainWindow):
                     existing_sets = [
                         d
                         for d in os.listdir(template_dir)
-                        if os.path.isdir(template_dir / d)
-                        and not d.startswith("P-")
+                        if os.path.isdir(template_dir / d) and not d.startswith("P-")
                     ]
                     missing_sets = [
                         sid for sid in online_set_ids if sid not in existing_sets
@@ -239,9 +238,7 @@ class MainWindow(QMainWindow):
                     all_cards = [code for code, _, _ in dex.items()]
                     for set_id in existing_sets:
                         expected_codes = [
-                            code
-                            for code in all_cards
-                            if code.startswith(f"{set_id}_")
+                            code for code in all_cards if code.startswith(f"{set_id}_")
                         ]
                         if not expected_codes:
                             continue
@@ -269,9 +266,11 @@ class MainWindow(QMainWindow):
                             "Detected missing card art (sets: %s, cards: %s)"
                             % (
                                 ", ".join(missing_sets) if missing_sets else "none",
-                                ", ".join(missing_cards_by_set.keys())
-                                if missing_cards_by_set
-                                else "none",
+                                (
+                                    ", ".join(missing_cards_by_set.keys())
+                                    if missing_cards_by_set
+                                    else "none"
+                                ),
                             )
                         )
 
@@ -310,15 +309,15 @@ class MainWindow(QMainWindow):
                         total_missing_cards = sum(
                             len(numbers) for numbers in missing_cards_by_set.values()
                         )
-                        task_label = f"Card Art Download ({len(set_ids_to_download)} sets)"
+                        task_label = (
+                            f"Card Art Download ({len(set_ids_to_download)} sets)"
+                        )
                         if total_missing_cards:
                             task_label = (
                                 f"Card Art Download ({len(set_ids_to_download)} sets, "
                                 f"{total_missing_cards} cards)"
                             )
-                        self._add_processing_task(
-                            task_id, task_label
-                        )
+                        self._add_processing_task(task_id, task_label)
 
                         worker = CardArtDownloadWorker(
                             set_ids=set_ids_to_download,
@@ -542,7 +541,14 @@ class MainWindow(QMainWindow):
         self._update_status_message(status)
 
     def _on_update_download_progress(self, current: int, total: int):
-        self._update_progress(current, total, self.tr("Downloading update..."))
+        if current % 5 == 0:
+            self._update_progress(
+                current,
+                total,
+                self.tr("Downloading update... %1/%2")
+                .replace("%1", str(current))
+                .replace("%2", str(total)),
+            )
 
     def _on_update_download_result(self, result: dict):
         try:
@@ -587,18 +593,18 @@ class MainWindow(QMainWindow):
             "@echo off",
             "setlocal",
             f"set PID={os.getpid()}",
-            f"set SRC_INTERNAL=\"{internal_src}\"",
-            f"set SRC_EXE=\"{exe_src}\"",
-            f"set TARGET_INTERNAL=\"{internal_target}\"",
-            f"set TARGET_EXE=\"{exe_target}\"",
+            f'set SRC_INTERNAL="{internal_src}"',
+            f'set SRC_EXE="{exe_src}"',
+            f'set TARGET_INTERNAL="{internal_target}"',
+            f'set TARGET_EXE="{exe_target}"',
             "timeout /T 1 /NOBREAK >nul",
             "taskkill /PID %PID% /F >nul 2>&1",
             ":waitloop",
-            "tasklist /FI \"PID eq %PID%\" | find \"%PID%\" >nul",
+            'tasklist /FI "PID eq %PID%" | find "%PID%" >nul',
             "if not errorlevel 1 (timeout /T 1 /NOBREAK >nul & goto waitloop)",
             "robocopy %SRC_INTERNAL% %TARGET_INTERNAL% /E /R:2 /W:1 >nul",
             "copy /Y %SRC_EXE% %TARGET_EXE% >nul",
-            "start \"\" %TARGET_EXE%",
+            'start "" %TARGET_EXE%',
             "endlocal",
         ]
 
@@ -663,7 +669,6 @@ class MainWindow(QMainWindow):
         diagnose_image = QAction(self.tr("&Diagnose Image"), self)
         diagnose_image.triggered.connect(self._on_diagnose_image)
         debug_menu.addAction(diagnose_image)
-
 
         # Help menu
         help_menu = menu_bar.addMenu(self.tr("&Help"))
@@ -1327,9 +1332,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(
                 self,
                 self.tr("Diagnosis Error"),
-                self.tr("Failed to open image diagnosis: %1").replace(
-                    "%1", str(e)
-                ),
+                self.tr("Failed to open image diagnosis: %1").replace("%1", str(e)),
             )
 
     def _on_cards_load_status(self, status: str):

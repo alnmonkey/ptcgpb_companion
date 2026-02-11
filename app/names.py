@@ -13,6 +13,7 @@ SHINEDUST_REQUIREMENTS = {
     "2SS": 30_000,
 }
 
+
 @dataclass
 class C:
     set_id: S
@@ -25,7 +26,9 @@ class C:
         return f"{self.set_id.value}_{str(self.number)}"
 
 
-set_builder = lambda set_id: lambda c, n, r: C(set_id=set_id, number=c, name=n, rarity=r)
+set_builder = lambda set_id: lambda c, n, r: C(
+    set_id=set_id, number=c, name=n, rarity=r
+)
 
 genetic_apex = set_builder(S.GENETIC_APEX)
 mythical_island = set_builder(S.MYTHICAL_ISLAND)
@@ -2674,6 +2677,7 @@ _cards = [
     fantastical_parade(234, "Protective Poncho", Card.Rarity.CROWN_RARE),
 ]
 
+
 class Dex:
     cards = _cards
 
@@ -2681,12 +2685,18 @@ class Dex:
         return self.get_by_id(item)
 
     def get_by_id(self, card_id: str):
-        pieces = card_id.split('_')
+        pieces = card_id.split("_")
         if len(pieces) == 2:
             set_id, number = pieces
         else:
             set_id, number = pieces[-2:]
-        return next(filter(lambda card: card.set_id == set_id and card.number == int(number), self.cards), None)
+        return next(
+            filter(
+                lambda card: card.set_id == set_id and card.number == int(number),
+                self.cards,
+            ),
+            None,
+        )
 
     def get_by_set(self, set_id: str):
         return list(filter(lambda card: card.set_id == set_id, self.cards))
