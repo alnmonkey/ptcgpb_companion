@@ -164,6 +164,36 @@ cards_to_test = [
         d["B2_138"],
         None,
     ),
+    # CardImg(
+    #     "img_9.png",
+    #     CardSet.MEGA_RISING,
+    #     d["B1_77"],
+    #     d["B1_181"],
+    #     d["B1_261"],
+    #     d["B1_111"],
+    #     d["B1_148"],
+    #     d["B1_303"],
+    # ),
+    CardImg(
+        "img_10.png",
+        CardSet.MEGA_RISING,
+        d["B1_187"],
+        d["B1_68"],
+        d["B1_19"],
+        d["B1_75"],
+        d["B1_264"],
+        None,
+    ),
+    CardImg(
+        "img_11.png",
+        CardSet.MEGA_RISING,
+        d["B1_89"],
+        d["B1_77"],
+        d["B1_110"],
+        d["B1_199"],
+        d["B1_67"],
+        None,
+    ),
 ]
 
 

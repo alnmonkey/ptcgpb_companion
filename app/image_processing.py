@@ -409,14 +409,76 @@ class ImageProcessor:
                     card_set = card["obj"].set_id
                     set_counts[card_set] = set_counts.get(card_set, 0) + 1
 
-                # Find the dominant set (most common)
-                dominant_set = max(set_counts, key=set_counts.get)
-                dominant_count = set_counts[dominant_set]
+                # Find the sets with the maximum count
+                max_count = max(set_counts.values())
+                top_sets = [s for s, count in set_counts.items() if count == max_count]
 
-                logger.debug(
-                    f"Dominant set: {dominant_set} with {dominant_count} cards"
-                )
-                logger.debug(f"Set distribution: {set_counts}")
+                # A clear winner exists if there's only one top set and it has more than half of the cards
+                is_clear_winner = len(top_sets) == 1 and max_count > len(detected_cards) / 2
+
+                if not is_clear_winner and len(set_counts) > 1:
+                    logger.debug(
+                        f"No clear winner among {list(set_counts.keys())}. Evaluating confidence..."
+                    )
+                    best_set = top_sets[0]
+                    max_total_confidence = -1
+                    best_set_matches = {}
+
+                    for candidate_set in set_counts.keys():
+                        total_confidence = 0
+                        current_matches = {}
+                        for card in detected_cards:
+                            # Re-match with forced set to get confidence for this specific set
+                            # We do this for all cards to be sure we have the best match within this set
+                            x, y, w, h = (
+                                card["x"],
+                                card["y"],
+                                card["width"],
+                                card["height"],
+                            )
+                            card_region = screenshot[y : y + h, x : x + w]
+                            match = self._find_best_card_match(
+                                card_region,
+                                force_detailed=True,
+                                force_set=candidate_set,
+                            )
+                            if match:
+                                total_confidence += match["confidence"]
+                                current_matches[card["position"]] = match
+
+                        logger.debug(
+                            f"Set {candidate_set} total confidence: {total_confidence:.4f}"
+                        )
+                        if total_confidence > max_total_confidence:
+                            max_total_confidence = total_confidence
+                            best_set = candidate_set
+                            best_set_matches = current_matches
+
+                    dominant_set = best_set
+                    # Update detected_cards with the best matches found for the dominant set
+                    for i, card in enumerate(detected_cards):
+                        pos = card["position"]
+                        if pos in best_set_matches:
+                            match = best_set_matches[pos]
+                            card_obj = self._get_card_obj(
+                                match["card_name"], match["card_set"]
+                            )
+                            detected_cards[i] = {
+                                "position": pos,
+                                "obj": card_obj,
+                                "confidence": match["confidence"],
+                                "x": card["x"],
+                                "y": card["y"],
+                                "width": card["width"],
+                                "height": card["height"],
+                            }
+                    dominant_count = len(detected_cards)
+                else:
+                    dominant_set = top_sets[0]
+                    dominant_count = max_count
+
+                print(f"Dominant set: {dominant_set} with {dominant_count} cards")
+                print(f"Set distribution: {set_counts}")
 
                 # If there are outliers (cards from different sets), re-evaluate them
                 outliers = [
@@ -426,7 +488,7 @@ class ImageProcessor:
                 ]
 
                 if outliers:
-                    logger.debug(
+                    print(
                         f"Found {len(outliers)} outlier(s) not matching dominant set {dominant_set}"
                     )
 
@@ -441,7 +503,7 @@ class ImageProcessor:
                         )
                         card_region = screenshot[y : y + h, x : x + w]
 
-                        logger.debug(
+                        print(
                             f"Re-evaluating card at position {pos} (was {outlier['obj'].id}, forcing to {dominant_set})"
                         )
 
@@ -452,11 +514,11 @@ class ImageProcessor:
                             force_set=dominant_set,
                         )
 
-                        if best_match and best_match["confidence"] > 0.5:
+                        if best_match and best_match["confidence"] > 0.6:
                             card_obj: C = self._get_card_obj(
                                 best_match["card_name"], best_match["card_set"]
                             )
-                            logger.debug(
+                            print(
                                 f"Re-evaluated card {pos}: {card_obj.name} (confidence: {best_match['confidence']:.2f})"
                             )
 
@@ -476,7 +538,7 @@ class ImageProcessor:
                         else:
                             logger.debug(f"Re-evaluation failed for position {pos}")
 
-            logger.debug(f"Found {len(detected_cards)} cards in {image_path}")
+            print(f"Found {len(detected_cards)} cards in {image_path}")
             return detected_cards
 
         except Exception as e:
@@ -626,9 +688,6 @@ class ImageProcessor:
         Returns:
             Dict: Best match result with card_name, card_set, and confidence
         """
-        best_match = None
-        best_score = -1
-
         # Multi-stage matching for better performance:
         # 1. Quick search using pHash and Hamming distance to identify likely sets
         # 2. Detailed search at full resolution within the candidate sets
