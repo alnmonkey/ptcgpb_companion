@@ -206,6 +206,7 @@ class MainWindow(QMainWindow):
                 # Mark task running and update dashboard counters
                 self._update_task_status(task_id, "Running")
                 self._request_dashboard_update()
+                return
             else:
                 # Check for missing sets among existing folders
                 try:
@@ -217,6 +218,13 @@ class MainWindow(QMainWindow):
                     ]
 
                     if not online_set_ids:
+                        # No online sets found, but we should still fix rarities
+                        try:
+                            from app.db.models import fix_missing_rarities
+
+                            fix_missing_rarities(logger)
+                        except Exception as e:
+                            logger.error(f"Error during missing rarity fix: {e}")
                         return
 
                     # Find sets that don't have a folder yet
@@ -350,8 +358,23 @@ class MainWindow(QMainWindow):
                         self.thread_pool.start(worker)
                         self._update_task_status(task_id, "Running")
                         self._request_dashboard_update()
+                    else:
+                        # No missing art, so we can run the rarity fix now
+                        try:
+                            from app.db.models import fix_missing_rarities
+
+                            fix_missing_rarities(logger)
+                        except Exception as e:
+                            logger.error(f"Error during missing rarity fix: {e}")
                 except Exception as e:
                     logger.warning(f"Could not check for missing card art sets: {e}")
+                    # Even if we couldn't check, try to fix rarities
+                    try:
+                        from app.db.models import fix_missing_rarities
+
+                        fix_missing_rarities(logger)
+                    except Exception as e2:
+                        logger.error(f"Error during missing rarity fix: {e2}")
         except Exception as e:
             logger.error(f"Failed to start art download worker: {e}")
             self._update_status_message(f"Failed to start art download: {e}")
@@ -2464,6 +2487,15 @@ class MainWindow(QMainWindow):
                 self.active_workers.pop()
         except Exception:
             pass
+
+        # Check for cards with missing rarity and fix them
+        try:
+            from app.db.models import fix_missing_rarities
+
+            fix_missing_rarities(logger)
+        except Exception as e:
+            logger.error(f"Error during missing rarity fix: {e}")
+
         # Ensure progress cleared and task counter refreshed
         if task_id:
             self._update_task_status()  # refresh counter

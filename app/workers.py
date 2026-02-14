@@ -486,8 +486,6 @@ class CardArtDownloadWorker(QRunnable):
             def download_set(set_id: str) -> int:
                 from app.db.models import Card
 
-                RARITY_MAP = dict(zip(Card.Rarity.values, Card.Rarity.labels))
-
                 # Use a child logger that includes the thread name
                 logger = self.logger.getChild(threading.current_thread().name)
 

@@ -112,6 +112,36 @@ def fix_code_named_cards(logger=None):
     return fixed_count
 
 
+def fix_missing_rarities(logger=None):
+    if logger is None:
+        logger = logging.getLogger(__name__)
+
+    from app.names import Dex
+
+    dex = Dex()
+
+    cards_missing_rarity = Card.objects.filter(rarity__isnull=True)
+    if not cards_missing_rarity.exists():
+        return 0
+
+    logger.info(
+        f"Fixing {cards_missing_rarity.count()} card records with missing rarity..."
+    )
+    fixed_count = 0
+    for card in cards_missing_rarity:
+        dex_card = dex[card.code]
+        if not dex_card:
+            continue
+
+        card.rarity = dex_card.rarity
+        card.save()
+        fixed_count += 1
+
+    if fixed_count:
+        logger.info(f"Updated {fixed_count} card rarities from names.py.")
+    return fixed_count
+
+
 class Screenshot(models.Model):
     timestamp = models.CharField(max_length=255, null=True, blank=True)
     account = models.ForeignKey(
