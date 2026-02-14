@@ -402,8 +402,6 @@ class CardArtDownloadWorker(QRunnable):
 
             dex = Dex()
 
-            rarity = dict(zip(Card.Rarity.values, Card.Rarity.labels))
-
             if self.set_ids:
                 set_ids = self.set_ids
             else:
@@ -555,18 +553,10 @@ class CardArtDownloadWorker(QRunnable):
                             f.write(content)
 
                         card_code = f"{set_id}_{card_num}"
-                        raw_name = dex.get(card_code, card_code).name
+                        dex_card = dex.get(card_code, None)
 
-                        display_name = raw_name
-                        display_rarity = None
-
-                        # Match rarity from name, e.g. "Bulbasaur (1D)"
-                        rarity_match = re.search(r"\s*\(([^)]+)\)$", raw_name)
-                        if rarity_match:
-                            rarity_code = rarity_match.group(1)
-                            display_name = raw_name[: rarity_match.start()].strip()
-                            if rarity_code in RARITY_MAP:
-                                display_rarity = rarity_code
+                        display_name = dex_card.name
+                        display_rarity = dex_card.rarity
 
                         try:
                             valid_set = CardSet(set_id)
@@ -1062,8 +1052,16 @@ class ScreenshotProcessingWorker(QRunnable):
             # Count occurrences of each set code
             set_counts = {}
             for card in cards_found:
-                set_code = card.get("card_set")
-                if set_code:
+                card_obj = card.get("obj")
+                if card_obj and hasattr(card_obj, "set_id"):
+                    set_code = (
+                        card_obj.set_id.value
+                        if hasattr(card_obj.set_id, "value")
+                        else str(card_obj.set_id)
+                    )
+                    set_counts[set_code] = set_counts.get(set_code, 0) + 1
+                elif "card_set" in card:
+                    set_code = card.get("card_set")
                     set_counts[set_code] = set_counts.get(set_code, 0) + 1
 
             if not set_counts:
@@ -1071,9 +1069,7 @@ class ScreenshotProcessingWorker(QRunnable):
 
             # Get the most common set code
             dominant_set_code = max(set_counts, key=set_counts.get)
-
-            # Map set code to name
-            return sets.get(dominant_set_code, dominant_set_code)
+            return dominant_set_code
         except Exception as e:
             logger.error(f"Error identifying set: {e}")
             return "Unknown"
@@ -1115,14 +1111,21 @@ class ScreenshotProcessingWorker(QRunnable):
                     created = False
 
                     if not screenshot_obj:
+                        # Try to get set code from pack_type
+                        set_code = translate_set_name(pack_type) or pack_type
+                        
+                        # Validate set_code is a valid CardSet value
+                        valid_set = None
+                        try:
+                            if set_code in CardSet.values:
+                                valid_set = CardSet(set_code)
+                        except (ValueError, AttributeError):
+                            pass
+
                         screenshot_obj = Screenshot.objects.create(
                             name=filename,
                             timestamp=datetime.now().isoformat(),
-                            set=(
-                                CardSet(translate_set_name(pack_type))
-                                if translate_set_name(pack_type)
-                                else None
-                            ),
+                            set=valid_set,
                         )
                         created = True
 
@@ -1195,8 +1198,8 @@ class ScreenshotProcessingWorker(QRunnable):
                         # Add relationship between screenshot and card
                         screenshot_cards.append(
                             ScreenshotCard(
-                                screenshot=screenshot_obj,
-                                card=card_obj,
+                                screenshot_id=screenshot_obj.id,
+                                card_id=card_obj.id,
                                 position=card_data.get("position", 1),
                                 confidence=card_data.get("confidence", 0.0),
                             )
@@ -1204,13 +1207,30 @@ class ScreenshotProcessingWorker(QRunnable):
 
                         # Log the card detection
                         logger.debug(
-                            f"Stored card {card_name} ({card_set}) with confidence {card_data.get('confidence', 0.0):.2f}"
+                            f"Detected card {card_name} ({card_set}) at position {card_data.get('position', 1)} with confidence {card_data.get('confidence', 0.0):.2f}"
                         )
 
-                    ScreenshotCard.objects.bulk_create(screenshot_cards)
-                    # Mark screenshot as processed
-                    screenshot_obj.processed = True
-                    screenshot_obj.save()
+                    if screenshot_cards:
+                        try:
+                            ScreenshotCard.objects.bulk_create(screenshot_cards)
+                            logger.debug(f"Successfully saved {len(screenshot_cards)} cards for {filename}")
+                        except Exception as e:
+                            logger.error(f"Failed to bulk save cards for {filename}: {e}")
+                            # Fallback to individual saves if bulk fails
+                            for sc in screenshot_cards:
+                                try:
+                                    sc.save()
+                                except Exception as sc_e:
+                                    logger.error(f"Failed to save individual card at position {sc.position}: {sc_e}")
+                    
+                    # Mark screenshot as processed if we successfully saved cards or it was blank
+                    # If screenshot_cards were created but bulk_create failed, some might still be missing
+                    # but we've logged errors above.
+                    if screenshot_cards or not cards_found:
+                        screenshot_obj.processed = True
+                        screenshot_obj.save()
+                    else:
+                        logger.warning(f"No valid cards to save for {filename}, not marking as processed")
 
             except Exception as e:
                 logger.error(f"Error storing results for {filename}: {e}")
