@@ -32,6 +32,7 @@ class ImageProcessor:
 
     _init_lock = threading.Lock()
     _phashes_lock = threading.Lock()
+    _session_refreshed = False
 
     def __init__(self, card_imgs_dir: str = None):
         """Initialize the image processor"""
@@ -45,9 +46,11 @@ class ImageProcessor:
             # Pre-calculated templates for performance
             self.color_templates = {}
             self.phash_templates = {}
+            self.whash_templates = {}
 
             # Vectorized data structures for performance
             self.phash_matrix = None
+            self.whash_matrix = None
             self.phash_metadata = []
             self.template_vectors = (
                 {}
@@ -64,6 +67,17 @@ class ImageProcessor:
     def _load_phashes(self) -> bool:
         """Load pHashes from phashes.json if it exists"""
         hash_file = os.path.join(self.card_imgs_dir, "phashes.json")
+
+        with ImageProcessor._phashes_lock:
+            if not ImageProcessor._session_refreshed:
+                if os.path.exists(hash_file):
+                    logger.info(f"Recreating pHashes for new session: {hash_file}")
+                    try:
+                        os.remove(hash_file)
+                    except Exception as e:
+                        logger.error(f"Failed to remove old pHashes file: {e}")
+                ImageProcessor._session_refreshed = True
+
         if not os.path.exists(hash_file):
             return False
         # Check to see if the file was created before 2026-02-11. If so,
@@ -81,29 +95,47 @@ class ImageProcessor:
                 for set_name, cards in data.items():
                     if set_name not in self.phash_templates:
                         self.phash_templates[set_name] = {}
-                    for card_name, hex_hash in cards.items():
-                        self.phash_templates[set_name][card_name] = (
-                            imagehash.hex_to_hash(hex_hash)
-                        )
-            logger.info(f"Loaded pHashes from {hash_file}")
+                    if set_name not in self.whash_templates:
+                        self.whash_templates[set_name] = {}
+                    for card_name, hashes in cards.items():
+                        if isinstance(hashes, dict):
+                            self.phash_templates[set_name][card_name] = (
+                                imagehash.hex_to_hash(hashes["phash"])
+                            )
+                            self.whash_templates[set_name][card_name] = (
+                                imagehash.hex_to_hash(hashes["whash"])
+                            )
+                        else:
+                            # Backward compatibility: only phash was stored
+                            self.phash_templates[set_name][card_name] = (
+                                imagehash.hex_to_hash(hashes)
+                            )
+            logger.info(f"Loaded hashes from {hash_file}")
             return True
         except Exception as e:
             logger.error(f"Failed to load pHashes from {hash_file}: {e}")
             return False
 
     def _save_phashes(self):
-        """Save pHashes to phashes.json"""
+        """Save hashes to phashes.json"""
         hash_file = os.path.join(self.card_imgs_dir, "phashes.json")
         try:
             data = {}
             for set_name, cards in self.phash_templates.items():
                 data[set_name] = {}
                 for card_name, h in cards.items():
-                    data[set_name][card_name] = str(h)
+                    w = self.whash_templates.get(set_name, {}).get(card_name)
+                    if w:
+                        data[set_name][card_name] = {
+                            "phash": str(h),
+                            "whash": str(w)
+                        }
+                    else:
+                        data[set_name][card_name] = str(h)
 
             with open(hash_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
-            logger.info(f"Saved pHashes to {hash_file}")
+            logger.info(f"Saved hashes to {hash_file}")
         except Exception as e:
             logger.error(f"Failed to save pHashes to {hash_file}: {e}")
 
@@ -227,11 +259,12 @@ class ImageProcessor:
                 raise
 
     def _prepare_templates(self):
-        """Pre-calculate versions of all templates and compute pHashes"""
+        """Pre-calculate versions of all templates and compute pHashes and wHashes"""
         self.color_templates = {}
         self.phash_templates = {}
+        self.whash_templates = {}
 
-        logger.info("Preparing templates and computing pHashes")
+        logger.info("Preparing templates and computing hashes")
 
         # Try to load existing hashes
         self._load_phashes()
@@ -241,16 +274,27 @@ class ImageProcessor:
             self.color_templates[set_name] = {}
             if set_name not in self.phash_templates:
                 self.phash_templates[set_name] = {}
+            if set_name not in self.whash_templates:
+                self.whash_templates[set_name] = {}
 
             for card_name, template in cards.items():
                 # 1. Matching resolution color template
                 small = cv2.resize(template, (self.match_width, self.match_height))
                 self.color_templates[set_name][card_name] = small
 
-                # 2. pHash (computed from full image for better accuracy)
+                # 2. pHash & wHash (computed from full image for better accuracy)
+                template_pil = None
                 if card_name not in self.phash_templates[set_name]:
                     template_pil = Image.fromarray(template)
                     self.phash_templates[set_name][card_name] = imagehash.phash(
+                        template_pil
+                    )
+                    new_hashes_computed = True
+                
+                if card_name not in self.whash_templates.get(set_name, {}):
+                    if template_pil is None:
+                        template_pil = Image.fromarray(template)
+                    self.whash_templates[set_name][card_name] = imagehash.whash(
                         template_pil
                     )
                     new_hashes_computed = True
@@ -266,19 +310,20 @@ class ImageProcessor:
 
     def _rebuild_vectorized_data(self):
         """Build vectorized data structures for faster matching"""
-        # 1. Rebuild pHash matrix
+        # 1. Rebuild Hash matrices
         phash_list = []
+        whash_list = []
         self.phash_metadata = []
 
         for set_name, cards in self.phash_templates.items():
             for card_name, h in cards.items():
                 phash_list.append(h.hash.flatten())
+                w = self.whash_templates.get(set_name, {}).get(card_name)
+                whash_list.append(w.hash.flatten())
                 self.phash_metadata.append((set_name, card_name))
 
-        if phash_list:
-            self.phash_matrix = np.array(phash_list)
-        else:
-            self.phash_matrix = None
+        self.phash_matrix = np.array(phash_list)
+        self.whash_matrix = np.array(whash_list)
 
         # 2. Rebuild template matrices for detailed search
         self.template_vectors = {}
@@ -467,6 +512,8 @@ class ImageProcessor:
                                 card_region,
                                 force_detailed=True,
                                 force_set=candidate_set,
+                                # When re-evaluating for a specific set, we want to be more pixel-accurate
+                                weights=(0.40, 0.10, 0.35, 0.15),
                             )
                             if match:
                                 total_confidence += match["confidence"]
@@ -546,6 +593,8 @@ class ImageProcessor:
                             card_region,
                             force_detailed=True,
                             force_set=dominant_set,
+                            # When re-evaluating for a specific set, we want to be more pixel-accurate
+                            weights=(0.40, 0.10, 0.35, 0.15),
                         )
 
                         if best_match and best_match["confidence"] > 0.6:
@@ -709,6 +758,7 @@ class ImageProcessor:
         force_detailed: bool = False,
         exclude_sets: List[str] = None,
         force_set: str = None,
+        weights: Tuple[float, float, float, float] = None,
     ) -> Dict[str, Any]:
         """
         Find the best matching card in the database for a card region
@@ -718,18 +768,23 @@ class ImageProcessor:
             force_detailed: If True, always perform detailed search regardless of quick search confidence
             exclude_sets: If provided, do not search within these sets
             force_set: If provided, only search within this specific set
+            weights: Optional tuple of (p_weight, w_weight, corr_weight, border_weight) to override defaults
 
         Returns:
             Dict: Best match result with card_name, card_set, and confidence
         """
         # Multi-stage matching for better performance:
-        # 1. Quick search using pHash and Hamming distance to identify likely sets
+        # 1. Quick search using pHash/wHash and Hamming distance to identify likely sets
         # 2. Detailed search at full resolution within the candidate sets
 
-        # Stage 1: Quick search using pHash
-        # Compute pHash for the region directly from the provided region
+        if weights is None:
+            # Default weights: distinguish sets while keeping content identification robust
+            weights = (0.60, 0.10, 0.15, 0.15)
+
+        # Stage 1: Quick search using hashes
         region_pil = Image.fromarray(card_region)
-        region_hash = imagehash.phash(region_pil)
+        region_phash = imagehash.phash(region_pil)
+        region_whash = imagehash.whash(region_pil)
 
         # Quick search to identify candidate sets and best card match
         set_scores = {}
@@ -747,24 +802,35 @@ class ImageProcessor:
         else:
             indices = list(range(len(self.phash_metadata)))
 
-        sub_matrix = self.phash_matrix[indices]
-        q_hash = region_hash.hash.flatten()
-        # Hamming distance: count non-matching bits
-        distances = np.count_nonzero(sub_matrix != q_hash, axis=1)
-        scores = 1.0 - (distances / 64.0)
+        # pHash scores
+        sub_matrix_p = self.phash_matrix[indices]
+        q_hash_p = region_phash.hash.flatten()
+        distances_p = np.count_nonzero(sub_matrix_p != q_hash_p, axis=1)
+        scores_p = 1.0 - (distances_p / 64.0)
 
-        # Build set_scores and phash_score_map in one pass
+        # wHash scores
+        sub_matrix_w = self.whash_matrix[indices]
+        q_hash_w = region_whash.hash.flatten()
+        distances_w = np.count_nonzero(sub_matrix_w != q_hash_w, axis=1)
+        scores_w = 1.0 - (distances_w / 64.0)
+
+        # Combined hash score for Stage 1
+        combined_scores = 0.8 * scores_p + 0.2 * scores_w
+
+        # Build set_scores and hash maps in one pass
         phash_score_map = {}
-        for i, score in enumerate(scores):
+        whash_score_map = {}
+        for i, score in enumerate(combined_scores):
             meta_idx = indices[i]
             s_name, c_name = self.phash_metadata[meta_idx]
             key = f"{s_name}_{c_name}"
-            phash_score_map[key] = float(score)
+            phash_score_map[key] = float(scores_p[i])
+            whash_score_map[key] = float(scores_w[i])
 
             if score > set_scores.get(s_name, 0):
                 set_scores[s_name] = score
 
-        # Stage 2: Hybrid search combining pHash and detailed correlation
+        # Stage 2: Hybrid search combining pHash, wHash and detailed correlation
         if not set_scores:
             return None
 
@@ -816,14 +882,24 @@ class ImageProcessor:
                 border_scores = 1.0 - (color_diffs / max_color_distance)
                 border_scores = np.clip(border_scores, 0.0, 1.0)
 
-            # Vectorized pHash scores lookup
-            phash_scores = np.array(
+            # Vectorized hash scores lookup
+            p_scores = np.array(
                 [phash_score_map.get(f"{search_set}_{cn}", 0.0) for cn in metadata],
+                dtype=np.float32,
+            )
+            w_scores = np.array(
+                [whash_score_map.get(f"{search_set}_{cn}", 0.0) for cn in metadata],
                 dtype=np.float32,
             )
 
             # Vectorized hybrid scores
-            hybrid_scores = 0.60 * phash_scores + 0.15 * corr_scores + 0.25 * border_scores
+            # Optimized weights to distinguish similar cards while keeping robust set identification
+            hybrid_scores = (
+                weights[0] * p_scores
+                + weights[1] * w_scores
+                + weights[2] * corr_scores
+                + weights[3] * border_scores
+            )
 
             # Find best in this set
             best_idx = int(np.argmax(hybrid_scores))
@@ -848,7 +924,8 @@ class ImageProcessor:
                     "card_name": metadata[best_idx],
                     "card_set": search_set,
                     "confidence": best_set_hybrid,
-                    "phash_score": float(phash_scores[best_idx]),
+                    "phash_score": float(p_scores[best_idx]),
+                    "whash_score": float(w_scores[best_idx]),
                     "corr_score": float(corr_scores[best_idx]),
                     "hybrid_score": best_set_hybrid,
                 }
