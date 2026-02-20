@@ -194,6 +194,26 @@ cards_to_test = [
         d["B1_67"],
         None,
     ),
+    CardImg(
+        "img_12.png",
+        CardSet.MEGA_RISING,
+        d["B1_122"],
+        d["B1_226"],
+        d["B1_53"],
+        d["B1_117"],
+        d["B1_92"],
+        d["B1_300"],
+    ),
+    CardImg(
+        "img_13.png",
+        CardSet.FANTASTICAL_PARADE,
+        d["B2_39"],
+        d["B2_139"],
+        d["B2_145"],
+        d["B2_115"],
+        d["B2_8"],
+        d["B2_223"],
+    ),
 ]
 
 
