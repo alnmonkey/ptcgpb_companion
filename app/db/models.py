@@ -71,8 +71,8 @@ def translate_set_name(set_name):
         "CrimsonBlaze": "B1a",
         # Fantastical Parade
         "Parade": "B2",
-        # Paldean Wonders  # NOT FINALIZED YET
-        "Wonders": "B2a",
+        # Paldean Wonders
+        "PaldeanWonders": "B2a",
     }
     return ptcgpb_names.get(set_name, None)
 
