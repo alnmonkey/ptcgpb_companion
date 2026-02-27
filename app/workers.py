@@ -623,20 +623,95 @@ class CardArtDownloadWorker(QRunnable):
             if total_saved > 0 and not self._is_cancelled:
                 try:
                     self.signals.status.emit(
-                        "Precomputing pHashes for downloaded cards..."
+                        QCoreApplication.translate(
+                            "CardArtDownloadWorker",
+                            "Precomputing pHashes for downloaded cards...",
+                        )
                     )
                     from app.image_processing import ImageProcessor
 
-                    processor = ImageProcessor(dest_root)
+                    processor = ImageProcessor(dest_root, force_recompute=True)
 
                     # Also update image_path for cards that might have been downloaded but not in DB
                     # (though update_or_create above should handle most cases during the download)
-
-                    self.signals.status.emit("pHashes precomputed and saved.")
-                except Exception as e:
-                    self.logger.error(f"Failed to precompute pHashes: {e}")
                     self.signals.status.emit(
-                        f"Warning: Failed to precompute pHashes: {e}"
+                        QCoreApplication.translate(
+                            "CardArtDownloadWorker",
+                            "Syncing database with downloaded art...",
+                        )
+                    )
+
+                    all_codes = processor.get_loaded_template_codes()
+                    existing_codes = set(Card.objects.values_list("code", flat=True))
+
+                    new_cards = []
+                    for card_code in all_codes:
+                        if card_code in existing_codes:
+                            continue
+
+                        if "_" not in card_code:
+                            continue
+
+                        parts = card_code.split("_")
+                        set_id = parts[0]
+                        if len(parts) > 2:
+                            set_id = "_".join(parts[:-1])
+
+                        try:
+                            dex_card = dex.get(card_code, None)
+                        except (ValueError, TypeError):
+                            continue
+
+                        if not dex_card:
+                            continue
+
+                        try:
+                            valid_set = CardSet(set_id)
+                            set_val = valid_set.value
+                        except ValueError:
+                            set_val = set_id
+
+                        # Find the actual extension on disk
+                        set_dir = os.path.join(dest_root, set_id)
+                        filename = None
+                        for ext in [".webp", ".png", ".jpg", ".jpeg"]:
+                            if os.path.exists(os.path.join(set_dir, f"{card_code}{ext}")):
+                                filename = f"{card_code}{ext}"
+                                break
+
+                        if not filename:
+                            continue
+
+                        new_cards.append(
+                            Card(
+                                code=card_code,
+                                name=dex_card.name,
+                                set=set_val,
+                                rarity=dex_card.rarity,
+                                image_path=f"{set_id}/{filename}",
+                            )
+                        )
+
+                    if new_cards:
+                        with transaction.atomic():
+                            Card.objects.bulk_create(new_cards, ignore_conflicts=True)
+                        self.logger.info(
+                            f"Synced {len(new_cards)} missing cards to database."
+                        )
+
+                    self.signals.status.emit(
+                        QCoreApplication.translate(
+                            "CardArtDownloadWorker",
+                            "pHashes precomputed and database synced.",
+                        )
+                    )
+                except Exception as e:
+                    self.logger.error(f"Failed to precompute pHashes or sync DB: {e}")
+                    self.signals.status.emit(
+                        QCoreApplication.translate(
+                            "CardArtDownloadWorker",
+                            "Warning: Failed to complete post-download tasks: %1",
+                        ).replace("%1", str(e))
                     )
 
             self.signals.result.emit(

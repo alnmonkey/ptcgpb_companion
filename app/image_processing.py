@@ -34,10 +34,14 @@ class ImageProcessor:
     _phashes_lock = threading.Lock()
     _session_refreshed = False
 
-    def __init__(self, card_imgs_dir: str = None):
+    def __init__(self, card_imgs_dir: str = None, force_recompute: bool = False):
         """Initialize the image processor"""
         self.card_imgs_dir = card_imgs_dir or os.path.join("resources", "card_imgs")
         self._lock = threading.RLock()
+
+        with ImageProcessor._phashes_lock:
+            if force_recompute:
+                ImageProcessor._session_refreshed = False
 
         with ImageProcessor._init_lock:
             self.card_database = self._load_card_database()
