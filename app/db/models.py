@@ -20,6 +20,7 @@ class CardSet(models.TextChoices):
     CRIMSON_BLAZE = "B1a", "Crimson Blaze"
     FANTASTICAL_PARADE = "B2", "Fantastical Parade"
     PALDEAN_WONDERS = "B2a", "Paldean Wonders"
+    MEGA_SHINE = "B2b", "Mega Shine"
     PROMO_A = "P-A", "Promo A"
     PROMO_B = "P-B", "Promo B"
 
@@ -73,6 +74,7 @@ def translate_set_name(set_name):
         "Parade": "B2",
         # Paldean Wonders
         "PaldeanWonders": "B2a",
+        "MegaShine": "B2b",
     }
     return ptcgpb_names.get(set_name, None)
 
