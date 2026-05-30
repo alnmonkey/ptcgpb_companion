@@ -560,13 +560,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
-            <translation>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</translation>
+            <source>Added Paradox Drive!</source>
+            <translation>Added Paradox Drive!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Fixed bug where release notes weren't translated</source>
-            <translation>Fixed bug where release notes weren't translated</translation>
+            <source>Removed third-party data dependency; new releases should be even faster!</source>
+            <translation>Removed third-party data dependency; new releases should be even faster!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -592,6 +592,14 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>Close</translation>
+        </message>
+        <message>
+            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
+            <translation type="vanished">Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</translation>
+        </message>
+        <message>
+            <source>Fixed bug where release notes weren't translated</source>
+            <translation type="vanished">Fixed bug where release notes weren't translated</translation>
         </message>
     </context>
     <context>

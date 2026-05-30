@@ -558,13 +558,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
-            <translation>将“星灵守护者闪光蛋蛋”和“闪光椰蛋树”添加到相似卡牌列表中</translation>
+            <source>Added Paradox Drive!</source>
+            <translation>新增悖论驱动！</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Fixed bug where release notes weren't translated</source>
-            <translation>修复了版本说明未翻译的错误。</translation>
+            <source>Removed third-party data dependency; new releases should be even faster!</source>
+            <translation>移除了对第三方数据的依赖；新版本应该会更快！</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -590,6 +590,14 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>关闭</translation>
+        </message>
+        <message>
+            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
+            <translation type="vanished">将“星灵守护者闪光蛋蛋”和“闪光椰蛋树”添加到相似卡牌列表中</translation>
+        </message>
+        <message>
+            <source>Fixed bug where release notes weren't translated</source>
+            <translation type="vanished">修复了版本说明未翻译的错误。</translation>
         </message>
     </context>
     <context>

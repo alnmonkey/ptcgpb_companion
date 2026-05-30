@@ -554,13 +554,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
-            <translation>類似のカードに「天界の守護者 色違いのタマタマと色違いのナッシー」を追加しました</translation>
+            <source>Added Paradox Drive!</source>
+            <translation>パラドックス・ドライブを追加しました！</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Fixed bug where release notes weren't translated</source>
-            <translation>リリースノートが翻訳されないバグを修正しました。</translation>
+            <source>Removed third-party data dependency; new releases should be even faster!</source>
+            <translation>サードパーティのデータへの依存を解消しました。新しいリリースはさらに高速化されるはずです！</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -586,6 +586,14 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>近い</translation>
+        </message>
+        <message>
+            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
+            <translation type="vanished">類似のカードに「天界の守護者 色違いのタマタマと色違いのナッシー」を追加しました</translation>
+        </message>
+        <message>
+            <source>Fixed bug where release notes weren't translated</source>
+            <translation type="vanished">リリースノートが翻訳されないバグを修正しました。</translation>
         </message>
     </context>
     <context>

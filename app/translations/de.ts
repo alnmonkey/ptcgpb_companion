@@ -554,13 +554,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
-            <translation>Die Karten „Hellbraunes Exeggcute“ und „Hellbraunes Exeggutor“ wurden zu den ähnlichen Karten hinzugefügt.</translation>
+            <source>Added Paradox Drive!</source>
+            <translation>Paradox Drive hinzugefügt!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Fixed bug where release notes weren't translated</source>
-            <translation>Ein Fehler wurde behoben, durch den die Versionshinweise nicht übersetzt wurden.</translation>
+            <source>Removed third-party data dependency; new releases should be even faster!</source>
+            <translation>Die Abhängigkeit von Drittanbieterdaten wurde beseitigt; neue Versionen sollten noch schneller sein!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -586,6 +586,14 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>Schließen</translation>
+        </message>
+        <message>
+            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
+            <translation type="vanished">Die Karten „Hellbraunes Exeggcute“ und „Hellbraunes Exeggutor“ wurden zu den ähnlichen Karten hinzugefügt.</translation>
+        </message>
+        <message>
+            <source>Fixed bug where release notes weren't translated</source>
+            <translation type="vanished">Ein Fehler wurde behoben, durch den die Versionshinweise nicht übersetzt wurden.</translation>
         </message>
     </context>
     <context>

@@ -629,9 +629,9 @@ class FirstLaunchDialog(QDialog):
         # =============================================================================
         first_launch_release_notes = [
             self.tr(
-                "Added Celestial Guardians Shiny Exeggcute & Shiny Exeggutor to similar cards matching"
+                "Added Paradox Drive!"
             ),
-            self.tr("Fixed bug where release notes weren't translated"),
+            self.tr("Removed third-party data dependency; new releases should be even faster!"),
         ]
 
         main_layout = QVBoxLayout()

@@ -554,13 +554,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
-            <translation>Ajout de Noeunoeuf chromatique et Noadkoko chromatique de Gardiens Célestes à des cartes similaires.</translation>
+            <source>Added Paradox Drive!</source>
+            <translation>Ajout du Paradox Drive !</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Fixed bug where release notes weren't translated</source>
-            <translation>Correction d&amp;#39;un bug qui empêchait la traduction des notes de version</translation>
+            <source>Removed third-party data dependency; new releases should be even faster!</source>
+            <translation>Suppression de la dépendance aux données tierces ; les nouvelles versions devraient être encore plus rapides !</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -586,6 +586,14 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>Fermer</translation>
+        </message>
+        <message>
+            <source>Added Celestial Guardians Shiny Exeggcute &amp; Shiny Exeggutor to similar cards matching</source>
+            <translation type="vanished">Ajout de Noeunoeuf chromatique et Noadkoko chromatique de Gardiens Célestes à des cartes similaires.</translation>
+        </message>
+        <message>
+            <source>Fixed bug where release notes weren't translated</source>
+            <translation type="vanished">Correction d&amp;#39;un bug qui empêchait la traduction des notes de version</translation>
         </message>
     </context>
     <context>
