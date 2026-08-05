@@ -24,6 +24,7 @@ class CardSet(models.TextChoices):
     PULSING_AURA = "B3", "Pulsing Aura"
     PARADOX_DRIVE = "B3a", "Paradox Drive"
     EVERYDAY_WONDERS = "B3b", "Everyday Wonders"
+    RULER_OF_THE_SKIES = "B4", "Ruler Of The Skies"
     PROMO_A = "P-A", "Promo A"
     PROMO_B = "P-B", "Promo B"
 
@@ -81,6 +82,8 @@ def translate_set_name(set_name):
         "MegaShine": "B2b",
         # Pulsing Aura
         "PulsingAura": "B3",
+        # Ruler of the Skies
+        "RulerOfTheSkies": "B4",
     }
     return ptcgpb_names.get(set_name, None)
 

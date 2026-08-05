@@ -560,13 +560,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Everyday Wonders</source>
-            <translation>Added Everyday Wonders</translation>
+            <source>Added Ruler of the Skies</source>
+            <translation>Added Ruler of the Skies</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
-            <translation>Added everything you need for the new Everyday Wonders set. Best of luck!</translation>
+            <source>Thanks for your patience while I get this out the door. Have fun!</source>
+            <translation>Thanks for your patience while I get this out the door. Have fun!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -592,6 +592,18 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>Close</translation>
+        </message>
+        <message>
+            <source>Added Ruler fo the Skies</source>
+            <translation type="vanished">Added Ruler fo the Skies</translation>
+        </message>
+        <message>
+            <source>Added Everyday Wonders</source>
+            <translation type="vanished">Added Everyday Wonders</translation>
+        </message>
+        <message>
+            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
+            <translation type="vanished">Added everything you need for the new Everyday Wonders set. Best of luck!</translation>
         </message>
         <message>
             <source>Added Paradox Drive!</source>

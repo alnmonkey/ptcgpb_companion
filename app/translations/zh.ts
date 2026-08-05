@@ -558,13 +558,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Everyday Wonders</source>
-            <translation>新增日常奇迹</translation>
+            <source>Added Ruler of the Skies</source>
+            <translation>新增天空统治者</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
-            <translation>新版“日常奇迹”套装所需的一切都已添加完毕。祝您好运！</translation>
+            <source>Thanks for your patience while I get this out the door. Have fun!</source>
+            <translation>感谢您的耐心等待，我会尽快处理完。祝您玩得开心！</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -590,6 +590,18 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>关闭</translation>
+        </message>
+        <message>
+            <source>Added Ruler fo the Skies</source>
+            <translation type="vanished">新增天空统治者</translation>
+        </message>
+        <message>
+            <source>Added Everyday Wonders</source>
+            <translation type="vanished">新增日常奇迹</translation>
+        </message>
+        <message>
+            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
+            <translation type="vanished">新版“日常奇迹”套装所需的一切都已添加完毕。祝您好运！</translation>
         </message>
         <message>
             <source>Added Paradox Drive!</source>

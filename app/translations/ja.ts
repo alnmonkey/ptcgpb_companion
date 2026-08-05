@@ -554,13 +554,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Everyday Wonders</source>
-            <translation>日常の驚きを追加しました</translation>
+            <source>Added Ruler of the Skies</source>
+            <translation>空の支配者を追加しました</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
-            <translation>新しい「エブリデイ・ワンダーズ」セットに必要なものをすべて追加しました。幸運を祈ります！</translation>
+            <source>Thanks for your patience while I get this out the door. Have fun!</source>
+            <translation>発送までしばらくお待ちいただき、ありがとうございます。楽しんでください！</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -586,6 +586,18 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>近い</translation>
+        </message>
+        <message>
+            <source>Added Ruler fo the Skies</source>
+            <translation type="vanished">空の支配者を追加しました</translation>
+        </message>
+        <message>
+            <source>Added Everyday Wonders</source>
+            <translation type="vanished">日常の驚きを追加しました</translation>
+        </message>
+        <message>
+            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
+            <translation type="vanished">新しい「エブリデイ・ワンダーズ」セットに必要なものをすべて追加しました。幸運を祈ります！</translation>
         </message>
         <message>
             <source>Added Paradox Drive!</source>

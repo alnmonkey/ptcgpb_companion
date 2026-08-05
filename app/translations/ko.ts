@@ -554,13 +554,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Everyday Wonders</source>
-            <translation>일상의 놀라운 순간들을 추가했습니다</translation>
+            <source>Added Ruler of the Skies</source>
+            <translation>하늘의 지배자를 추가했습니다</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
-            <translation>새로운 &amp;#39;일상의 경이로움&amp;#39; 세트에 필요한 모든 것을 추가했습니다. 행운을 빌어요!</translation>
+            <source>Thanks for your patience while I get this out the door. Have fun!</source>
+            <translation>이 메일을 보내는 동안 기다려주셔서 감사합니다. 즐거운 시간 보내세요!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -586,6 +586,18 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>닫다</translation>
+        </message>
+        <message>
+            <source>Added Ruler fo the Skies</source>
+            <translation type="vanished">하늘의 지배자를 추가했습니다</translation>
+        </message>
+        <message>
+            <source>Added Everyday Wonders</source>
+            <translation type="vanished">일상의 놀라운 순간들을 추가했습니다</translation>
+        </message>
+        <message>
+            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
+            <translation type="vanished">새로운 &amp;#39;일상의 경이로움&amp;#39; 세트에 필요한 모든 것을 추가했습니다. 행운을 빌어요!</translation>
         </message>
         <message>
             <source>Added Paradox Drive!</source>

@@ -554,13 +554,13 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Everyday Wonders</source>
-            <translation>Maravillas cotidianas añadidas</translation>
+            <source>Added Ruler of the Skies</source>
+            <translation>Se agregó el Gobernante de los Cielos</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
-            <translation>Hemos añadido todo lo necesario para el nuevo set de Maravillas Cotidianas. ¡Mucha suerte!</translation>
+            <source>Thanks for your patience while I get this out the door. Have fun!</source>
+            <translation>Gracias por su paciencia mientras termino de prepararlo. ¡Que lo disfruten!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="639" />
@@ -586,6 +586,18 @@
             <location filename="../dialogs.py" line="664" />
             <source>Close</source>
             <translation>Cerca</translation>
+        </message>
+        <message>
+            <source>Added Ruler fo the Skies</source>
+            <translation type="vanished">Se agregó el Gobernante de los Cielos</translation>
+        </message>
+        <message>
+            <source>Added Everyday Wonders</source>
+            <translation type="vanished">Maravillas cotidianas añadidas</translation>
+        </message>
+        <message>
+            <source>Added everything you need for the new Everyday Wonders set. Best of luck!</source>
+            <translation type="vanished">Hemos añadido todo lo necesario para el nuevo set de Maravillas Cotidianas. ¡Mucha suerte!</translation>
         </message>
         <message>
             <source>Added Paradox Drive!</source>

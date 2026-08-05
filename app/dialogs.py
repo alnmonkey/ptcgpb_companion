@@ -629,9 +629,9 @@ class FirstLaunchDialog(QDialog):
         # =============================================================================
         first_launch_release_notes = [
             self.tr(
-                "Added Everyday Wonders"
+                "Added Ruler of the Skies"
             ),
-            self.tr("Added everything you need for the new Everyday Wonders set. Best of luck!"),
+            self.tr("Thanks for your patience while I get this out the door. Have fun!"),
         ]
 
         main_layout = QVBoxLayout()
