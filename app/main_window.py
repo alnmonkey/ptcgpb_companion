@@ -150,8 +150,11 @@ class MainWindow(QMainWindow):
         """
         On the first launch, display the FirstLaunchDialog with release notes.
 
-        Both the Close button and the window's X button dismiss the dialog
-        and trigger a screenshot processing job with overwrite enabled.
+        Both the Close button and the window's X button dismiss the dialog.
+        Afterwards the user is asked whether a rescan is needed; a full
+        screenshot reprocess (with overwrite enabled) only runs if they say
+        yes, since it can take a long time and is pointless for users who
+        haven't opened packs from newly-added sets.
         """
         already_shown = self.settings.get_setting("General/first_launch_shown", False)
         if already_shown:
@@ -159,21 +162,15 @@ class MainWindow(QMainWindow):
 
         dialog = FirstLaunchDialog(self)
         # exec() returns regardless of how the dialog was closed
-        # (Close button -> accept, X button -> reject). We trigger
-        # screenshot processing in either case.
+        # (Close button -> accept, X button -> reject).
         dialog.exec()
 
         # Persist the flag so this dialog is only shown once.
         self.settings.set_setting("General/first_launch_shown", True)
 
-        # Kick off screenshot processing with overwrite enabled.
+        # No point asking about a rescan we can't actually run.
         screenshots_dir = self.settings.get_setting("General/screenshots_dir", "")
-        if screenshots_dir and os.path.isdir(screenshots_dir):
-            self._defer_scan_until_idle(
-                lambda: self._on_processing_started(screenshots_dir, overwrite=True),
-                reason="first-launch processing",
-            )
-        else:
+        if not (screenshots_dir and os.path.isdir(screenshots_dir)):
             logger.warning(
                 "First-launch processing skipped: screenshots_dir is not set "
                 "or does not exist (%r).",
@@ -185,6 +182,54 @@ class MainWindow(QMainWindow):
                     "is not configured. Please set it in Preferences."
                 )
             )
+            return
+
+        if not self._prompt_for_first_launch_rescan():
+            logger.info("User declined first-launch rescan.")
+            self._update_status_message(
+                self.tr(
+                    "Skipped screenshot rescan. You can run it any time with "
+                    "Load New Data."
+                )
+            )
+            return
+
+        # Kick off screenshot processing with overwrite enabled.
+        self._defer_scan_until_idle(
+            lambda: self._on_processing_started(screenshots_dir, overwrite=True),
+            reason="first-launch processing",
+        )
+
+    def _prompt_for_first_launch_rescan(self) -> bool:
+        """
+        Ask whether the user's existing screenshots need to be reprocessed.
+
+        Returns True if the user asked for a rescan. Dismissing the box with
+        the window's X button counts as "skip" -- a question dialog shouldn't
+        start a long-running job just because it was closed.
+        """
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle(self.tr("Rescan Screenshots?"))
+        msg_box.setText(
+            self.tr(
+                "This update adds cards the previous version couldn't recognize. "
+                "If you opened packs from newly-added sets before updating, your "
+                "screenshots need a rescan to pick them up.\n\n"
+                "This can take a while. If you haven't opened any packs from the "
+                "new sets, you can skip it — you can always run it later from "
+                "Load New Data."
+            )
+        )
+        rescan_button = msg_box.addButton(
+            self.tr("Rescan"), QMessageBox.ButtonRole.AcceptRole
+        )
+        msg_box.addButton(self.tr("Skip"), QMessageBox.ButtonRole.RejectRole)
+        msg_box.setDefaultButton(rescan_button)
+        msg_box.setIcon(QMessageBox.Icon.Question)
+
+        msg_box.exec()
+
+        return msg_box.clickedButton() == rescan_button
 
     def _defer_scan_until_idle(
         self, callback, reason: str = "scan", poll_interval_ms: int = 500

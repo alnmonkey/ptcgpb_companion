@@ -50,6 +50,7 @@ pulsing_aura = set_builder(S.PULSING_AURA)
 paradox_drive = set_builder(S.PARADOX_DRIVE)
 everyday_wonders = set_builder(S.EVERYDAY_WONDERS)
 ruler_of_the_skies = set_builder(S.RULER_OF_THE_SKIES)
+team_rockets_ambition = set_builder(S.TEAM_ROCKETS_AMBITION)
 
 # DO NOT UPDATE MANUALLY. Use ./names_builder.py
 _cards = [

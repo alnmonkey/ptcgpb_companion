@@ -4,12 +4,12 @@
     <context>
         <name>AboutDialog</name>
         <message>
-            <location filename="../dialogs.py" line="684" />
+            <location filename="../dialogs.py" line="685" />
             <source>About PTCGPB Companion</source>
             <translation>PTCGPB 컴패니언 소개</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="701" />
+            <location filename="../dialogs.py" line="702" />
             <source>&lt;h2&gt;PTCGPB Companion&lt;/h2&gt;
                &lt;p&gt;Pokémon Card Identification Tool&lt;/p&gt;
                &lt;p&gt;Version %1&lt;/p&gt;
@@ -19,7 +19,7 @@
             <translation>&lt;h2&gt;PTCGPB 동반자&lt;/h2&gt;&lt;p&gt; 포켓몬 카드 식별 도구&lt;/p&gt;&lt;p&gt; 버전 %1&lt;/p&gt;&lt;p&gt; © 2026 itsthejoker&lt;/p&gt;&lt;p&gt; MIT 라이선스 및 오픈 소스. 🌯로 제작되었습니다.&lt;br&gt; &lt;a href="https://github.com/itsthejoker/ptcgpb_companion"&gt;https://github.com/itsthejoker/ptcgpb-companion&lt;/a&gt;&lt;/p&gt;&lt;p&gt; PyQt6 및 OpenCV로 개발되었습니다.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="711" />
+            <location filename="../dialogs.py" line="712" />
             <source>Close</source>
             <translation>닫다</translation>
         </message>
@@ -27,154 +27,154 @@
     <context>
         <name>AccountCardListDialog</name>
         <message>
-            <location filename="../dialogs.py" line="1036" />
+            <location filename="../dialogs.py" line="1037" />
             <source>Accounts owning %1</source>
             <translation>%1을 소유한 계정</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1056" />
+            <location filename="../dialogs.py" line="1057" />
             <source>Showing account distribution for: &lt;b&gt;%1&lt;/b&gt;</source>
             <translation>다음 항목에 대한 계정 분포를 표시합니다: &lt;b&gt;%1&lt;/b&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1064" />
+            <location filename="../dialogs.py" line="1065" />
             <source>Filter:</source>
             <translation>필터:</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1066" />
+            <location filename="../dialogs.py" line="1067" />
             <source>Search account name...</source>
             <translation>계정 이름을 검색하세요...</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1076" />
+            <location filename="../dialogs.py" line="1077" />
             <source>Account Name</source>
             <translation>계정 이름</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1077" />
+            <location filename="../dialogs.py" line="1078" />
             <source>Quantity</source>
             <translation>수량</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1078" />
+            <location filename="../dialogs.py" line="1079" />
             <source>Shinedust</source>
             <translation>샤인더스트</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1079" />
+            <location filename="../dialogs.py" line="1080" />
             <source>Age</source>
             <translation>나이</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1158" />
-            <location filename="../dialogs.py" line="1080" />
+            <location filename="../dialogs.py" line="1159" />
+            <location filename="../dialogs.py" line="1081" />
             <source>Screenshot</source>
             <translation>스크린샷</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1081" />
+            <location filename="../dialogs.py" line="1082" />
             <source>Action</source>
             <translation>행동</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1116" />
+            <location filename="../dialogs.py" line="1117" />
             <source>Copy all to clipboard</source>
             <translation>모두 클립보드에 복사</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1149" />
+            <location filename="../dialogs.py" line="1150" />
             <source>%1d</source>
             <translation>1%</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1167" />
+            <location filename="../dialogs.py" line="1168" />
             <source>Remove</source>
             <translation>제거하다</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1403" />
-            <location filename="../dialogs.py" line="1284" />
-            <location filename="../dialogs.py" line="1206" />
-            <location filename="../dialogs.py" line="1186" />
+            <location filename="../dialogs.py" line="1404" />
+            <location filename="../dialogs.py" line="1285" />
+            <location filename="../dialogs.py" line="1207" />
+            <location filename="../dialogs.py" line="1187" />
             <source>Error</source>
             <translation>오류</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1187" />
+            <location filename="../dialogs.py" line="1188" />
             <source>The screenshot path could not be found:
 %1</source>
             <translation>스크린샷 경로를 찾을 수 없습니다: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1206" />
+            <location filename="../dialogs.py" line="1207" />
             <source>Card not found in database.</source>
             <translation>데이터베이스에서 해당 카드를 찾을 수 없습니다.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1256" />
-            <location filename="../dialogs.py" line="1235" />
-            <location filename="../dialogs.py" line="1216" />
+            <location filename="../dialogs.py" line="1257" />
+            <location filename="../dialogs.py" line="1236" />
+            <location filename="../dialogs.py" line="1217" />
             <source>Select Shinedust Cost</source>
             <translation>샤인더스트 ​​비용 선택</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1218" />
+            <location filename="../dialogs.py" line="1219" />
             <source>Is this a 4,000 or 10,000 shinedust move for %1?</source>
             <translation>이 기술은 1% 강화에 4,000 샤인더스트가 필요한가요, 아니면 10,000 샤인더스트가 필요한가요?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1237" />
+            <location filename="../dialogs.py" line="1238" />
             <source>Is this a 25,000 or 30,000 shinedust move for %1?</source>
             <translation>이 기술은 1% 강화에 25,000 샤인더스트가 필요한 건가요, 아니면 30,000 샤인더스트가 필요한 건가요?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1257" />
+            <location filename="../dialogs.py" line="1258" />
             <source>Was this card shared?</source>
             <translation>이 카드는 공유된 카드인가요?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1259" />
+            <location filename="../dialogs.py" line="1260" />
             <source>Shared</source>
             <translation>공유됨</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1285" />
+            <location filename="../dialogs.py" line="1286" />
             <source>Account '%1' not found.</source>
             <translation>계정 &amp;#39;%1&amp;#39;을 찾을 수 없습니다.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1300" />
+            <location filename="../dialogs.py" line="1301" />
             <source>Insufficient Shinedust</source>
             <translation>샤인더스트 ​​부족</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1302" />
+            <location filename="../dialogs.py" line="1303" />
             <source>Account &lt;b&gt;%1&lt;/b&gt; does not have enough shinedust (%2) to perform this action (cost: %3).</source>
             <translation>계정 &lt;b&gt;%1에는&lt;/b&gt; 이 작업을 수행하는 데 필요한 샤인더스트(%2)가 부족합니다(비용: %3).</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1311" />
+            <location filename="../dialogs.py" line="1312" />
             <source>Remove anyway</source>
             <translation>어쨌든 제거하세요</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1320" />
+            <location filename="../dialogs.py" line="1321" />
             <source>Remove Card?</source>
             <translation>카드를 제거하시겠습니까?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1322" />
+            <location filename="../dialogs.py" line="1323" />
             <source>Unknown</source>
             <translation>알려지지 않은</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1325" />
+            <location filename="../dialogs.py" line="1326" />
             <source>One instance of &lt;b&gt;%1&lt;/b&gt; will be removed from account &lt;b&gt;%2&lt;/b&gt;.&lt;br&gt;&lt;br&gt;This will cost &lt;b&gt;%3&lt;/b&gt; shinedust.&lt;br&gt;&lt;br&gt;If the account has multiples of this same card, only one will be removed.</source>
             <translation>계정 &lt;b&gt;%2&lt;/b&gt; 에서 &lt;b&gt;%1&lt;/b&gt; 의 인스턴스 하나가 제거됩니다.&lt;br&gt;&lt;br&gt; 이것은 샤인더스트 &lt;b&gt;​​3%를&lt;/b&gt; 소모합니다.&lt;br&gt;&lt;br&gt; 계정에 동일한 카드가 여러 장 있는 경우, 한 장만 삭제됩니다.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1404" />
+            <location filename="../dialogs.py" line="1405" />
             <source>Could not find card in database to remove.</source>
             <translation>데이터베이스에서 삭제할 카드를 찾을 수 없습니다.</translation>
         </message>
@@ -365,12 +365,12 @@
     <context>
         <name>CardImageDialog</name>
         <message>
-            <location filename="../dialogs.py" line="744" />
+            <location filename="../dialogs.py" line="745" />
             <source>Error</source>
             <translation>오류</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="745" />
+            <location filename="../dialogs.py" line="746" />
             <source>Could not load image: %1</source>
             <translation>이미지를 불러올 수 없습니다: %1</translation>
         </message>
@@ -419,120 +419,120 @@
     <context>
         <name>DiagnoseImageDialog</name>
         <message>
-            <location filename="../dialogs.py" line="801" />
+            <location filename="../dialogs.py" line="802" />
             <source>Diagnose Image</source>
             <translation>진단 이미지</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="819" />
+            <location filename="../dialogs.py" line="820" />
             <source>No image selected</source>
             <translation>선택된 이미지가 없습니다</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="822" />
+            <location filename="../dialogs.py" line="823" />
             <source>Browse...</source>
             <translation>먹다...</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="825" />
+            <location filename="../dialogs.py" line="826" />
             <source>Image File:</source>
             <translation>이미지 파일:</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="834" />
+            <location filename="../dialogs.py" line="835" />
             <source>#</source>
             <translation>#</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="835" />
+            <location filename="../dialogs.py" line="836" />
             <source>Status</source>
             <translation>상태</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="836" />
+            <location filename="../dialogs.py" line="837" />
             <source>Name</source>
             <translation>이름</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="837" />
+            <location filename="../dialogs.py" line="838" />
             <source>ID</source>
             <translation>ID</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="838" />
+            <location filename="../dialogs.py" line="839" />
             <source>Confidence</source>
             <translation>신뢰</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="856" />
+            <location filename="../dialogs.py" line="857" />
             <source>Run Diagnostics</source>
             <translation>진단 실행</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="870" />
+            <location filename="../dialogs.py" line="871" />
             <source>Select Image</source>
             <translation>이미지 선택</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="872" />
+            <location filename="../dialogs.py" line="873" />
             <source>Image Files (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;All Files (*)</source>
             <translation>이미지 파일(*.png *.jpg *.jpeg *.webp *.bmp *.gif); 모든 파일(*)</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="889" />
+            <location filename="../dialogs.py" line="890" />
             <source>Invalid Image</source>
             <translation>잘못된 이미지</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="890" />
+            <location filename="../dialogs.py" line="891" />
             <source>Please select a valid image file.</source>
             <translation>유효한 이미지 파일을 선택하십시오.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="914" />
+            <location filename="../dialogs.py" line="915" />
             <source>Detected %1 cards out of %2 slots</source>
             <translation>%2개의 슬롯 중 %1개의 카드가 감지되었습니다.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="920" />
+            <location filename="../dialogs.py" line="921" />
             <source>Error: %1</source>
             <translation>오류: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="923" />
+            <location filename="../dialogs.py" line="924" />
             <source>Diagnosis Error</source>
             <translation>진단 오류</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="924" />
+            <location filename="../dialogs.py" line="925" />
             <source>Failed to diagnose image: %1</source>
             <translation>이미지 진단 실패: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="930" />
+            <location filename="../dialogs.py" line="931" />
             <source>Failed to preprocess screenshot.</source>
             <translation>스크린샷 전처리 작업에 실패했습니다.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="934" />
+            <location filename="../dialogs.py" line="935" />
             <source>No card positions detected in screenshot.</source>
             <translation>스크린샷에서 카드 위치가 감지되지 않았습니다.</translation>
         </message>
         <message>
+            <location filename="../dialogs.py" line="956" />
             <location filename="../dialogs.py" line="955" />
-            <location filename="../dialogs.py" line="954" />
             <source>Empty</source>
             <translation>비어 있는</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="972" />
+            <location filename="../dialogs.py" line="973" />
+            <location filename="../dialogs.py" line="963" />
             <location filename="../dialogs.py" line="962" />
-            <location filename="../dialogs.py" line="961" />
             <source>Unknown</source>
             <translation>알려지지 않은</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="966" />
+            <location filename="../dialogs.py" line="967" />
             <source>Matched</source>
             <translation>일치함</translation>
         </message>
@@ -554,38 +554,51 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Ruler of the Skies</source>
-            <translation>하늘의 지배자를 추가했습니다</translation>
+            <source>TEAM ROCKET RETURNS!</source>
+            <translation>로켓단이 돌아왔다!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Thanks for your patience while I get this out the door. Have fun!</source>
-            <translation>이 메일을 보내는 동안 기다려주셔서 감사합니다. 즐거운 시간 보내세요!</translation>
+            <source>When I was a kid, I always wanted to join Team Rocket. I'm still annoyed they wouldn't let me.</source>
+            <translation>어렸을 때 저는 항상 로켓단에 들어가고 싶었어요. 그들이 저를 받아주지 않았던 게 아직도 아쉬워요.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="639" />
+            <location filename="../dialogs.py" line="635" />
+            <source>Enjoy Team Rocket's Ambition!</source>
+            <translation>로켓단의 야망을 즐겨보세요!</translation>
+        </message>
+        <message>
+            <location filename="../dialogs.py" line="640" />
             <source>&lt;h2&gt;What's New&lt;/h2&gt;</source>
             <translation>&lt;h2&gt;새로운 소식&lt;/h2&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="646" />
+            <location filename="../dialogs.py" line="647" />
             <source>Welcome to PTCGPB Companion!</source>
             <translation>PTCGPB 컴패니언에 오신 것을 환영합니다!</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="649" />
+            <location filename="../dialogs.py" line="650" />
             <source>Thanks for installing (or updating) PTCGPB Companion. Here are the highlights for this release:</source>
             <translation>PTCGPB Companion을 설치(또는 업데이트)해 주셔서 감사합니다. 이번 릴리스의 주요 변경 사항은 다음과 같습니다.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="659" />
+            <location filename="../dialogs.py" line="660" />
             <source>Best of luck!</source>
             <translation>행운을 빌어요!</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="664" />
+            <location filename="../dialogs.py" line="665" />
             <source>Close</source>
             <translation>닫다</translation>
+        </message>
+        <message>
+            <source>Added Ruler of the Skies</source>
+            <translation type="vanished">하늘의 지배자를 추가했습니다</translation>
+        </message>
+        <message>
+            <source>Thanks for your patience while I get this out the door. Have fun!</source>
+            <translation type="vanished">이 메일을 보내는 동안 기다려주셔서 감사합니다. 즐거운 시간 보내세요!</translation>
         </message>
         <message>
             <source>Added Ruler fo the Skies</source>
@@ -619,597 +632,624 @@
     <context>
         <name>MainWindow</name>
         <message>
-            <location filename="../main_window.py" line="183" />
+            <location filename="../main_window.py" line="180" />
             <source>First-launch processing skipped: screenshots directory is not configured. Please set it in Preferences.</source>
             <translation>첫 실행 시 처리가 건너뛰어졌습니다. 스크린샷 디렉터리가 구성되지 않았습니다. 환경 설정에서 설정해 주세요.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="211" />
+            <location filename="../main_window.py" line="190" />
+            <source>Skipped screenshot rescan. You can run it any time with Load New Data.</source>
+            <translation>스크린샷 재스캔을 건너뛰었습니다. &amp;#39;새 데이터 불러오기&amp;#39;를 통해 언제든지 실행할 수 있습니다.</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="212" />
+            <source>Rescan Screenshots?</source>
+            <translation>스크린샷을 다시 스캔해 주시겠어요?</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="214" />
+            <source>This update adds cards the previous version couldn't recognize. If you opened packs from newly-added sets before updating, your screenshots need a rescan to pick them up.
+
+This can take a while. If you haven't opened any packs from the new sets, you can skip it — you can always run it later from Load New Data.</source>
+            <translation>이번 업데이트에서는 이전 버전에서 인식하지 못했던 카드들이 추가되었습니다. 업데이트 전에 새로 추가된 세트의 팩을 개봉하셨다면, 해당 카드를 인식하기 위해 스크린샷을 다시 스캔해야 합니다. 이 과정은 다소 시간이 걸릴 수 있습니다. 새 세트의 팩을 개봉하지 않으셨다면 이 과정을 건너뛸 수 있으며, 나중에 &amp;#39;새 데이터 불러오기&amp;#39;에서 언제든지 다시 실행할 수 있습니다.</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="224" />
+            <source>Rescan</source>
+            <translation>재스캔</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="226" />
+            <source>Skip</source>
+            <translation>건너뛰다</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="256" />
             <source>Waiting for running jobs to finish before starting %1...</source>
             <translation>%1을 시작하기 전에 실행 중인 작업이 완료될 때까지 기다립니다...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="586" />
+            <location filename="../main_window.py" line="631" />
             <source>Update Available</source>
             <translation>업데이트 가능</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="588" />
+            <location filename="../main_window.py" line="633" />
             <source>Version %1 is available. Would you like to download and install it now?
 
 Asset: %2</source>
             <translation>버전 %1이 출시되었습니다. 지금 다운로드하여 설치하시겠습니까? 에셋: %2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="595" />
+            <location filename="../main_window.py" line="640" />
             <source>Download</source>
             <translation>다운로드</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="598" />
+            <location filename="../main_window.py" line="643" />
             <source>Later</source>
             <translation>나중에</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="610" />
+            <location filename="../main_window.py" line="655" />
             <source>Download Unavailable</source>
             <translation>다운로드할 수 없습니다</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="611" />
+            <location filename="../main_window.py" line="656" />
             <source>No downloadable update asset was found for this release. The release page will be opened.</source>
             <translation>이번 릴리스에 대한 다운로드 가능한 업데이트 파일을 찾을 수 없습니다. 릴리스 페이지가 열립니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="652" />
+            <location filename="../main_window.py" line="697" />
             <source>Downloading update... %1/%2</source>
             <translation>업데이트 다운로드 중... %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="675" />
+            <location filename="../main_window.py" line="720" />
             <source>Update Failed</source>
             <translation>업데이트 실패</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="676" />
+            <location filename="../main_window.py" line="721" />
             <source>Failed to download or apply update: %1</source>
             <translation>업데이트 다운로드 또는 적용에 실패했습니다: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="683" />
+            <location filename="../main_window.py" line="728" />
             <source>Update Not Supported</source>
             <translation>업데이트는 지원되지 않습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="684" />
+            <location filename="../main_window.py" line="729" />
             <source>Updates can only be installed from the packaged application.</source>
             <translation>업데이트는 패키지 애플리케이션에서만 설치할 수 있습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="744" />
+            <location filename="../main_window.py" line="789" />
             <source>&amp;File</source>
             <translation>&amp;amp;파일</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="747" />
+            <location filename="../main_window.py" line="792" />
             <source>&amp;Import CSV</source>
             <translation>CSV 가져오기</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="753" />
+            <location filename="../main_window.py" line="798" />
             <source>&amp;Process Screenshots</source>
             <translation>&amp;amp; 프로세스 스크린샷</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="759" />
+            <location filename="../main_window.py" line="804" />
             <source>&amp;Load New Data</source>
             <translation>새 데이터 불러오기</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="765" />
+            <location filename="../main_window.py" line="810" />
             <source>Process &amp;Removed Cards</source>
             <translation>처리 및 제거된 카드</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="770" />
+            <location filename="../main_window.py" line="815" />
             <source>&amp;Preferences</source>
             <translation>&amp;amp;환경설정</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="777" />
+            <location filename="../main_window.py" line="822" />
             <source>E&amp;xit</source>
             <translation>출구</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="783" />
+            <location filename="../main_window.py" line="828" />
             <source>&amp;Debug</source>
             <translation>&amp;amp;디버그</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="785" />
+            <location filename="../main_window.py" line="830" />
             <source>&amp;Diagnose Image</source>
             <translation>&amp;amp;이미지 진단</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="790" />
+            <location filename="../main_window.py" line="835" />
             <source>&amp;Help</source>
             <translation>&amp;amp;돕다</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="793" />
+            <location filename="../main_window.py" line="838" />
             <source>&amp;About</source>
             <translation>&amp;amp;에 대한</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="827" />
+            <location filename="../main_window.py" line="872" />
             <source>Total Cards: 0</source>
             <translation>총 카드 수: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="832" />
+            <location filename="../main_window.py" line="877" />
             <source>Total Packs: 0</source>
             <translation>총 팩 수: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="837" />
+            <location filename="../main_window.py" line="882" />
             <source>Unique Cards: 0</source>
             <translation>고유 카드 수: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="951" />
-            <location filename="../main_window.py" line="842" />
+            <location filename="../main_window.py" line="996" />
+            <location filename="../main_window.py" line="887" />
             <source>Last Processed: Never</source>
             <translation>마지막 처리 시간: 없음</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="851" />
+            <location filename="../main_window.py" line="896" />
             <source>Import CSV</source>
             <translation>CSV 가져오기</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="855" />
+            <location filename="../main_window.py" line="900" />
             <source>Load Screenshots</source>
             <translation>스크린샷 불러오기</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2085" />
-            <location filename="../main_window.py" line="2058" />
-            <location filename="../main_window.py" line="859" />
+            <location filename="../main_window.py" line="2130" />
+            <location filename="../main_window.py" line="2103" />
+            <location filename="../main_window.py" line="904" />
             <source>Load New Data</source>
             <translation>새 데이터 불러오기</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="867" />
+            <location filename="../main_window.py" line="912" />
             <source>Recent Activity:</source>
             <translation>최근 활동:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="872" />
+            <location filename="../main_window.py" line="917" />
             <source>Clear</source>
             <translation>분명한</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="887" />
+            <location filename="../main_window.py" line="932" />
             <source>Dashboard</source>
             <translation>계기반</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="918" />
+            <location filename="../main_window.py" line="963" />
             <source>Error updating statistics: %1</source>
             <translation>통계 업데이트 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="926" />
+            <location filename="../main_window.py" line="971" />
             <source>Total Cards: %1</source>
             <translation>총 카드 수: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="929" />
+            <location filename="../main_window.py" line="974" />
             <source>Unique Cards: %1</source>
             <translation>고유 카드: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="932" />
+            <location filename="../main_window.py" line="977" />
             <source>Total Packs: %1</source>
             <translation>총 팩 수: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="946" />
+            <location filename="../main_window.py" line="991" />
             <source>Last Processed: %1</source>
             <translation>마지막 처리 시간: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="955" />
+            <location filename="../main_window.py" line="1000" />
             <source>Dashboard statistics updated</source>
             <translation>대시보드 통계가 업데이트되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1070" />
+            <location filename="../main_window.py" line="1115" />
             <source>No recent activity</source>
             <translation>최근 활동 없음</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1078" />
+            <location filename="../main_window.py" line="1123" />
             <source>Error loading activity</source>
             <translation>활동 로딩 오류</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1089" />
+            <location filename="../main_window.py" line="1134" />
             <source>All Sets</source>
             <translation>모든 세트</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1091" />
+            <location filename="../main_window.py" line="1136" />
             <source>Set:</source>
             <translation>세트:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1095" />
+            <location filename="../main_window.py" line="1140" />
             <source>All Rarities</source>
             <translation>모든 희귀도</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1097" />
+            <location filename="../main_window.py" line="1142" />
             <source>Rarity:</source>
             <translation>희박:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1101" />
+            <location filename="../main_window.py" line="1146" />
             <source>Tradeable only</source>
             <translation>거래 전용</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1106" />
+            <location filename="../main_window.py" line="1151" />
             <source>Search cards...</source>
             <translation>검색 카드...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1111" />
+            <location filename="../main_window.py" line="1156" />
             <source>Refresh</source>
             <translation>새로 고치다</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1144" />
+            <location filename="../main_window.py" line="1189" />
             <source>Cards</source>
             <translation>카드</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1187" />
+            <location filename="../main_window.py" line="1232" />
             <source>No active tasks</source>
             <translation>활성화된 작업 없음</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1197" />
+            <location filename="../main_window.py" line="1242" />
             <source>Active Tasks:</source>
             <translation>활성 작업:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1205" />
+            <location filename="../main_window.py" line="1250" />
             <source>Task Details:</source>
             <translation>작업 세부 정보:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1211" />
+            <location filename="../main_window.py" line="1256" />
             <source>Cancel Selected</source>
             <translation>선택 취소</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1215" />
+            <location filename="../main_window.py" line="1260" />
             <source>Clear Completed</source>
             <translation>지우기 완료</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1222" />
+            <location filename="../main_window.py" line="1267" />
             <source>Processing</source>
             <translation>처리 중</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1242" />
+            <location filename="../main_window.py" line="1287" />
             <source>Cancelled</source>
             <translation>취소</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1454" />
+            <location filename="../main_window.py" line="1499" />
             <source>Diagnosis Error</source>
             <translation>진단 오류</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1455" />
+            <location filename="../main_window.py" line="1500" />
             <source>Failed to open image diagnosis: %1</source>
             <translation>이미지 진단 열기 실패: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1618" />
+            <location filename="../main_window.py" line="1663" />
             <source>Showing %1 of %2 unique cards</source>
             <translation>총 2개의 고유 카드 중 1개를 표시합니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1626" />
+            <location filename="../main_window.py" line="1671" />
             <source>Error applying filters: %1</source>
             <translation>필터 적용 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1700" />
+            <location filename="../main_window.py" line="1745" />
             <source>No Data</source>
             <translation>데이터 없음</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1701" />
+            <location filename="../main_window.py" line="1746" />
             <source>No account distribution found for %1</source>
             <translation>%1에 대한 계정 분배를 찾을 수 없습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1710" />
+            <location filename="../main_window.py" line="1755" />
             <source>Error</source>
             <translation>오류</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1711" />
+            <location filename="../main_window.py" line="1756" />
             <source>Could not show account distribution: %1</source>
             <translation>계정 분포를 표시할 수 없습니다: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1851" />
+            <location filename="../main_window.py" line="1896" />
             <source>DB: Connected</source>
             <translation>DB: 연결됨</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1921" />
+            <location filename="../main_window.py" line="1966" />
             <source>Tasks: %1</source>
             <translation>작업: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2059" />
+            <location filename="../main_window.py" line="2104" />
             <source>A data import is already in progress. Please wait for it to finish.</source>
             <translation>데이터 가져오기가 이미 진행 중입니다. 완료될 때까지 기다려 주세요.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2069" />
+            <location filename="../main_window.py" line="2114" />
             <source>CSV file path is not set.</source>
             <translation>CSV 파일 경로가 설정되지 않았습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2071" />
+            <location filename="../main_window.py" line="2116" />
             <source>CSV file not found: %1</source>
             <translation>CSV 파일을 찾을 수 없습니다: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2074" />
+            <location filename="../main_window.py" line="2119" />
             <source>Screenshots directory is not set.</source>
             <translation>스크린샷 디렉터리가 설정되지 않았습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2077" />
+            <location filename="../main_window.py" line="2122" />
             <source>Screenshots directory not found: %1</source>
             <translation>스크린샷 디렉토리를 찾을 수 없습니다: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2088" />
+            <location filename="../main_window.py" line="2133" />
             <source>Please use the Import CSV or Process Screenshots options to set the correct locations.</source>
             <translation>CSV 가져오기 또는 스크린샷 처리 옵션을 사용하여 올바른 위치를 설정하십시오.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2100" />
+            <location filename="../main_window.py" line="2145" />
             <source>Starting data import…</source>
             <translation>데이터 가져오기 시작 중…</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2117" />
+            <location filename="../main_window.py" line="2162" />
             <source>CSV import completed</source>
             <translation>CSV 가져오기가 완료되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2119" />
+            <location filename="../main_window.py" line="2164" />
             <source>CSV import cancelled</source>
             <translation>CSV 가져오기가 취소되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2127" />
+            <location filename="../main_window.py" line="2172" />
             <source>Error importing CSV: %1</source>
             <translation>CSV 가져오기 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2133" />
+            <location filename="../main_window.py" line="2178" />
             <source>Starting background CSV import...</source>
             <translation>백그라운드 CSV 가져오기를 시작합니다...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2141" />
+            <location filename="../main_window.py" line="2186" />
             <source>CSV Import: %1</source>
             <translation>CSV 가져오기: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2180" />
+            <location filename="../main_window.py" line="2225" />
             <source>CSV import started in background</source>
             <translation>CSV 가져오기가 백그라운드에서 시작되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2185" />
+            <location filename="../main_window.py" line="2230" />
             <source>Error starting CSV import: %1</source>
             <translation>CSV 가져오기 시작 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2193" />
+            <location filename="../main_window.py" line="2238" />
             <source>CSV import: %1/%2</source>
             <translation>CSV 가져오기: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2215" />
+            <location filename="../main_window.py" line="2260" />
             <source>CSV import completed: %1 packs imported</source>
             <translation>CSV 가져오기 완료: %1개 팩이 가져와졌습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2232" />
+            <location filename="../main_window.py" line="2277" />
             <source>Starting screenshot processing from saved directory…</source>
             <translation>저장된 디렉토리에서 스크린샷 처리를 시작합니다…</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2239" />
+            <location filename="../main_window.py" line="2284" />
             <source>CSV import error: %1</source>
             <translation>CSV 가져오기 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2250" />
+            <location filename="../main_window.py" line="2295" />
             <source>Combined import stopped due to CSV import error.</source>
             <translation>CSV 가져오기 오류로 인해 통합 가져오기가 중단되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2257" />
+            <location filename="../main_window.py" line="2302" />
             <source>CSV import finished</source>
             <translation>CSV 가져오기가 완료되었습니다</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2289" />
+            <location filename="../main_window.py" line="2334" />
             <source>Combined import stopped: saved screenshots directory is unavailable.</source>
             <translation>통합 가져오기가 중지되었습니다. 저장된 스크린샷 디렉터리를 사용할 수 없습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2313" />
+            <location filename="../main_window.py" line="2358" />
             <source>Screenshot processing: %1/%2</source>
             <translation>스크린샷 처리 중: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2333" />
+            <location filename="../main_window.py" line="2378" />
             <source>Screenshot processing completed: %1 files processed</source>
             <translation>스크린샷 처리 완료: %1개 파일 처리됨</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2348" />
+            <location filename="../main_window.py" line="2393" />
             <source>Data import finished!</source>
             <translation>데이터 가져오기가 완료되었습니다!</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2373" />
+            <location filename="../main_window.py" line="2418" />
             <source>Screenshot processing error: %1</source>
             <translation>스크린샷 처리 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2384" />
+            <location filename="../main_window.py" line="2429" />
             <source>Combined import stopped due to screenshot processing error.</source>
             <translation>스크린샷 처리 오류로 인해 통합 가져오기가 중단되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2391" />
+            <location filename="../main_window.py" line="2436" />
             <source>Screenshot processing finished</source>
             <translation>스크린샷 처리 완료</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2424" />
+            <location filename="../main_window.py" line="2469" />
             <source>Missing Screenshot Data</source>
             <translation>스크린샷 데이터가 누락되었습니다</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2425" />
+            <location filename="../main_window.py" line="2470" />
             <source>No screenshot records found in database. Please import a CSV file first (File -&gt; Import CSV) before processing screenshots. Alternatively, go to File -&gt; Preferences and verify all paths are correct.</source>
             <translation>데이터베이스에서 스크린샷 기록을 찾을 수 없습니다. 스크린샷을 처리하기 전에 먼저 CSV 파일을 가져오세요(파일 -&amp;gt; CSV 가져오기). 또는 파일 -&amp;gt; 환경설정으로 이동하여 모든 경로가 올바른지 확인하세요.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2432" />
+            <location filename="../main_window.py" line="2477" />
             <source>Aborted screenshot processing: No screenshot records in database</source>
             <translation>스크린샷 처리 중단: 데이터베이스에 스크린샷 기록이 없습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2441" />
+            <location filename="../main_window.py" line="2486" />
             <source>Error checking card count: %1</source>
             <translation>카드 개수 확인 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2456" />
+            <location filename="../main_window.py" line="2501" />
             <source>Screenshot processing completed</source>
             <translation>스크린샷 처리가 완료되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2458" />
+            <location filename="../main_window.py" line="2503" />
             <source>Screenshot processing cancelled</source>
             <translation>스크린샷 처리가 취소되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2466" />
+            <location filename="../main_window.py" line="2511" />
             <source>Error processing screenshots: %1</source>
             <translation>스크린샷 처리 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2472" />
+            <location filename="../main_window.py" line="2517" />
             <source>Starting background screenshot processing...</source>
             <translation>백그라운드 스크린샷 처리를 시작합니다...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2481" />
+            <location filename="../main_window.py" line="2526" />
             <source>Screenshot Processing: %1</source>
             <translation>스크린샷 처리 중: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2526" />
+            <location filename="../main_window.py" line="2571" />
             <source>Screenshot processing started in background</source>
             <translation>스크린샷 처리가 백그라운드에서 시작되었습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2532" />
+            <location filename="../main_window.py" line="2577" />
             <source>Error starting screenshot processing: %1</source>
             <translation>스크린샷 처리 시작 중 오류 발생: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2541" />
+            <location filename="../main_window.py" line="2586" />
             <source>Downloading card art</source>
             <translation>카드 이미지 다운로드</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2558" />
+            <location filename="../main_window.py" line="2603" />
             <source>Card art download complete: %1 images saved</source>
             <translation>카드 디자인 다운로드 완료: 이미지 1개 저장됨</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2565" />
+            <location filename="../main_window.py" line="2610" />
             <source>Card art download complete</source>
             <translation>카드 디자인 다운로드 완료</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2571" />
+            <location filename="../main_window.py" line="2616" />
             <source>Card art download error: %1</source>
             <translation>카드 이미지 다운로드 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2605" />
+            <location filename="../main_window.py" line="2650" />
             <source>Error showing about dialog: %1</source>
             <translation>대화 상자에 표시되는 오류: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2618" />
+            <location filename="../main_window.py" line="2663" />
             <source>Error showing preferences dialog: %1</source>
             <translation>환경설정 대화 상자를 표시하는 데 오류가 발생했습니다: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2640" />
+            <location filename="../main_window.py" line="2685" />
             <source>Closing application. Cleaning up... this may take a moment.</source>
             <translation>애플리케이션을 종료합니다. 정리 작업 중이며 잠시 시간이 걸릴 수 있습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2728" />
+            <location filename="../main_window.py" line="2773" />
             <source>No Removed Cards</source>
             <translation>제거된 카드 없음</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2728" />
+            <location filename="../main_window.py" line="2773" />
             <source>No cards to process.</source>
             <translation>처리할 카드가 없습니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2733" />
+            <location filename="../main_window.py" line="2778" />
             <source>Process Removed Cards?</source>
             <translation>카드 삭제 처리 중이신가요?</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2735" />
+            <location filename="../main_window.py" line="2780" />
             <source>This will process &lt;b&gt;%1&lt;/b&gt; recorded card removals from the database.&lt;br&gt;&lt;br&gt;This is useful if you have re-imported screenshots that might have brought back cards you previously removed.</source>
             <translation>이렇게 하면 데이터베이스에서 기록된 카드 삭제 건수 &lt;b&gt;1%가&lt;/b&gt; 처리됩니다.&lt;br&gt;&lt;br&gt; 이 기능은 이전에 삭제했던 카드가 다시 나타나는 스크린샷을 다시 가져온 경우에 유용합니다.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2763" />
+            <location filename="../main_window.py" line="2808" />
             <source>Process Complete</source>
             <translation>프로세스 완료</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2764" />
+            <location filename="../main_window.py" line="2809" />
             <source>Processed %1 records. %2 cards were actually found and removed.</source>
             <translation>%1개의 레코드를 처리했습니다. 실제로 %2개의 카드가 발견되어 제거되었습니다.</translation>
         </message>

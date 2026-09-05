@@ -629,9 +629,10 @@ class FirstLaunchDialog(QDialog):
         # =============================================================================
         first_launch_release_notes = [
             self.tr(
-                "Added Ruler of the Skies"
+                "TEAM ROCKET RETURNS!"
             ),
-            self.tr("Thanks for your patience while I get this out the door. Have fun!"),
+            self.tr("When I was a kid, I always wanted to join Team Rocket. I'm still annoyed they wouldn't let me."),
+            self.tr("Enjoy Team Rocket's Ambition!"),
         ]
 
         main_layout = QVBoxLayout()

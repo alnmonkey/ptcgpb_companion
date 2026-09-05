@@ -4,12 +4,12 @@
     <context>
         <name>AboutDialog</name>
         <message>
-            <location filename="../dialogs.py" line="684" />
+            <location filename="../dialogs.py" line="685" />
             <source>About PTCGPB Companion</source>
             <translation>Acerca del compañero PTCGPB</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="701" />
+            <location filename="../dialogs.py" line="702" />
             <source>&lt;h2&gt;PTCGPB Companion&lt;/h2&gt;
                &lt;p&gt;Pokémon Card Identification Tool&lt;/p&gt;
                &lt;p&gt;Version %1&lt;/p&gt;
@@ -19,7 +19,7 @@
             <translation>&lt;h2&gt;PTCGPB Companion&lt;/h2&gt; &lt;p&gt;Herramienta de identificación de tarjetas Pokémon&lt;/p&gt; &lt;p&gt;Versión %1&lt;/p&gt; &lt;p&gt;© 2026 itsthejoker&lt;/p&gt; &lt;p&gt;Licencia MIT y código abierto. Hecho con 🌯.&lt;br&gt;&lt;a href="https://github.com/itsthejoker/ptcgpb_companion"&gt;https://github.com/itsthejoker/ptcgpb-companion&lt;/a&gt;&lt;/p&gt; &lt;p&gt;Construido con PyQt6 y OpenCV&lt;/p&gt;&lt;p&gt;&lt;/p&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="711" />
+            <location filename="../dialogs.py" line="712" />
             <source>Close</source>
             <translation>Cerrar</translation>
         </message>
@@ -27,154 +27,154 @@
     <context>
         <name>AccountCardListDialog</name>
         <message>
-            <location filename="../dialogs.py" line="1036" />
+            <location filename="../dialogs.py" line="1037" />
             <source>Accounts owning %1</source>
             <translation>Cuentas propietarias de %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1056" />
+            <location filename="../dialogs.py" line="1057" />
             <source>Showing account distribution for: &lt;b&gt;%1&lt;/b&gt;</source>
             <translation>Mostrando distribución de cuentas para: &lt;b&gt;%1&lt;/b&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1064" />
+            <location filename="../dialogs.py" line="1065" />
             <source>Filter:</source>
             <translation>Filtro:</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1066" />
+            <location filename="../dialogs.py" line="1067" />
             <source>Search account name...</source>
             <translation>Buscar nombre de cuenta...</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1076" />
+            <location filename="../dialogs.py" line="1077" />
             <source>Account Name</source>
             <translation>Nombre de cuenta</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1077" />
+            <location filename="../dialogs.py" line="1078" />
             <source>Quantity</source>
             <translation>Cantidad</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1078" />
+            <location filename="../dialogs.py" line="1079" />
             <source>Shinedust</source>
             <translation>polvo brillante</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1079" />
+            <location filename="../dialogs.py" line="1080" />
             <source>Age</source>
             <translation>edad</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1158" />
-            <location filename="../dialogs.py" line="1080" />
+            <location filename="../dialogs.py" line="1159" />
+            <location filename="../dialogs.py" line="1081" />
             <source>Screenshot</source>
             <translation>Captura de pantalla</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1081" />
+            <location filename="../dialogs.py" line="1082" />
             <source>Action</source>
             <translation>acción</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1116" />
+            <location filename="../dialogs.py" line="1117" />
             <source>Copy all to clipboard</source>
             <translation>Copiar todo al portapapeles</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1149" />
+            <location filename="../dialogs.py" line="1150" />
             <source>%1d</source>
             <translation>%1d</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1167" />
+            <location filename="../dialogs.py" line="1168" />
             <source>Remove</source>
             <translation>Quitar</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1403" />
-            <location filename="../dialogs.py" line="1284" />
-            <location filename="../dialogs.py" line="1206" />
-            <location filename="../dialogs.py" line="1186" />
+            <location filename="../dialogs.py" line="1404" />
+            <location filename="../dialogs.py" line="1285" />
+            <location filename="../dialogs.py" line="1207" />
+            <location filename="../dialogs.py" line="1187" />
             <source>Error</source>
             <translation>error</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1187" />
+            <location filename="../dialogs.py" line="1188" />
             <source>The screenshot path could not be found:
 %1</source>
             <translation>No se pudo encontrar la ruta de la captura de pantalla: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1206" />
+            <location filename="../dialogs.py" line="1207" />
             <source>Card not found in database.</source>
             <translation>Tarjeta no encontrada en la base de datos.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1256" />
-            <location filename="../dialogs.py" line="1235" />
-            <location filename="../dialogs.py" line="1216" />
+            <location filename="../dialogs.py" line="1257" />
+            <location filename="../dialogs.py" line="1236" />
+            <location filename="../dialogs.py" line="1217" />
             <source>Select Shinedust Cost</source>
             <translation>Seleccione el costo de Shinedust</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1218" />
+            <location filename="../dialogs.py" line="1219" />
             <source>Is this a 4,000 or 10,000 shinedust move for %1?</source>
             <translation>¿Es este un movimiento de 4000 o 10 000 de polvo brillante por %1?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1237" />
+            <location filename="../dialogs.py" line="1238" />
             <source>Is this a 25,000 or 30,000 shinedust move for %1?</source>
             <translation>¿Es este un movimiento de 25.000 o 30.000 de polvo brillante por %1?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1257" />
+            <location filename="../dialogs.py" line="1258" />
             <source>Was this card shared?</source>
             <translation>¿Esta tarjeta fue compartida?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1259" />
+            <location filename="../dialogs.py" line="1260" />
             <source>Shared</source>
             <translation>Compartido</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1285" />
+            <location filename="../dialogs.py" line="1286" />
             <source>Account '%1' not found.</source>
             <translation>Cuenta '%1' no encontrada.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1300" />
+            <location filename="../dialogs.py" line="1301" />
             <source>Insufficient Shinedust</source>
             <translation>Polvo de brillo insuficiente</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1302" />
+            <location filename="../dialogs.py" line="1303" />
             <source>Account &lt;b&gt;%1&lt;/b&gt; does not have enough shinedust (%2) to perform this action (cost: %3).</source>
             <translation>La cuenta &lt;b&gt;%1&lt;/b&gt; no tiene suficiente polvo brillante (%2) para realizar esta acción (coste: %3).</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1311" />
+            <location filename="../dialogs.py" line="1312" />
             <source>Remove anyway</source>
             <translation>Eliminar de todos modos</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1320" />
+            <location filename="../dialogs.py" line="1321" />
             <source>Remove Card?</source>
             <translation>¿Quitar tarjeta?</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1322" />
+            <location filename="../dialogs.py" line="1323" />
             <source>Unknown</source>
             <translation>Desconocido</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1325" />
+            <location filename="../dialogs.py" line="1326" />
             <source>One instance of &lt;b&gt;%1&lt;/b&gt; will be removed from account &lt;b&gt;%2&lt;/b&gt;.&lt;br&gt;&lt;br&gt;This will cost &lt;b&gt;%3&lt;/b&gt; shinedust.&lt;br&gt;&lt;br&gt;If the account has multiples of this same card, only one will be removed.</source>
             <translation>Se eliminará una instancia de &lt;b&gt;%1&lt;/b&gt; de la cuenta &lt;b&gt;%2&lt;/b&gt;.&lt;br&gt;&lt;br&gt;Esto costará &lt;b&gt;%3&lt;/b&gt; brillo.&lt;br&gt;&lt;br&gt;Si la cuenta tiene múltiples de esta misma tarjeta, solo se eliminará una.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="1404" />
+            <location filename="../dialogs.py" line="1405" />
             <source>Could not find card in database to remove.</source>
             <translation>No se pudo encontrar la tarjeta en la base de datos para eliminarla.</translation>
         </message>
@@ -365,12 +365,12 @@
     <context>
         <name>CardImageDialog</name>
         <message>
-            <location filename="../dialogs.py" line="744" />
+            <location filename="../dialogs.py" line="745" />
             <source>Error</source>
             <translation>error</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="745" />
+            <location filename="../dialogs.py" line="746" />
             <source>Could not load image: %1</source>
             <translation>No se pudo cargar la imagen: %1</translation>
         </message>
@@ -419,120 +419,120 @@
     <context>
         <name>DiagnoseImageDialog</name>
         <message>
-            <location filename="../dialogs.py" line="801" />
+            <location filename="../dialogs.py" line="802" />
             <source>Diagnose Image</source>
             <translation>Diagnosticar imagen</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="819" />
+            <location filename="../dialogs.py" line="820" />
             <source>No image selected</source>
             <translation>No hay ninguna imagen seleccionada</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="822" />
+            <location filename="../dialogs.py" line="823" />
             <source>Browse...</source>
             <translation>Navegar...</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="825" />
+            <location filename="../dialogs.py" line="826" />
             <source>Image File:</source>
             <translation>Archivo de imagen:</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="834" />
+            <location filename="../dialogs.py" line="835" />
             <source>#</source>
             <translation>#</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="835" />
+            <location filename="../dialogs.py" line="836" />
             <source>Status</source>
             <translation>Estado</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="836" />
+            <location filename="../dialogs.py" line="837" />
             <source>Name</source>
             <translation>Nombre</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="837" />
+            <location filename="../dialogs.py" line="838" />
             <source>ID</source>
             <translation>IDENTIFICACIÓN</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="838" />
+            <location filename="../dialogs.py" line="839" />
             <source>Confidence</source>
             <translation>Confianza</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="856" />
+            <location filename="../dialogs.py" line="857" />
             <source>Run Diagnostics</source>
             <translation>Ejecutar diagnósticos</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="870" />
+            <location filename="../dialogs.py" line="871" />
             <source>Select Image</source>
             <translation>Seleccionar imagen</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="872" />
+            <location filename="../dialogs.py" line="873" />
             <source>Image Files (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;All Files (*)</source>
             <translation>Archivos de imagen (*.png *.jpg *.jpeg *.webp *.bmp *.gif);;Todos los archivos (*)</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="889" />
+            <location filename="../dialogs.py" line="890" />
             <source>Invalid Image</source>
             <translation>Imagen no válida</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="890" />
+            <location filename="../dialogs.py" line="891" />
             <source>Please select a valid image file.</source>
             <translation>Seleccione un archivo de imagen válido.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="914" />
+            <location filename="../dialogs.py" line="915" />
             <source>Detected %1 cards out of %2 slots</source>
             <translation>Se detectaron %1 tarjetas de %2 ranuras</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="920" />
+            <location filename="../dialogs.py" line="921" />
             <source>Error: %1</source>
             <translation>Error: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="923" />
+            <location filename="../dialogs.py" line="924" />
             <source>Diagnosis Error</source>
             <translation>Error de diagnóstico</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="924" />
+            <location filename="../dialogs.py" line="925" />
             <source>Failed to diagnose image: %1</source>
             <translation>No se pudo diagnosticar la imagen: %1</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="930" />
+            <location filename="../dialogs.py" line="931" />
             <source>Failed to preprocess screenshot.</source>
             <translation>Error al preprocesar la captura de pantalla.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="934" />
+            <location filename="../dialogs.py" line="935" />
             <source>No card positions detected in screenshot.</source>
             <translation>No se detectaron posiciones de tarjetas en la captura de pantalla.</translation>
         </message>
         <message>
+            <location filename="../dialogs.py" line="956" />
             <location filename="../dialogs.py" line="955" />
-            <location filename="../dialogs.py" line="954" />
             <source>Empty</source>
             <translation>Vacío</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="972" />
+            <location filename="../dialogs.py" line="973" />
+            <location filename="../dialogs.py" line="963" />
             <location filename="../dialogs.py" line="962" />
-            <location filename="../dialogs.py" line="961" />
             <source>Unknown</source>
             <translation>Desconocido</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="966" />
+            <location filename="../dialogs.py" line="967" />
             <source>Matched</source>
             <translation>Emparejado</translation>
         </message>
@@ -554,38 +554,51 @@
         </message>
         <message>
             <location filename="../dialogs.py" line="631" />
-            <source>Added Ruler of the Skies</source>
-            <translation>Se agregó el Gobernante de los Cielos</translation>
+            <source>TEAM ROCKET RETURNS!</source>
+            <translation>¡EL EQUIPO ROCKET REGRESA!</translation>
         </message>
         <message>
             <location filename="../dialogs.py" line="634" />
-            <source>Thanks for your patience while I get this out the door. Have fun!</source>
-            <translation>Gracias por su paciencia mientras termino de prepararlo. ¡Que lo disfruten!</translation>
+            <source>When I was a kid, I always wanted to join Team Rocket. I'm still annoyed they wouldn't let me.</source>
+            <translation>Cuando era niño, siempre quise unirme al Equipo Rocket. Todavía me molesta que no me dejaran.</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="639" />
+            <location filename="../dialogs.py" line="635" />
+            <source>Enjoy Team Rocket's Ambition!</source>
+            <translation>¡Disfruta de la ambición del Equipo Rocket!</translation>
+        </message>
+        <message>
+            <location filename="../dialogs.py" line="640" />
             <source>&lt;h2&gt;What's New&lt;/h2&gt;</source>
             <translation>&lt;h2&gt;Qué hay de nuevo&lt;/h2&gt;</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="646" />
+            <location filename="../dialogs.py" line="647" />
             <source>Welcome to PTCGPB Companion!</source>
             <translation>¡Bienvenido a PTCGPB Companion!</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="649" />
+            <location filename="../dialogs.py" line="650" />
             <source>Thanks for installing (or updating) PTCGPB Companion. Here are the highlights for this release:</source>
             <translation>Gracias por instalar (o actualizar) PTCGPB Companion. Estos son los aspectos más destacados de esta versión:</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="659" />
+            <location filename="../dialogs.py" line="660" />
             <source>Best of luck!</source>
             <translation>¡Toda la suerte!</translation>
         </message>
         <message>
-            <location filename="../dialogs.py" line="664" />
+            <location filename="../dialogs.py" line="665" />
             <source>Close</source>
             <translation>Cerca</translation>
+        </message>
+        <message>
+            <source>Added Ruler of the Skies</source>
+            <translation type="vanished">Se agregó el Gobernante de los Cielos</translation>
+        </message>
+        <message>
+            <source>Thanks for your patience while I get this out the door. Have fun!</source>
+            <translation type="vanished">Gracias por su paciencia mientras termino de prepararlo. ¡Que lo disfruten!</translation>
         </message>
         <message>
             <source>Added Ruler fo the Skies</source>
@@ -619,597 +632,624 @@
     <context>
         <name>MainWindow</name>
         <message>
-            <location filename="../main_window.py" line="183" />
+            <location filename="../main_window.py" line="180" />
             <source>First-launch processing skipped: screenshots directory is not configured. Please set it in Preferences.</source>
             <translation>Se omitió el procesamiento inicial: el directorio de capturas de pantalla no está configurado. Configúrelo en Preferencias.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="211" />
+            <location filename="../main_window.py" line="190" />
+            <source>Skipped screenshot rescan. You can run it any time with Load New Data.</source>
+            <translation>Se omitió el escaneo de capturas de pantalla. Puede ejecutarlo en cualquier momento con la opción &amp;quot;Cargar datos nuevos&amp;quot;.</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="212" />
+            <source>Rescan Screenshots?</source>
+            <translation>¿Capturas de pantalla de nuevo?</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="214" />
+            <source>This update adds cards the previous version couldn't recognize. If you opened packs from newly-added sets before updating, your screenshots need a rescan to pick them up.
+
+This can take a while. If you haven't opened any packs from the new sets, you can skip it — you can always run it later from Load New Data.</source>
+            <translation>Esta actualización añade cartas que la versión anterior no reconocía. Si abriste sobres de las nuevas colecciones antes de actualizar, tus capturas de pantalla necesitan un nuevo escaneo para detectarlas. Esto puede tardar un poco. Si no has abierto ningún sobre de las nuevas colecciones, puedes omitir este paso; siempre puedes ejecutarlo más tarde desde «Cargar datos nuevos».</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="224" />
+            <source>Rescan</source>
+            <translation>Volver a escanear</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="226" />
+            <source>Skip</source>
+            <translation>Saltar</translation>
+        </message>
+        <message>
+            <location filename="../main_window.py" line="256" />
             <source>Waiting for running jobs to finish before starting %1...</source>
             <translation>Esperando a que finalicen los trabajos en ejecución antes de comenzar %1...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="586" />
+            <location filename="../main_window.py" line="631" />
             <source>Update Available</source>
             <translation>Actualización disponible</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="588" />
+            <location filename="../main_window.py" line="633" />
             <source>Version %1 is available. Would you like to download and install it now?
 
 Asset: %2</source>
             <translation>La versión %1 está disponible. ¿Quieres descargarla e instalarla ahora? Recurso: %2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="595" />
+            <location filename="../main_window.py" line="640" />
             <source>Download</source>
             <translation>Descargar</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="598" />
+            <location filename="../main_window.py" line="643" />
             <source>Later</source>
             <translation>Más tarde</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="610" />
+            <location filename="../main_window.py" line="655" />
             <source>Download Unavailable</source>
             <translation>Descarga no disponible</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="611" />
+            <location filename="../main_window.py" line="656" />
             <source>No downloadable update asset was found for this release. The release page will be opened.</source>
             <translation>No se encontró ninguna actualización descargable para esta versión. Se abrirá la página de lanzamiento.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="652" />
+            <location filename="../main_window.py" line="697" />
             <source>Downloading update... %1/%2</source>
             <translation>Descargando actualización... %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="675" />
+            <location filename="../main_window.py" line="720" />
             <source>Update Failed</source>
             <translation>Actualización fallida</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="676" />
+            <location filename="../main_window.py" line="721" />
             <source>Failed to download or apply update: %1</source>
             <translation>Error al descargar o aplicar la actualización: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="683" />
+            <location filename="../main_window.py" line="728" />
             <source>Update Not Supported</source>
             <translation>Actualización no compatible</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="684" />
+            <location filename="../main_window.py" line="729" />
             <source>Updates can only be installed from the packaged application.</source>
             <translation>Las actualizaciones sólo se pueden instalar desde la aplicación empaquetada.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="744" />
+            <location filename="../main_window.py" line="789" />
             <source>&amp;File</source>
             <translation>&amp;archivo</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="747" />
+            <location filename="../main_window.py" line="792" />
             <source>&amp;Import CSV</source>
             <translation>&amp;Importar CSV</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="753" />
+            <location filename="../main_window.py" line="798" />
             <source>&amp;Process Screenshots</source>
             <translation>&amp;Capturas de pantalla del proceso</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="759" />
+            <location filename="../main_window.py" line="804" />
             <source>&amp;Load New Data</source>
             <translation>&amp;Cargar nuevos datos</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="765" />
+            <location filename="../main_window.py" line="810" />
             <source>Process &amp;Removed Cards</source>
             <translation>Procesar y retirar tarjetas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="770" />
+            <location filename="../main_window.py" line="815" />
             <source>&amp;Preferences</source>
             <translation>&amp;Preferencias</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="777" />
+            <location filename="../main_window.py" line="822" />
             <source>E&amp;xit</source>
             <translation>Salir</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="783" />
+            <location filename="../main_window.py" line="828" />
             <source>&amp;Debug</source>
             <translation>&amp;amp;Depurar</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="785" />
+            <location filename="../main_window.py" line="830" />
             <source>&amp;Diagnose Image</source>
             <translation>&amp;amp;Diagnóstico de imagen</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="790" />
+            <location filename="../main_window.py" line="835" />
             <source>&amp;Help</source>
             <translation>&amp;Ayuda</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="793" />
+            <location filename="../main_window.py" line="838" />
             <source>&amp;About</source>
             <translation>&amp;Acerca de</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="827" />
+            <location filename="../main_window.py" line="872" />
             <source>Total Cards: 0</source>
             <translation>Tarjetas totales: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="832" />
+            <location filename="../main_window.py" line="877" />
             <source>Total Packs: 0</source>
             <translation>Paquetes totales: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="837" />
+            <location filename="../main_window.py" line="882" />
             <source>Unique Cards: 0</source>
             <translation>Cartas únicas: 0</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="951" />
-            <location filename="../main_window.py" line="842" />
+            <location filename="../main_window.py" line="996" />
+            <location filename="../main_window.py" line="887" />
             <source>Last Processed: Never</source>
             <translation>Último procesado: nunca</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="851" />
+            <location filename="../main_window.py" line="896" />
             <source>Import CSV</source>
             <translation>Importar CSV</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="855" />
+            <location filename="../main_window.py" line="900" />
             <source>Load Screenshots</source>
             <translation>Cargar capturas de pantalla</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2085" />
-            <location filename="../main_window.py" line="2058" />
-            <location filename="../main_window.py" line="859" />
+            <location filename="../main_window.py" line="2130" />
+            <location filename="../main_window.py" line="2103" />
+            <location filename="../main_window.py" line="904" />
             <source>Load New Data</source>
             <translation>Cargar nuevos datos</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="867" />
+            <location filename="../main_window.py" line="912" />
             <source>Recent Activity:</source>
             <translation>Actividad reciente:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="872" />
+            <location filename="../main_window.py" line="917" />
             <source>Clear</source>
             <translation>Borrar</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="887" />
+            <location filename="../main_window.py" line="932" />
             <source>Dashboard</source>
             <translation>Panel de control</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="918" />
+            <location filename="../main_window.py" line="963" />
             <source>Error updating statistics: %1</source>
             <translation>Error al actualizar estadísticas: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="926" />
+            <location filename="../main_window.py" line="971" />
             <source>Total Cards: %1</source>
             <translation>Tarjetas totales: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="929" />
+            <location filename="../main_window.py" line="974" />
             <source>Unique Cards: %1</source>
             <translation>Tarjetas únicas: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="932" />
+            <location filename="../main_window.py" line="977" />
             <source>Total Packs: %1</source>
             <translation>Paquetes totales: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="946" />
+            <location filename="../main_window.py" line="991" />
             <source>Last Processed: %1</source>
             <translation>Último procesado: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="955" />
+            <location filename="../main_window.py" line="1000" />
             <source>Dashboard statistics updated</source>
             <translation>Estadísticas del panel actualizadas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1070" />
+            <location filename="../main_window.py" line="1115" />
             <source>No recent activity</source>
             <translation>Ninguna actividad reciente</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1078" />
+            <location filename="../main_window.py" line="1123" />
             <source>Error loading activity</source>
             <translation>Error al cargar actividad</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1089" />
+            <location filename="../main_window.py" line="1134" />
             <source>All Sets</source>
             <translation>Todos los conjuntos</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1091" />
+            <location filename="../main_window.py" line="1136" />
             <source>Set:</source>
             <translation>Conjunto:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1095" />
+            <location filename="../main_window.py" line="1140" />
             <source>All Rarities</source>
             <translation>Todas las rarezas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1097" />
+            <location filename="../main_window.py" line="1142" />
             <source>Rarity:</source>
             <translation>Rareza:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1101" />
+            <location filename="../main_window.py" line="1146" />
             <source>Tradeable only</source>
             <translation>Solo para intercambio</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1106" />
+            <location filename="../main_window.py" line="1151" />
             <source>Search cards...</source>
             <translation>Buscar tarjetas...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1111" />
+            <location filename="../main_window.py" line="1156" />
             <source>Refresh</source>
             <translation>Actualizar</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1144" />
+            <location filename="../main_window.py" line="1189" />
             <source>Cards</source>
             <translation>Tarjetas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1187" />
+            <location filename="../main_window.py" line="1232" />
             <source>No active tasks</source>
             <translation>Sin tareas activas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1197" />
+            <location filename="../main_window.py" line="1242" />
             <source>Active Tasks:</source>
             <translation>Tareas activas:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1205" />
+            <location filename="../main_window.py" line="1250" />
             <source>Task Details:</source>
             <translation>Detalles de la tarea:</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1211" />
+            <location filename="../main_window.py" line="1256" />
             <source>Cancel Selected</source>
             <translation>Cancelar Seleccionado</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1215" />
+            <location filename="../main_window.py" line="1260" />
             <source>Clear Completed</source>
             <translation>Borrar completado</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1222" />
+            <location filename="../main_window.py" line="1267" />
             <source>Processing</source>
             <translation>Procesamiento</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1242" />
+            <location filename="../main_window.py" line="1287" />
             <source>Cancelled</source>
             <translation>Cancelado</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1454" />
+            <location filename="../main_window.py" line="1499" />
             <source>Diagnosis Error</source>
             <translation>Error de diagnóstico</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1455" />
+            <location filename="../main_window.py" line="1500" />
             <source>Failed to open image diagnosis: %1</source>
             <translation>No se pudo abrir el diagnóstico de imagen: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1618" />
+            <location filename="../main_window.py" line="1663" />
             <source>Showing %1 of %2 unique cards</source>
             <translation>Mostrando %1 de %2 tarjetas únicas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1626" />
+            <location filename="../main_window.py" line="1671" />
             <source>Error applying filters: %1</source>
             <translation>Error al aplicar filtros: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1700" />
+            <location filename="../main_window.py" line="1745" />
             <source>No Data</source>
             <translation>Sin datos</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1701" />
+            <location filename="../main_window.py" line="1746" />
             <source>No account distribution found for %1</source>
             <translation>No se encontró distribución de cuenta para %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1710" />
+            <location filename="../main_window.py" line="1755" />
             <source>Error</source>
             <translation>error</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1711" />
+            <location filename="../main_window.py" line="1756" />
             <source>Could not show account distribution: %1</source>
             <translation>No se pudo mostrar la distribución de la cuenta: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1851" />
+            <location filename="../main_window.py" line="1896" />
             <source>DB: Connected</source>
             <translation>Base de datos: conectado</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="1921" />
+            <location filename="../main_window.py" line="1966" />
             <source>Tasks: %1</source>
             <translation>Tareas: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2059" />
+            <location filename="../main_window.py" line="2104" />
             <source>A data import is already in progress. Please wait for it to finish.</source>
             <translation>La importación de datos ya está en curso. Espere a que finalice.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2069" />
+            <location filename="../main_window.py" line="2114" />
             <source>CSV file path is not set.</source>
             <translation>La ruta del archivo CSV no está configurada.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2071" />
+            <location filename="../main_window.py" line="2116" />
             <source>CSV file not found: %1</source>
             <translation>Archivo CSV no encontrado: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2074" />
+            <location filename="../main_window.py" line="2119" />
             <source>Screenshots directory is not set.</source>
             <translation>El directorio de capturas de pantalla no está configurado.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2077" />
+            <location filename="../main_window.py" line="2122" />
             <source>Screenshots directory not found: %1</source>
             <translation>Directorio de capturas de pantalla no encontrado: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2088" />
+            <location filename="../main_window.py" line="2133" />
             <source>Please use the Import CSV or Process Screenshots options to set the correct locations.</source>
             <translation>Utilice las opciones Importar CSV o Procesar capturas de pantalla para establecer las ubicaciones correctas.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2100" />
+            <location filename="../main_window.py" line="2145" />
             <source>Starting data import…</source>
             <translation>Iniciando la importación de datos…</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2117" />
+            <location filename="../main_window.py" line="2162" />
             <source>CSV import completed</source>
             <translation>Importación CSV completada</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2119" />
+            <location filename="../main_window.py" line="2164" />
             <source>CSV import cancelled</source>
             <translation>Importación CSV cancelada</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2127" />
+            <location filename="../main_window.py" line="2172" />
             <source>Error importing CSV: %1</source>
             <translation>Error al importar CSV: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2133" />
+            <location filename="../main_window.py" line="2178" />
             <source>Starting background CSV import...</source>
             <translation>Iniciando importación CSV en segundo plano...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2141" />
+            <location filename="../main_window.py" line="2186" />
             <source>CSV Import: %1</source>
             <translation>Importación CSV: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2180" />
+            <location filename="../main_window.py" line="2225" />
             <source>CSV import started in background</source>
             <translation>La importación CSV comenzó en segundo plano</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2185" />
+            <location filename="../main_window.py" line="2230" />
             <source>Error starting CSV import: %1</source>
             <translation>Error al iniciar la importación CSV: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2193" />
+            <location filename="../main_window.py" line="2238" />
             <source>CSV import: %1/%2</source>
             <translation>Importación CSV: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2215" />
+            <location filename="../main_window.py" line="2260" />
             <source>CSV import completed: %1 packs imported</source>
             <translation>Importación CSV completada: %1 paquetes importados</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2232" />
+            <location filename="../main_window.py" line="2277" />
             <source>Starting screenshot processing from saved directory…</source>
             <translation>Iniciando el procesamiento de captura de pantalla desde el directorio guardado...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2239" />
+            <location filename="../main_window.py" line="2284" />
             <source>CSV import error: %1</source>
             <translation>Error de importación CSV: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2250" />
+            <location filename="../main_window.py" line="2295" />
             <source>Combined import stopped due to CSV import error.</source>
             <translation>La importación combinada se detuvo debido a un error de importación de CSV.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2257" />
+            <location filename="../main_window.py" line="2302" />
             <source>CSV import finished</source>
             <translation>Importación CSV finalizada</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2289" />
+            <location filename="../main_window.py" line="2334" />
             <source>Combined import stopped: saved screenshots directory is unavailable.</source>
             <translation>Importación combinada detenida: el directorio de capturas de pantalla guardadas no está disponible.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2313" />
+            <location filename="../main_window.py" line="2358" />
             <source>Screenshot processing: %1/%2</source>
             <translation>Procesamiento de captura de pantalla: %1/%2</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2333" />
+            <location filename="../main_window.py" line="2378" />
             <source>Screenshot processing completed: %1 files processed</source>
             <translation>Procesamiento de captura de pantalla completado: %1 archivos procesados</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2348" />
+            <location filename="../main_window.py" line="2393" />
             <source>Data import finished!</source>
             <translation>¡Importación de datos finalizada!</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2373" />
+            <location filename="../main_window.py" line="2418" />
             <source>Screenshot processing error: %1</source>
             <translation>Error de procesamiento de captura de pantalla: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2384" />
+            <location filename="../main_window.py" line="2429" />
             <source>Combined import stopped due to screenshot processing error.</source>
             <translation>La importación combinada se detuvo debido a un error en el procesamiento de la captura de pantalla.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2391" />
+            <location filename="../main_window.py" line="2436" />
             <source>Screenshot processing finished</source>
             <translation>Procesamiento de captura de pantalla finalizado</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2424" />
+            <location filename="../main_window.py" line="2469" />
             <source>Missing Screenshot Data</source>
             <translation>Faltan datos de captura de pantalla</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2425" />
+            <location filename="../main_window.py" line="2470" />
             <source>No screenshot records found in database. Please import a CSV file first (File -&gt; Import CSV) before processing screenshots. Alternatively, go to File -&gt; Preferences and verify all paths are correct.</source>
             <translation>No se encontraron registros de capturas de pantalla en la base de datos. Importe primero un archivo CSV (Archivo -&amp;gt; Importar CSV) antes de procesar las capturas de pantalla. También puede ir a Archivo -&amp;gt; Preferencias y verificar que todas las rutas sean correctas.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2432" />
+            <location filename="../main_window.py" line="2477" />
             <source>Aborted screenshot processing: No screenshot records in database</source>
             <translation>Procesamiento de captura de pantalla cancelado: no hay registros de captura de pantalla en la base de datos</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2441" />
+            <location filename="../main_window.py" line="2486" />
             <source>Error checking card count: %1</source>
             <translation>Error al verificar el recuento de tarjetas: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2456" />
+            <location filename="../main_window.py" line="2501" />
             <source>Screenshot processing completed</source>
             <translation>Procesamiento de captura de pantalla completado</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2458" />
+            <location filename="../main_window.py" line="2503" />
             <source>Screenshot processing cancelled</source>
             <translation>Procesamiento de captura de pantalla cancelado</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2466" />
+            <location filename="../main_window.py" line="2511" />
             <source>Error processing screenshots: %1</source>
             <translation>Error al procesar capturas de pantalla: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2472" />
+            <location filename="../main_window.py" line="2517" />
             <source>Starting background screenshot processing...</source>
             <translation>Iniciando procesamiento de captura de pantalla en segundo plano...</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2481" />
+            <location filename="../main_window.py" line="2526" />
             <source>Screenshot Processing: %1</source>
             <translation>Procesamiento de captura de pantalla: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2526" />
+            <location filename="../main_window.py" line="2571" />
             <source>Screenshot processing started in background</source>
             <translation>El procesamiento de captura de pantalla se inició en segundo plano.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2532" />
+            <location filename="../main_window.py" line="2577" />
             <source>Error starting screenshot processing: %1</source>
             <translation>Error al iniciar el procesamiento de captura de pantalla: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2541" />
+            <location filename="../main_window.py" line="2586" />
             <source>Downloading card art</source>
             <translation>Descargando arte de tarjeta</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2558" />
+            <location filename="../main_window.py" line="2603" />
             <source>Card art download complete: %1 images saved</source>
             <translation>Descarga del arte de la tarjeta completa: %1 imágenes guardadas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2565" />
+            <location filename="../main_window.py" line="2610" />
             <source>Card art download complete</source>
             <translation>Descarga del arte de la tarjeta completa</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2571" />
+            <location filename="../main_window.py" line="2616" />
             <source>Card art download error: %1</source>
             <translation>Error de descarga del arte de la tarjeta: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2605" />
+            <location filename="../main_window.py" line="2650" />
             <source>Error showing about dialog: %1</source>
             <translation>Error al mostrar acerca del diálogo: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2618" />
+            <location filename="../main_window.py" line="2663" />
             <source>Error showing preferences dialog: %1</source>
             <translation>Error al mostrar el cuadro de diálogo de preferencias: %1</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2640" />
+            <location filename="../main_window.py" line="2685" />
             <source>Closing application. Cleaning up... this may take a moment.</source>
             <translation>Cierre de solicitud. Limpiar... esto puede llevar un momento.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2728" />
+            <location filename="../main_window.py" line="2773" />
             <source>No Removed Cards</source>
             <translation>Sin tarjetas eliminadas</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2728" />
+            <location filename="../main_window.py" line="2773" />
             <source>No cards to process.</source>
             <translation>No hay tarjetas para procesar.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2733" />
+            <location filename="../main_window.py" line="2778" />
             <source>Process Removed Cards?</source>
             <translation>¿Procesar tarjetas retiradas?</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2735" />
+            <location filename="../main_window.py" line="2780" />
             <source>This will process &lt;b&gt;%1&lt;/b&gt; recorded card removals from the database.&lt;br&gt;&lt;br&gt;This is useful if you have re-imported screenshots that might have brought back cards you previously removed.</source>
             <translation>Esto procesará &lt;b&gt;%1&lt;/b&gt; eliminaciones de tarjetas registradas de la base de datos.&lt;br&gt;&lt;br&gt;Esto es útil si has vuelto a importar capturas de pantalla que podrían haber recuperado tarjetas que eliminaste anteriormente.</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2763" />
+            <location filename="../main_window.py" line="2808" />
             <source>Process Complete</source>
             <translation>Proceso completo</translation>
         </message>
         <message>
-            <location filename="../main_window.py" line="2764" />
+            <location filename="../main_window.py" line="2809" />
             <source>Processed %1 records. %2 cards were actually found and removed.</source>
             <translation>%1 registros procesados. En realidad, se encontraron y eliminaron %2 tarjetas.</translation>
         </message>
