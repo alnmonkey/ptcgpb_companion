@@ -149,7 +149,7 @@ def build_cards(use_snapshot: bool) -> list[C]:
 
 def write_names(cards: list[C]) -> None:
     set2factory: Callable[[CardSet], str] = lambda s_id: (
-        s_id.label.lower().replace(" ", "_").replace("-", "_")
+        s_id.label.lower().replace(" ", "_").replace("-", "_").replace("'", "")
     )
 
     names_path = REPO_ROOT / "app" / "names.py"

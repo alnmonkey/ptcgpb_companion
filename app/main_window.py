@@ -1923,6 +1923,7 @@ class MainWindow(QMainWindow):
             # Update specific task status
             for task in self.processing_tasks:
                 if task["task_id"] == task_id:
+                    status_changed = bool(status) and task.get("status") != status
                     if status:
                         task["status"] = status
 
@@ -1950,8 +1951,8 @@ class MainWindow(QMainWindow):
                                 )
                                 break
 
-                    # Log status change if status provided
-                    if status:
+                    # Log only actual status transitions
+                    if status_changed:
                         logger.info(f"Task {task_id} status changed to {status}")
 
                     break
